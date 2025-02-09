@@ -17,6 +17,11 @@ namespace Data.Entities
 		//unique
 		public String Key { get; set; } = default!;
 
+		[Column(TypeName = "VARCHAR(5000)")]
 		public String? Description { get; set; }
+
+		public ICollection<Platform> Platforms { get; set; } = new List<Platform>();
+
+		public ICollection<Genre> Genres { get; set; } = new List<Genre>();
 	}
 }

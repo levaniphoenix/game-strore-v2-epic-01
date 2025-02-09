@@ -29,7 +29,7 @@ namespace Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("VARCHAR(5000)");
 
                     b.Property<string>("Key")
                         .IsRequired()
@@ -50,36 +50,6 @@ namespace Data.Migrations
                     b.ToTable("Games");
                 });
 
-            modelBuilder.Entity("Data.Entities.GameGenre", b =>
-                {
-                    b.Property<Guid>("GameId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("GenreId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("GameId", "GenreId");
-
-                    b.HasIndex("GenreId");
-
-                    b.ToTable("GameGenre");
-                });
-
-            modelBuilder.Entity("Data.Entities.GamePlatform", b =>
-                {
-                    b.Property<Guid>("GameId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PlatformId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("GameId", "PlatformId");
-
-                    b.HasIndex("PlatformId");
-
-                    b.ToTable("GamePlatform");
-                });
-
             modelBuilder.Entity("Data.Entities.Genre", b =>
                 {
                     b.Property<Guid>("Id")
@@ -88,7 +58,7 @@ namespace Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("VARCHAR(50)");
 
                     b.Property<Guid?>("ParentGenreId")
                         .HasColumnType("uniqueidentifier");
@@ -98,93 +68,95 @@ namespace Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Genre");
+                    b.HasIndex("ParentGenreId");
+
+                    b.ToTable("Genres");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("000a57c3-3871-483c-8bd1-7e04d59fba81"),
+                            Id = new Guid("056341d2-838e-40f3-b3ea-6c64c50922d2"),
                             Name = "Strategy"
                         },
                         new
                         {
-                            Id = new Guid("63499d64-2baf-4b14-a56b-f5065bab8173"),
+                            Id = new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa"),
                             Name = "Sports Races"
                         },
                         new
                         {
-                            Id = new Guid("2dcac868-4939-4370-907a-1cfb78194a2c"),
+                            Id = new Guid("81cbf5ee-fb01-412a-97cd-79bf741b5220"),
                             Name = "Action"
                         },
                         new
                         {
-                            Id = new Guid("876808bc-5a87-464f-8210-cf922a517505"),
+                            Id = new Guid("d4420df2-0630-4783-a203-2ff20a0bb388"),
                             Name = "Adventure"
                         },
                         new
                         {
-                            Id = new Guid("9af09bc8-14ec-4278-9a63-550020252018"),
+                            Id = new Guid("e5a464d8-2bfc-41bc-8bba-e2efbc028231"),
                             Name = "Skill"
                         },
                         new
                         {
-                            Id = new Guid("13e1dbfe-c785-4e16-84aa-3f0a3b8a7cf0"),
+                            Id = new Guid("44d96f8e-7ae8-4f21-a836-8d2f018da989"),
                             Name = "RTS",
-                            ParentGenreId = new Guid("000a57c3-3871-483c-8bd1-7e04d59fba81")
+                            ParentGenreId = new Guid("056341d2-838e-40f3-b3ea-6c64c50922d2")
                         },
                         new
                         {
-                            Id = new Guid("86ee6cf7-5ac3-4e1a-abba-d9e491e4c8a7"),
+                            Id = new Guid("74db4762-d154-4d64-97d4-33ae1518fe83"),
                             Name = "TBS",
-                            ParentGenreId = new Guid("000a57c3-3871-483c-8bd1-7e04d59fba81")
+                            ParentGenreId = new Guid("056341d2-838e-40f3-b3ea-6c64c50922d2")
                         },
                         new
                         {
-                            Id = new Guid("00b5aa22-fca4-458c-b2fe-0ca9c41d111a"),
+                            Id = new Guid("1b433802-d162-4a34-92f0-1cedc54f5788"),
                             Name = "RPG",
-                            ParentGenreId = new Guid("000a57c3-3871-483c-8bd1-7e04d59fba81")
+                            ParentGenreId = new Guid("056341d2-838e-40f3-b3ea-6c64c50922d2")
                         },
                         new
                         {
-                            Id = new Guid("9e2864a4-de70-4edc-855a-7b0cac706d8d"),
+                            Id = new Guid("a448d817-2740-4a88-a36a-f7e3f9aa1ce1"),
                             Name = "Rally",
-                            ParentGenreId = new Guid("63499d64-2baf-4b14-a56b-f5065bab8173")
+                            ParentGenreId = new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa")
                         },
                         new
                         {
-                            Id = new Guid("bba0aa30-9568-4320-b4f5-bdec42cd37ba"),
+                            Id = new Guid("8669663c-4678-40e9-8f37-ddd4465a9cf9"),
                             Name = "Arcade",
-                            ParentGenreId = new Guid("63499d64-2baf-4b14-a56b-f5065bab8173")
+                            ParentGenreId = new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa")
                         },
                         new
                         {
-                            Id = new Guid("485fd6ed-83b7-4e68-a764-bfe3b11b09de"),
+                            Id = new Guid("28e19936-9787-4ee9-8361-d1698515563a"),
                             Name = "Formula",
-                            ParentGenreId = new Guid("63499d64-2baf-4b14-a56b-f5065bab8173")
+                            ParentGenreId = new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa")
                         },
                         new
                         {
-                            Id = new Guid("0703e73d-b472-455c-9f00-447656157658"),
+                            Id = new Guid("7379c31b-3085-43af-afee-d004f19df8b1"),
                             Name = "Off-road",
-                            ParentGenreId = new Guid("63499d64-2baf-4b14-a56b-f5065bab8173")
+                            ParentGenreId = new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa")
                         },
                         new
                         {
-                            Id = new Guid("59842c6a-03c1-474c-b6d7-0887d4f4a847"),
+                            Id = new Guid("3d3179bd-c77b-4d04-8e9b-5e38186ca7e7"),
                             Name = "FPS",
-                            ParentGenreId = new Guid("2dcac868-4939-4370-907a-1cfb78194a2c")
+                            ParentGenreId = new Guid("81cbf5ee-fb01-412a-97cd-79bf741b5220")
                         },
                         new
                         {
-                            Id = new Guid("27ac08bb-d4ff-43cb-be3a-1ce734803b00"),
+                            Id = new Guid("57f45cec-c522-4c29-a802-ee93f33b2cff"),
                             Name = "TPS",
-                            ParentGenreId = new Guid("2dcac868-4939-4370-907a-1cfb78194a2c")
+                            ParentGenreId = new Guid("81cbf5ee-fb01-412a-97cd-79bf741b5220")
                         },
                         new
                         {
-                            Id = new Guid("212673fe-09d4-4277-b0ad-2ee9f1e36408"),
+                            Id = new Guid("a3877603-c23a-410b-8193-d6acc78b98d1"),
                             Name = "Puzzle",
-                            ParentGenreId = new Guid("876808bc-5a87-464f-8210-cf922a517505")
+                            ParentGenreId = new Guid("d4420df2-0630-4783-a203-2ff20a0bb388")
                         });
                 });
 
@@ -203,67 +175,103 @@ namespace Data.Migrations
                     b.HasIndex("Type")
                         .IsUnique();
 
-                    b.ToTable("Platform");
+                    b.ToTable("Platforms");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("bc3da320-db42-4b46-9d92-5c59c6cea5d4"),
+                            Id = new Guid("a6b26716-5b71-46f7-b2f8-a19c0dd573c6"),
                             Type = "Mobile"
                         },
                         new
                         {
-                            Id = new Guid("71115c91-409c-433c-8093-b0284d5620a8"),
+                            Id = new Guid("fd1daa9a-6e5b-4d16-9b4e-9890f6247fdf"),
                             Type = "Browser"
                         },
                         new
                         {
-                            Id = new Guid("a41ab438-23d9-4523-9691-94db7efc95e6"),
+                            Id = new Guid("64d99402-5850-42b1-ba04-659c2c56afa2"),
                             Type = "Desktop"
                         },
                         new
                         {
-                            Id = new Guid("ad559831-3ac5-43ed-b4aa-8cddc790bc98"),
+                            Id = new Guid("5d20764d-94a4-4c8b-b2e3-abef4cd84b2c"),
                             Type = "Console"
                         });
                 });
 
-            modelBuilder.Entity("Data.Entities.GameGenre", b =>
+            modelBuilder.Entity("GameGenre", b =>
                 {
-                    b.HasOne("Data.Entities.Game", "Game")
-                        .WithMany()
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("GamesId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasOne("Data.Entities.Genre", "Genre")
-                        .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("GenresId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("Game");
+                    b.HasKey("GamesId", "GenresId");
 
-                    b.Navigation("Genre");
+                    b.HasIndex("GenresId");
+
+                    b.ToTable("GameGenre");
                 });
 
-            modelBuilder.Entity("Data.Entities.GamePlatform", b =>
+            modelBuilder.Entity("GamePlatform", b =>
                 {
-                    b.HasOne("Data.Entities.Game", "Game")
+                    b.Property<Guid>("GamesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("GamesId", "PlatformsId");
+
+                    b.HasIndex("PlatformsId");
+
+                    b.ToTable("GamePlatforms", (string)null);
+                });
+
+            modelBuilder.Entity("Data.Entities.Genre", b =>
+                {
+                    b.HasOne("Data.Entities.Genre", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentGenreId");
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("GameGenre", b =>
+                {
+                    b.HasOne("Data.Entities.Game", null)
                         .WithMany()
-                        .HasForeignKey("GameId")
+                        .HasForeignKey("GamesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Data.Entities.Platform", "Platform")
+                    b.HasOne("Data.Entities.Genre", null)
                         .WithMany()
-                        .HasForeignKey("PlatformId")
+                        .HasForeignKey("GenresId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GamePlatform", b =>
+                {
+                    b.HasOne("Data.Entities.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GamesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Game");
+                    b.HasOne("Data.Entities.Platform", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Navigation("Platform");
+            modelBuilder.Entity("Data.Entities.Genre", b =>
+                {
+                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }

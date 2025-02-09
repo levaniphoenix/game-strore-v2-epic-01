@@ -12,23 +12,24 @@ namespace Data.Data
 		public DbSet<Game> Games { get; set; } = default!;
 		public DbSet<Genre> Genres { get; set; } = default!;
 		public DbSet<Platform> Platforms { get; set; } = default!;
-		public DbSet<GameGenre> GameGenres { get; set; } = default!;
-		public DbSet<GamePlatform> GamePlatforms { get; set; } = default!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Game>().HasIndex(g => g.Key).IsUnique();
-			modelBuilder.Entity<Game>().HasIndex(g => g.Name).IsUnique();
+			modelBuilder.Entity<Game>().HasIndex(g => g.Name).IsUnique(true);
+			modelBuilder.Entity<Game>()
+				.HasMany(e => e.Platforms)
+				.WithMany(e => e.Games)
+				.UsingEntity(j => j.ToTable("GamePlatforms"));
 
-			modelBuilder.Entity<Genre>().HasIndex(g => g.Name).IsUnique();
+			modelBuilder.Entity<Genre>()
+				.HasOne(e => e.Parent)
+				.WithMany(e => e.Children)
+				.HasForeignKey(e => e.ParentGenreId);
 
-			modelBuilder.Entity<Platform>().HasIndex(p => p.Type).IsUnique();
+			modelBuilder.Entity<Genre>().HasIndex(g => g.Name).IsUnique(true);
 
-			//Game-Genre combinations are unique.
-			modelBuilder.Entity<GameGenre>().HasKey(gg => new { gg.GameId, gg.GenreId });
-
-			//Game-Platform combinations are unique.
-			modelBuilder.Entity<GamePlatform>().HasKey(gp => new { gp.GameId, gp.PlatformId });
+			modelBuilder.Entity<Platform>().HasIndex(p => p.Type).IsUnique(true);
 
 			seed(modelBuilder);
 		}

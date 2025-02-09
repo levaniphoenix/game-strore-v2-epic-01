@@ -12,5 +12,7 @@ namespace Data.Entities
 		[Column(TypeName = "VARCHAR(100)")]
 		//unique
 		public String Type { get; set; } = default!;
+
+		public ICollection<Game> Games { get; set; } = new List<Game>();
 	}
 }
