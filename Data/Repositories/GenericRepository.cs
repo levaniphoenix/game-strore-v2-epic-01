@@ -5,12 +5,12 @@ using System.Linq.Expressions;
 
 namespace Data.Repositories
 {
-	public class GenericRepository<TEntity>: IRepository<TEntity> where TEntity: class
+	public abstract class GenericRepository<TEntity>: IRepository<TEntity> where TEntity: class
 	{
 		internal GamestoreDBContext context;
 		internal DbSet<TEntity> dbSet;
 
-		public GenericRepository(GamestoreDBContext context)
+		protected GenericRepository(GamestoreDBContext context)
 		{
 			this.context = context;
 			this.dbSet = context.Set<TEntity>();
