@@ -1,8 +1,8 @@
-﻿using Data.Entities;
+﻿using Business.Models;
 
 namespace Business.Interfaces
 {
-	internal interface IGenreService : ICrud<Genre>
+	public interface IGenreService : ICrud<GenreModel>
 	{
 	}
 }

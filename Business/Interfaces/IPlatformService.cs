@@ -1,8 +1,8 @@
-using Data.Entities;
+using Business.Models;
 
 namespace Business.Interfaces
 {
-    public interface IPlatformService : ICrud<Platform>
+    public interface IPlatformService : ICrud<PlatformModel>
     {
     }
 }

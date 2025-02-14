@@ -1,8 +1,8 @@
-﻿using Data.Entities;
+﻿using Business.Models;
 
 namespace Business.Interfaces
 {
-	public interface IGameService : ICrud<Game>
+	public interface IGameService : ICrud<GameModel>
 	{
 	}
 }

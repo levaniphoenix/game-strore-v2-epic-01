@@ -1,4 +1,6 @@
-﻿using Business.Interfaces;
+﻿using AutoMapper;
+using Business.Interfaces;
+using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
 
@@ -8,14 +10,18 @@ namespace Business.Services
 	{
 		private readonly IUnitOfWork unitOfWork;
 
-		public PlatformService(IUnitOfWork unitOfWork)
+		private IMapper mapper { get; }
+
+		public PlatformService(IUnitOfWork unitOfWork, IMapper mapper)
 		{
 			this.unitOfWork = unitOfWork;
+			this.mapper = mapper;
 		}
 
-		public async Task AddAsync(Platform model)
+		public async Task AddAsync(PlatformModel model)
 		{
-			await unitOfWork.PlatformRepository!.AddAsync(model);
+			var platform = mapper.Map<Platform>(model);
+			await unitOfWork.PlatformRepository!.AddAsync(platform);
 		}
 
 		public async Task DeleteAsync(object modelId)
@@ -23,19 +29,22 @@ namespace Business.Services
 			await unitOfWork.PlatformRepository!.DeleteByIdAsync(modelId);
 		}
 
-		public async Task<IEnumerable<Platform>>GetAllAsync()
+		public async Task<IEnumerable<PlatformModel>>GetAllAsync()
 		{
-			return await unitOfWork.PlatformRepository!.GetAllAsync();
+			var platforms = await unitOfWork.PlatformRepository!.GetAllAsync();
+			return mapper.Map<IEnumerable<PlatformModel>>(platforms);
 		}
 
-		public async Task<Platform?> GetByIdAsync(object id)
+		public async Task<PlatformModel?> GetByIdAsync(object id)
 		{
-			return await unitOfWork.PlatformRepository!.GetByIDAsync(id);
+			var platform = await unitOfWork.PlatformRepository!.GetByIDAsync(id);
+			return mapper.Map<PlatformModel?>(platform);
 		}
 
-		public Task UpdateAsync(Platform model)
+		public Task UpdateAsync(PlatformModel model)
 		{
-			unitOfWork.PlatformRepository!.Update(model);
+			var platform = mapper.Map<Platform>(model);
+			unitOfWork.PlatformRepository!.Update(platform);
 			return Task.CompletedTask;
 		}
 	}

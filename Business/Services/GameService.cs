@@ -1,4 +1,6 @@
-﻿using Business.Interfaces;
+﻿using AutoMapper;
+using Business.Interfaces;
+using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
 
@@ -8,15 +10,21 @@ namespace Business.Services
 	{
 		private readonly IUnitOfWork unitOfWork;
 
-		public GameService(IUnitOfWork unitOfWork)
+		private IMapper mapper { get; }
+
+		public GameService(IUnitOfWork unitOfWork, IMapper mapper)
 		{
+			this.mapper = mapper;
 			this.unitOfWork = unitOfWork;
 		}
 
-		public async Task AddAsync(Game model)
+		public async Task AddAsync(GameModel model)
 		{
 			if(model == null) throw new ArgumentNullException(nameof(model));
-			await unitOfWork.GameRepository!.AddAsync(model);
+			
+			var game = mapper.Map<Game>(model);
+
+			await unitOfWork.GameRepository!.AddAsync(game);
 			await unitOfWork.SaveAsync();
 		}
 
@@ -26,21 +34,24 @@ namespace Business.Services
 			await unitOfWork.SaveAsync();
 		}
 
-		public async Task<IEnumerable<Game>> GetAllAsync()
+		public async Task<IEnumerable<GameModel>> GetAllAsync()
 		{
-			return await unitOfWork.GameRepository!.GetAllAsync();
+			var games = await unitOfWork.GameRepository!.GetAllAsync();
+			return mapper.Map<IEnumerable<GameModel>>(games);
 		}
 
-		public async Task<Game?> GetByIdAsync(object id)
+		public async Task<GameModel?> GetByIdAsync(object id)
 		{
 			if (id == null) throw new ArgumentNullException(nameof(id));
-			return await unitOfWork.GameRepository!.GetByIDAsync(id);
+			var game = await unitOfWork.GameRepository!.GetByIDAsync(id);
+			return mapper.Map<GameModel?>(game);
 		}
 
-		public Task UpdateAsync(Game model)
+		public Task UpdateAsync(GameModel model)
 		{
 			if (model == null) throw new ArgumentNullException(nameof(model));
-			unitOfWork.GameRepository!.Update(model);
+			var game = mapper.Map<Game>(model);
+			unitOfWork.GameRepository!.Update(game);
 			return Task.CompletedTask;
 		}
 	}

@@ -1,4 +1,6 @@
-﻿using Business.Interfaces;
+﻿using AutoMapper;
+using Business.Interfaces;
+using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
 
@@ -8,14 +10,18 @@ namespace Business.Services
 	{
 		private readonly IUnitOfWork unitOfWork;
 
-		public GenreService(IUnitOfWork unitOfWork)
+		private IMapper mapper { get; }
+
+		public GenreService(IUnitOfWork unitOfWork, IMapper mapper)
 		{
 			this.unitOfWork = unitOfWork;
+			this.mapper = mapper;
 		}
 
-		public async Task AddAsync(Genre model)
+		public async Task AddAsync(GenreModel model)
 		{
-			await unitOfWork.GenreRepository!.AddAsync(model);
+			var genre = mapper.Map<Genre>(model);
+			await unitOfWork.GenreRepository!.AddAsync(genre);
 		}
 
 		public async Task DeleteAsync(object modelId)
@@ -23,19 +29,22 @@ namespace Business.Services
 			await unitOfWork.GenreRepository!.DeleteByIdAsync(modelId);
 		}
 
-		public async Task<IEnumerable<Genre>> GetAllAsync()
+		public async Task<IEnumerable<GenreModel>> GetAllAsync()
 		{
-			return await unitOfWork.GenreRepository!.GetAllAsync();
+			var genres = await unitOfWork.GenreRepository!.GetAllAsync();
+			return mapper.Map<IEnumerable<GenreModel>>(genres);
 		}
 
-		public async Task<Genre?> GetByIdAsync(object id)
+		public async Task<GenreModel?> GetByIdAsync(object id)
 		{
-			return await unitOfWork.GenreRepository!.GetByIDAsync(id);
+			var genre = await unitOfWork.GenreRepository!.GetByIDAsync(id);
+			return mapper.Map<GenreModel?>(genre);
 		}
 
-		public Task UpdateAsync(Genre model)
+		public Task UpdateAsync(GenreModel model)
 		{
-			unitOfWork.GenreRepository!.Update(model);
+			var genre = mapper.Map<Genre>(model);
+			unitOfWork.GenreRepository!.Update(genre);
 			return Task.CompletedTask;
 		}
 	}
