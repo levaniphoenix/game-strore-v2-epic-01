@@ -22,7 +22,7 @@ namespace Data.Data
 			{
 				if (this.gameRepository == null)
 				{
-					this.gameRepository = new GenericRepository<Game>(context);
+					this.gameRepository = new GameRepository(context);
 				}
 				return gameRepository;
 			}
@@ -33,7 +33,7 @@ namespace Data.Data
 			{
 				if (this.platformRepository == null)
 				{
-					this.platformRepository = new GenericRepository<Platform>(context);
+					this.platformRepository = new PlatformRepository(context);
 				}
 				return platformRepository;
 			}
@@ -44,7 +44,7 @@ namespace Data.Data
 			{
 				if (this.genreRepository == null)
 				{
-					this.genreRepository = new GenericRepository<Genre>(context);
+					this.genreRepository = new GenreRepository(context);
 				}
 				return genreRepository;
 			}

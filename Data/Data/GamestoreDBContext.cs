@@ -20,7 +20,30 @@ namespace Data.Data
 			modelBuilder.Entity<Game>()
 				.HasMany(e => e.Platforms)
 				.WithMany(e => e.Games)
-				.UsingEntity(j => j.ToTable("GamePlatforms"));
+				.UsingEntity<GamePlatform>(
+					j => j
+						.HasOne(e => e.Platform)
+						.WithMany()
+						.HasForeignKey(e => e.PlatformId),
+					j => j
+						.HasOne(e => e.Game)
+						.WithMany()
+						.HasForeignKey(e => e.GameId)
+				);
+
+			modelBuilder.Entity<Game>()
+				.HasMany(e => e.Genres)
+				.WithMany(e => e.Games)
+				.UsingEntity<GameGenre>(
+					j => j
+						.HasOne(e => e.Genre)
+						.WithMany()
+						.HasForeignKey(e => e.GenreId),
+					j => j
+						.HasOne(e => e.Game)
+						.WithMany()
+						.HasForeignKey(e => e.GameId)
+				);
 
 			modelBuilder.Entity<Genre>()
 				.HasOne(e => e.Parent)
@@ -31,43 +54,13 @@ namespace Data.Data
 
 			modelBuilder.Entity<Platform>().HasIndex(p => p.Type).IsUnique(true);
 
-			seed(modelBuilder);
-		}
+			modelBuilder.Entity<GamePlatform>()
+				.HasKey(gp => new { gp.GameId, gp.PlatformId });
 
-		private static void seed(ModelBuilder modelBuilder)
-		{
-			modelBuilder.Entity<Platform>().HasData(
-				new Platform { Type = "Mobile" , Id = Guid.NewGuid() },
-				new Platform { Type = "Browser", Id = Guid.NewGuid() },
-				new Platform { Type = "Desktop", Id = Guid.NewGuid() },
-				new Platform { Type = "Console", Id = Guid.NewGuid() }
-				);
+			modelBuilder.Entity<GameGenre>()
+				.HasKey(gg => new { gg.GameId, gg.GenreId });
 
-			var genres = new Genre[]
-			{
-				new Genre { Name = "Strategy" , Id = Guid.NewGuid()},
-				new Genre { Name = "Sports Races", Id = Guid.NewGuid() },
-				new Genre { Name = "Action", Id = Guid.NewGuid() }, 
-				new Genre { Name = "Adventure", Id = Guid.NewGuid() },
-				new Genre { Name = "Skill", Id = Guid.NewGuid() }
-			};
-
-			var subGenres = new Genre[]
-			{
-				new Genre { Name = "RTS", ParentGenreId = genres[0].Id , Id = Guid.NewGuid()},
-				new Genre { Name = "TBS", ParentGenreId = genres[0].Id, Id = Guid.NewGuid() },
-				new Genre { Name = "RPG", ParentGenreId = genres[0].Id, Id = Guid.NewGuid() },
-				new Genre { Name = "Rally", ParentGenreId = genres[1].Id, Id = Guid.NewGuid() },
-				new Genre { Name = "Arcade", ParentGenreId = genres[1].Id, Id = Guid.NewGuid() },
-				new Genre { Name = "Formula", ParentGenreId = genres[1].Id, Id = Guid.NewGuid() },
-				new Genre { Name = "Off-road", ParentGenreId = genres[1].Id, Id = Guid.NewGuid() },
-				new Genre { Name = "FPS", ParentGenreId = genres[2].Id, Id = Guid.NewGuid() },
-				new Genre { Name = "TPS", ParentGenreId = genres[2].Id, Id = Guid.NewGuid() },
-				new Genre { Name = "Puzzle", ParentGenreId = genres[3].Id, Id = Guid.NewGuid() },
-			};
-
-			modelBuilder.Entity<Genre>().HasData(genres);
-			modelBuilder.Entity<Genre>().HasData(subGenres);
+			DBSeeder.seed(modelBuilder);
 		}
 	}
 }
