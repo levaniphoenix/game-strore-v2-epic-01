@@ -1,18 +1,36 @@
 ﻿using Data.Data;
 using Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore.Tests.DataTests
 {
 	[TestFixture]
 	public class GenreRepositoryTests
 	{
+		private GamestoreDBContext context;
+
+		[SetUp]
+		public void Setup()
+		{
+			context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
+			context.Database.OpenConnection();
+			context.Database.EnsureDeleted();
+			context.Database.EnsureCreated();
+		}
+
+		[TearDown]
+		public void Teardown()
+		{
+			context.Database.CloseConnection();
+			context.Dispose();
+		}
+
 		[Test]
 		public async Task GenreRepositoryGetAllReturnsAllValues()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.genres.Concat(UnitTestHelper.subGenres);
+			var expected = DBSeeder.Genres;
 			//act
 			var result = await unitOfWork.GenreRepository.GetAllAsync();
 			//assert
@@ -24,9 +42,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GenreRepositoryGetByIDReturnsSingleValue(int i)
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.genres[i];
+			var expected = DBSeeder.Genres[i];
 			//act
 			var result = await unitOfWork.GenreRepository.GetByIDAsync(expected.Id);
 			//assert
@@ -37,9 +54,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GenreRepositoryGetAllByNameReturnsSingleValue()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.genres[0];
+			var expected = DBSeeder.Genres[0];
 			//act
 			var result = await unitOfWork.GenreRepository.GetAllAsync(g => g.Name == expected.Name);
 			//assert
@@ -51,7 +67,6 @@ namespace Gamestore.Tests.DataTests
 		public async Task GenreRepositoryAddAsyncAddsValueToDatabase()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
 			var expected = new Genre { Name = "Testing Genre", Id = Guid.NewGuid() };
 			//act
@@ -66,9 +81,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GenreRepositoryDeleteRemovesSingleValue()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.genres[0];
+			var expected = DBSeeder.Genres[0];
 			//act
 			unitOfWork.GenreRepository.Delete(expected);
 			await unitOfWork.SaveAsync();
@@ -81,9 +95,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GenreRepositoryDeleteByIdAsyncRemovesSingleValue()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.genres[0];
+			var expected = DBSeeder.Genres[0];
 			//act
 			await unitOfWork.GenreRepository.DeleteByIdAsync(expected.Id);
 			await unitOfWork.SaveAsync();
@@ -96,9 +109,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GenreRepositoryUpdateUpdatesValueInDatabase()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var genre = UnitTestHelper.genres[0];
+			var genre = DBSeeder.Genres[0];
 			genre.Name = "Updated Genre";
 			//act
 			unitOfWork.GenreRepository.Update(genre);

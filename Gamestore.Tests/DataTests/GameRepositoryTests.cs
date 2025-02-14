@@ -1,21 +1,39 @@
 ﻿using Data.Data;
 using Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore.Tests.DataTests
 {
 	[TestFixture]
 	public class GameRepositoryTests
 	{
+		private GamestoreDBContext context;
+
+		[SetUp]
+		public void Setup()
+		{
+			context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
+			context.Database.OpenConnection();
+			context.Database.EnsureDeleted();
+			context.Database.EnsureCreated();
+		}
+
+		[TearDown]
+		public void Teardown()
+		{
+			context.Database.CloseConnection();
+			context.Dispose();
+		}
+
 		[TestCase(0)]
 		[TestCase(1)]
 		[TestCase(2)]
 		public async Task GameRepositoryGetByIDReturnsSingleValue(int i)
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
 
-			var expected = UnitTestHelper.games[i];
+			var expected = DBSeeder.Games[i];
 
 			//act
 			var result = await unitOfWork.GameRepository.GetByIDAsync(expected.Id);
@@ -30,10 +48,9 @@ namespace Gamestore.Tests.DataTests
 		public async Task GameRepositoryGetByKeyReturnsSingleValue(int i)
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
 
-			var expected = UnitTestHelper.games[i];
+			var expected = DBSeeder.Games[i];
 
 			//act
 			var result = await unitOfWork.GameRepository.GetAllAsync(g => g.Key == expected.Key);
@@ -47,9 +64,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GameRepositoryGetAllReturnsAllValues()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.games;
+			var expected = DBSeeder.Games;
 			//act
 			var result = await unitOfWork.GameRepository.GetAllAsync();
 			//assert
@@ -61,7 +77,6 @@ namespace Gamestore.Tests.DataTests
 		public async Task GameRepositoryAddAsyncAddsValueToDatabase()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
 
 			var game = new Game
@@ -86,9 +101,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GameRepositoryUpdateAsyncUpdatesValueInDatabase()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var game = UnitTestHelper.games[0];
+			var game = DBSeeder.Games[0];
 			game.Name = "Updated Game";
 			//act
 			unitOfWork.GameRepository.Update(game);
@@ -102,9 +116,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GameRepositoryDeleteAsyncRemovesValueFromDatabase()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var game = UnitTestHelper.games[0];
+			var game = DBSeeder.Games[0];
 			//act
 			unitOfWork.GameRepository.Delete(game);
 			await unitOfWork.SaveAsync();
@@ -117,9 +130,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task GameRepositoryDeleteByIdAsyncRemovesValueFromDatabase()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var game = UnitTestHelper.games[0];
+			var game = DBSeeder.Games[0];
 			//act
 			await unitOfWork.GameRepository.DeleteByIdAsync(game.Id);
 			await unitOfWork.SaveAsync();
@@ -132,12 +144,21 @@ namespace Gamestore.Tests.DataTests
 		public async Task GameRepositoryGetAllWithIncludeReturnsAllValuesWithIncludedProperties()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.games;
+			var expected = DBSeeder.Games;
+			
+			var expectedGenres = from gg in DBSeeder.GameGenres
+								 join genre in DBSeeder.Genres on gg.GenreId equals genre.Id
+								 join game in DBSeeder.Games on gg.GameId equals game.Id
+								 orderby genre.Id
+								 select genre;
 
-			var expectedPlatforms = expected.SelectMany(i => i.Platforms).OrderBy(i => i.Id);
-			var expectedGenres = expected.SelectMany(i => i.Genres).OrderBy(i => i.Id);
+			var expectedPlatforms = from gp in DBSeeder.GamePlatforms
+								 join p in DBSeeder.Platforms on gp.PlatformId equals p.Id
+								 join g in DBSeeder.Games on gp.GameId equals g.Id
+								 orderby p.Id
+								 select p;
+
 			//act
 			var result = await unitOfWork.GameRepository.GetAllAsync(includeProperties: "Platforms,Genres");
 			//assert
@@ -146,7 +167,7 @@ namespace Gamestore.Tests.DataTests
 				Is.EqualTo(expectedPlatforms).Using(new PlatformEqualityComparer()), message: "GetAllAsync does not return inclided entities");
 
 			Assert.That(result.SelectMany(i => i.Genres).OrderBy(i => i.Id),
-				Is.EqualTo(expectedGenres).Using(new GenreEqualityComparer()), message: "GetAllAsync does not return inclided entities");
+				Is.EqualTo(expectedGenres).Using(new GenreEqualityComparer()), message: "GetAllAsync does not return included entities");
 
 			Assert.That(result, Is.EquivalentTo(expected).Using(new GameEqualityComparer()), message: "GetAllAsync does not work");
 		}

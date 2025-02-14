@@ -1,5 +1,6 @@
 ﻿using Data.Data;
 using Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore.Tests.DataTests
 {
@@ -7,13 +8,30 @@ namespace Gamestore.Tests.DataTests
 	public class PlatformRepositoryTests
 	{
 
+		private GamestoreDBContext context;
+
+		[SetUp]
+		public void Setup()
+		{
+			context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
+			context.Database.OpenConnection();
+			context.Database.EnsureDeleted();
+			context.Database.EnsureCreated();
+		}
+
+		[TearDown]
+		public void Teardown()
+		{
+			context.Database.CloseConnection();
+			context.Dispose();
+		}
+
 		[Test]
 		public async Task PlatformRepositoryGetAllReturnsAllValues()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.platforms;
+			var expected = DBSeeder.Platforms;
 			//act
 			var result = await unitOfWork.PlatformRepository.GetAllAsync();
 			//assert
@@ -24,9 +42,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task PlatformRepositoryGetByIDReturnsSingleValue()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.platforms[0];
+			var expected = DBSeeder.Platforms[0];
 			//act
 			var result = await unitOfWork.PlatformRepository.GetByIDAsync(expected.Id);
 			//assert
@@ -37,9 +54,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task PlatformRepositoryGetByTypeReturnsSingleValue()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.platforms[0];
+			var expected = DBSeeder.Platforms[0];
 			//act
 			var result = await unitOfWork.PlatformRepository.GetAllAsync(g => g.Type == expected.Type);
 			//assert
@@ -51,7 +67,6 @@ namespace Gamestore.Tests.DataTests
 		public async Task PlatformRepositoryAddAsyncAddsSingleValue()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
 			var expected = new Platform { Type = "Mobile_Apple", Id = Guid.NewGuid() };
 			//act
@@ -66,9 +81,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task PlatformRepositoryDeleteAsyncRemovesSingleValue()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var expected = UnitTestHelper.platforms[0];
+			var expected = DBSeeder.Platforms[0];
 			//act
 			unitOfWork.PlatformRepository.Delete(expected);
 			await unitOfWork.SaveAsync();
@@ -81,9 +95,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task PlatformRepositoryUpdateAsyncUpdatesValueInDatabase()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var platform = UnitTestHelper.platforms[0];
+			var platform = DBSeeder.Platforms[0];
 			var expected = new Platform { Type = "Test", Id = platform.Id };
 			//act
 			unitOfWork.PlatformRepository.Update(expected);
@@ -97,9 +110,8 @@ namespace Gamestore.Tests.DataTests
 		public async Task PlatformRepositoryDeleteByIdRemovesValueFromDataBase()
 		{
 			// Arrange
-			using var context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
 			var unitOfWork = new UnitOfWork(context);
-			var platform = UnitTestHelper.platforms[0];
+			var platform = DBSeeder.Platforms[0];
 			//act
 			await unitOfWork.PlatformRepository.DeleteByIdAsync(platform.Id);
 			await unitOfWork.SaveAsync();
