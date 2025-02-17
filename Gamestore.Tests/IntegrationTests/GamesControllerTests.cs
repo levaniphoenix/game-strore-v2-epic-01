@@ -1,5 +1,7 @@
 ﻿using Business.Models;
+using Data.Data;
 using Data.Entities;
+using FluentAssertions;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -27,6 +29,9 @@ namespace Gamestore.Tests.IntegrationTests
 			response.EnsureSuccessStatusCode();
 			var stingResponse = await response.Content.ReadAsStringAsync();
 			var actual = JsonConvert.DeserializeObject<List<GameModel>>(stingResponse);
+
+			actual.Should().NotBeNullOrEmpty();
+			actual.Count.Should().Be(DBSeeder.Games.Length);
 		}
 
 		//[Test]
