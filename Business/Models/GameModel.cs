@@ -17,8 +17,8 @@ namespace Business.Models
 		[StringLength(5000)]
 		public string? Description { get; set; }
 
-		public ICollection<Guid> PlatformIds { get; set; } = new List<Guid>();
+		public ICollection<Guid>? PlatformIds { get; set; } = new List<Guid>();
 
-		public ICollection<Guid> GenreIds { get; set; } = new List<Guid>();
+		public ICollection<Guid>? GenreIds { get; set; } = new List<Guid>();
 	}
 }
