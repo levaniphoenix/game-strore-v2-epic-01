@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
 using Data.Entities;
@@ -20,6 +21,7 @@ namespace Business.Services
 
 		public async Task AddAsync(PlatformModel model)
 		{
+			await ValidatePlatform(model);
 			var platform = mapper.Map<Platform>(model);
 			await unitOfWork.PlatformRepository!.AddAsync(platform);
 		}
@@ -41,11 +43,18 @@ namespace Business.Services
 			return mapper.Map<PlatformModel?>(platform);
 		}
 
-		public Task UpdateAsync(PlatformModel model)
+		public async Task UpdateAsync(PlatformModel model)
 		{
+			await ValidatePlatform(model);
 			var platform = mapper.Map<Platform>(model);
 			unitOfWork.PlatformRepository!.Update(platform);
-			return Task.CompletedTask;
+		}
+
+		public async Task ValidatePlatform(PlatformModel model)
+		{
+			var existingPlatform = (await unitOfWork.PlatformRepository!.GetAllAsync(g => g.Type == model.Type)).Single();
+
+			if (existingPlatform is not null) throw new GameStoreException(ErrorMessages.PlatformTypeAlreadyExists);
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
 using Data.Entities;
@@ -20,6 +21,7 @@ namespace Business.Services
 
 		public async Task AddAsync(GenreModel model)
 		{
+			await ValidateGenre(model);
 			var genre = mapper.Map<Genre>(model);
 			await unitOfWork.GenreRepository!.AddAsync(genre);
 		}
@@ -41,11 +43,18 @@ namespace Business.Services
 			return mapper.Map<GenreModel?>(genre);
 		}
 
-		public Task UpdateAsync(GenreModel model)
+		public async Task UpdateAsync(GenreModel model)
 		{
+			await ValidateGenre(model);
 			var genre = mapper.Map<Genre>(model);
 			unitOfWork.GenreRepository!.Update(genre);
-			return Task.CompletedTask;
+		}
+
+		public async Task ValidateGenre(GenreModel model)
+		{
+			var existingGenre = (await unitOfWork.GenreRepository!.GetAllAsync(g => g.Name == model.Name)).Single();
+
+			if (existingGenre is not null) throw new GameStoreException(ErrorMessages.GenreNameAlreadyExists);
 		}
 	}
 

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Services
 {
@@ -22,8 +24,10 @@ namespace Business.Services
 		{
 			if(model == null) throw new ArgumentNullException(nameof(model));
 			
-			var game = mapper.Map<Game>(model);
+			await ValidateGame(model);
 
+			var game = mapper.Map<Game>(model);
+			game.Key = GenerateKey(model.Name);
 			await unitOfWork.GameRepository!.AddAsync(game);
 			await unitOfWork.SaveAsync();
 		}
@@ -47,12 +51,38 @@ namespace Business.Services
 			return mapper.Map<GameModel?>(game);
 		}
 
-		public Task UpdateAsync(GameModel model)
+		public async Task UpdateAsync(GameModel model)
 		{
 			if (model == null) throw new ArgumentNullException(nameof(model));
+			
+			await ValidateGame(model);
+
 			var game = mapper.Map<Game>(model);
+			game.Key = GenerateKey(model.Name);
 			unitOfWork.GameRepository!.Update(game);
-			return Task.CompletedTask;
+			await unitOfWork.SaveAsync();
+		}
+
+		public string GenerateKey(string gameName)
+		{
+			if(gameName.IsNullOrEmpty()) throw new ArgumentNullException(nameof(gameName));
+
+			var key = gameName.Split(" ").Select(s => s.ToUpperInvariant());
+
+			return string.Join("", key);
+		}
+
+		public async Task ValidateGame(GameModel model)
+		{
+			var existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == model.Name)).Single();
+
+			if (existingGame is not null) throw new GameStoreException(ErrorMessages.GameNameAlreadyExists);
+
+			var key = GenerateKey(model.Name);
+
+			existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).Single();
+
+			if (existingGame is not null) throw new GameStoreException(ErrorMessages.GameKeyAlreadyExists);
 		}
 	}
 }
