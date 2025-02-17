@@ -12,18 +12,13 @@ namespace Gamestore.Tests
 		{
 			//var options = new DbContextOptionsBuilder<GamestoreDBContext>()
 			//	.UseInMemoryDatabase(Guid.NewGuid().ToString())
-			//	.Options;
+			//	.Options
 
 			var options = new DbContextOptionsBuilder<GamestoreDBContext>()
 				.UseSqlite("Data Source=:memory:")
 				.Options;
 
 			return options;
-		}
-
-		public static void SeedData(GamestoreDBContext context)
-		{
-			context.SaveChanges();
 		}
 
 		public static IMapper CreateMapperProfile()

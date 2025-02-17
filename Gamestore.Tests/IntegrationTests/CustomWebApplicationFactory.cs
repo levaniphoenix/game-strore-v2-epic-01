@@ -22,13 +22,6 @@ namespace Gamestore.Tests.IntegrationTests
 					options.UseInMemoryDatabase(Guid.Empty.ToString());
 					options.UseInternalServiceProvider(serviceProvider);
 				});
-
-				using (var scope = services.BuildServiceProvider().CreateScope())
-				{
-					var context = scope.ServiceProvider.GetRequiredService<GamestoreDBContext>();
-
-					UnitTestHelper.SeedData(context);
-				}
 			});
 		}
 
