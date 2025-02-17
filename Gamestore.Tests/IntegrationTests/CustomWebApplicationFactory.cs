@@ -22,6 +22,14 @@ namespace Gamestore.Tests.IntegrationTests
 					options.UseInMemoryDatabase(Guid.Empty.ToString());
 					options.UseInternalServiceProvider(serviceProvider);
 				});
+
+				using (var scope = services.BuildServiceProvider().CreateScope())
+				{
+					var context = scope.ServiceProvider.GetRequiredService<GamestoreDBContext>();
+
+					SeedData(context);
+				}
+
 			});
 		}
 
@@ -42,6 +50,21 @@ namespace Gamestore.Tests.IntegrationTests
 			{
 				services.Remove(descriptor);
 			}
+		}
+
+		private static void SeedData(GamestoreDBContext context)
+		{
+			context.Genres.AddRange(DBSeeder.Genres);
+
+			context.Platforms.AddRange(DBSeeder.Platforms);
+
+			context.Games.AddRange(DBSeeder.Games);
+
+			context.GamePlatforms.AddRange(DBSeeder.GamePlatforms);
+
+			context.GameGenres.AddRange(DBSeeder.GameGenres);
+
+			context.SaveChanges();
 		}
 	}
 }

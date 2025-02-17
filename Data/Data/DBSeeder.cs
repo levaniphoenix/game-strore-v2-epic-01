@@ -21,7 +21,7 @@ namespace Data.Data
 
 		public static GameGenre[] GameGenres => gameGenres;
 
-		public static void seed(ModelBuilder modelBuilder)
+		public static void Seed(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Platform>().HasData(platforms);
 			modelBuilder.Entity<Genre>().HasData(genres);

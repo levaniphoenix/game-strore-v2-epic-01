@@ -12,6 +12,8 @@ namespace Data.Data
 		public DbSet<Game> Games { get; set; } = default!;
 		public DbSet<Genre> Genres { get; set; } = default!;
 		public DbSet<Platform> Platforms { get; set; } = default!;
+		public DbSet<GamePlatform> GamePlatforms { get; set; } = default!;
+		public DbSet<GameGenre> GameGenres { get; set; } = default!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -60,7 +62,7 @@ namespace Data.Data
 			modelBuilder.Entity<GameGenre>()
 				.HasKey(gg => new { gg.GameId, gg.GenreId });
 
-			DBSeeder.seed(modelBuilder);
+			DBSeeder.Seed(modelBuilder);
 		}
 	}
 }
