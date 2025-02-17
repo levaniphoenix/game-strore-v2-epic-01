@@ -9,6 +9,8 @@ namespace Business
 		public AutomapperProfile() 
 		{
 			CreateMap<Game, GameModel>().ReverseMap();
+			CreateMap<Genre, GenreModel>().ReverseMap();
+			CreateMap<Platform, PlatformModel>().ReverseMap();
 		}
 	}
 }

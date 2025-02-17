@@ -9,13 +9,16 @@ namespace Business.Models
 
 		[Required]
 		[StringLength(100)]
-		public String Name { get; set; } = default!;
+		public string Name { get; set; } = default!;
+
+		[StringLength(100)]
+		public string? Key { get; set; }
 
 		[StringLength(5000)]
-		public String? Description { get; set; }
+		public string? Description { get; set; }
 
-		public ICollection<Platform> Platforms { get; set; } = new List<Platform>();
+		public ICollection<Guid> PlatformIds { get; set; } = new List<Guid>();
 
-		public ICollection<Genre> Genres { get; set; } = new List<Genre>();
+		public ICollection<Guid> GenreIds { get; set; } = new List<Guid>();
 	}
 }

@@ -14,7 +14,20 @@ namespace Gamestore.Tests.BusinessTests
 	[TestFixture]
 	public class GameServiceTests
 	{
+		[Test]
+		public async Task GameSercviceGetAllAsyncReturnsGamesFromDB()
+		{
+			var mockUnitOfWork = new Mock<IUnitOfWork>();
+			mockUnitOfWork.Setup(m => m.GameRepository!.GetAllAsync(It.IsAny<Expression<Func<Game, bool>>?>(), It.IsAny<Func<IQueryable<Game>, IOrderedQueryable<Game>>?>(), It.IsAny<string>()))
+				.ReturnsAsync(DBSeeder.Games);
 
+			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
+
+			var actual = await gameService.GetAllAsync();
+
+			actual.Should().NotBeNullOrEmpty();
+
+		}
 
 		[Test]
 		public async Task GameServiceAddAsyncThrowsArgumentNullException()
