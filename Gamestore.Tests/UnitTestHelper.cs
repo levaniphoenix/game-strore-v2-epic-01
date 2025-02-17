@@ -1,3 +1,5 @@
+using AutoMapper;
+using Business;
 using Data.Data;
 using Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +24,14 @@ namespace Gamestore.Tests
 		public static void SeedData(GamestoreDBContext context)
 		{
 			context.SaveChanges();
+		}
+
+		public static IMapper CreateMapperProfile()
+		{
+			var myProfile = new AutomapperProfile();
+			var configuration = new MapperConfiguration(cfg => cfg.AddProfile(myProfile));
+
+			return new Mapper(configuration);
 		}
 	}
 }

@@ -146,7 +146,7 @@ namespace Gamestore.Tests.DataTests
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
 			var expected = DBSeeder.Games;
-			
+
 			var expectedGenres = from gg in DBSeeder.GameGenres
 								 join genre in DBSeeder.Genres on gg.GenreId equals genre.Id
 								 join game in DBSeeder.Games on gg.GameId equals game.Id
@@ -154,10 +154,10 @@ namespace Gamestore.Tests.DataTests
 								 select genre;
 
 			var expectedPlatforms = from gp in DBSeeder.GamePlatforms
-								 join p in DBSeeder.Platforms on gp.PlatformId equals p.Id
-								 join g in DBSeeder.Games on gp.GameId equals g.Id
-								 orderby p.Id
-								 select p;
+									join p in DBSeeder.Platforms on gp.PlatformId equals p.Id
+									join g in DBSeeder.Games on gp.GameId equals g.Id
+									orderby p.Id
+									select p;
 
 			//act
 			var result = await unitOfWork.GameRepository.GetAllAsync(includeProperties: "Platforms,Genres");
@@ -172,5 +172,24 @@ namespace Gamestore.Tests.DataTests
 			Assert.That(result, Is.EquivalentTo(expected).Using(new GameEqualityComparer()), message: "GetAllAsync does not work");
 		}
 
+		[Test]
+		public async Task AddingGameWithDuplicateNameThrowsException()
+		{
+			var unitOfWork = new UnitOfWork(context);
+			var game = new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(), };
+
+			await unitOfWork.GameRepository.AddAsync(game);
+			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+		}
+
+		[Test]
+		public async Task AddingGameWithDuplicateKeyThrowsException()
+		{
+			var unitOfWork = new UnitOfWork(context);
+			var game = new Game { Name = "Test Game123", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(), };
+
+			await unitOfWork.GameRepository.AddAsync(game);
+			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+		}
 	}
 }
