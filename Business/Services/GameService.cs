@@ -4,6 +4,7 @@ using Business.Interfaces;
 using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
+using Humanizer.Localisation;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Services
@@ -27,7 +28,14 @@ namespace Business.Services
 			await ValidateGame(model);
 
 			var game = mapper.Map<Game>(model);
-			game.Key = GenerateKey(model.Name);
+
+			if (game.Key is null)
+			{
+				game.Key = GenerateKey(model.Name);
+			}
+
+			await PopulateNavigationProperties(model,game);
+
 			await unitOfWork.GameRepository!.AddAsync(game);
 			await unitOfWork.SaveAsync();
 		}
@@ -51,6 +59,13 @@ namespace Business.Services
 			return mapper.Map<GameModel?>(game);
 		}
 
+		public async Task<GameModel?> GetByName(string gameName)
+		{
+			if (gameName.IsNullOrEmpty()) throw new ArgumentNullException(nameof(gameName));
+			var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == gameName)).SingleOrDefault();
+			return mapper.Map<GameModel>(game);
+		}
+
 		public async Task UpdateAsync(GameModel model)
 		{
 			if (model == null) throw new ArgumentNullException(nameof(model));
@@ -58,7 +73,14 @@ namespace Business.Services
 			await ValidateGame(model);
 
 			var game = mapper.Map<Game>(model);
-			game.Key = GenerateKey(model.Name);
+			
+			if (game.Key is null)
+			{
+				game.Key = GenerateKey(model.Name);
+			}
+
+			await PopulateNavigationProperties(model, game);
+
 			unitOfWork.GameRepository!.Update(game);
 			await unitOfWork.SaveAsync();
 		}
@@ -74,15 +96,54 @@ namespace Business.Services
 
 		public async Task ValidateGame(GameModel model)
 		{
-			var existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == model.Name)).Single();
+			var existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == model.Name)).SingleOrDefault();
 
 			if (existingGame is not null) throw new GameStoreException(ErrorMessages.GameNameAlreadyExists);
 
-			var key = GenerateKey(model.Name);
+			var key = model.Key;
 
-			existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).Single();
+			if(key is null)
+			{
+				key = GenerateKey(model.Name);
+			}
+
+			existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
 
 			if (existingGame is not null) throw new GameStoreException(ErrorMessages.GameKeyAlreadyExists);
+		}
+
+		public async Task PopulateNavigationProperties(GameModel model,Game game)
+		{
+			if (model.PlatformIds is not null)
+			{
+				var platforms = (await unitOfWork.PlatformRepository!.GetAllAsync(p => model.PlatformIds.Contains(p.Id))).ToList();
+
+				foreach (var platfromID in model.PlatformIds)
+				{
+					if(!platforms.Select(p => p.Id).Contains(platfromID))
+					{
+						throw new GameStoreException(string.Format(ErrorMessages.PlatformDoesNotExist,platfromID));
+					}
+				}
+				
+				game.Platforms = platforms;
+			}
+
+			if (model.GenreIds is not null)
+			{
+				var genres = (await unitOfWork.GenreRepository!.GetAllAsync(p => model.GenreIds.Contains(p.Id))).ToList();
+
+				foreach (var genreID in model.GenreIds)
+				{
+					if (!genres.Select(p => p.Id).Contains(genreID))
+					{
+						throw new GameStoreException(string.Format(ErrorMessages.GenreDoesNotExist, genreID));
+					}
+				}
+
+
+				game.Genres = genres;
+			}
 		}
 	}
 }
