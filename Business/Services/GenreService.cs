@@ -24,11 +24,13 @@ namespace Business.Services
 			await ValidateGenre(model);
 			var genre = mapper.Map<Genre>(model);
 			await unitOfWork.GenreRepository!.AddAsync(genre);
+			await unitOfWork.SaveAsync();
 		}
 
 		public async Task DeleteAsync(object modelId)
 		{
 			await unitOfWork.GenreRepository!.DeleteByIdAsync(modelId);
+			await unitOfWork.SaveAsync();
 		}
 
 		public async Task<IEnumerable<GenreModel>> GetAllAsync()
@@ -37,10 +39,22 @@ namespace Business.Services
 			return mapper.Map<IEnumerable<GenreModel>>(genres);
 		}
 
+		public async Task<IEnumerable<GenreModel?>> GetGenresByParentId(Guid id)
+		{
+			var genres = await unitOfWork.GenreRepository!.GetAllAsync(g => g.ParentGenreId == id);
+			return mapper.Map<IEnumerable<GenreModel?>>(genres);
+		}
+
 		public async Task<GenreModel?> GetByIdAsync(object id)
 		{
 			var genre = await unitOfWork.GenreRepository!.GetByIDAsync(id);
 			return mapper.Map<GenreModel?>(genre);
+		}
+
+		public async Task<IEnumerable<GameModel?>> GetGamesByGenreIdAsync(Guid id)
+		{
+			var games =await unitOfWork.GameRepository!.GetAllAsync(g => g.Genres.Select(g => g.Id).Contains(id));
+			return mapper.Map<IEnumerable<GameModel?>>(games);
 		}
 
 		public async Task UpdateAsync(GenreModel model)
@@ -48,13 +62,14 @@ namespace Business.Services
 			await ValidateGenre(model);
 			var genre = mapper.Map<Genre>(model);
 			unitOfWork.GenreRepository!.Update(genre);
+			await unitOfWork.SaveAsync();
 		}
 
 		public async Task ValidateGenre(GenreModel model)
 		{
-			var existingGenre = (await unitOfWork.GenreRepository!.GetAllAsync(g => g.Name == model.Name)).Single();
+			var existingGenre = (await unitOfWork.GenreRepository!.GetAllAsync(g => g.Name == model.Genre.Name)).SingleOrDefault();
 
-			if (existingGenre is not null) throw new GameStoreException(ErrorMessages.GenreNameAlreadyExists);
+			if (existingGenre is not null) throw new GameStoreValidationException(ErrorMessages.GenreNameAlreadyExists);
 		}
 	}
 

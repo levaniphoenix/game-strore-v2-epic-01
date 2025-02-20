@@ -4,6 +4,7 @@ using Business.Interfaces;
 using Business.Services;
 using Data.Data;
 using Data.Interfaces;
+using Gamestore.ExeptionHandlers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore;
@@ -19,6 +20,9 @@ public class Startup(IConfiguration configuration)
         var connectionString = Configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<GamestoreDBContext>(options =>
             options.UseSqlServer(connectionString));
+
+        services.AddExceptionHandler<GameStoreValidationExceptionHandler>();
+        services.AddExceptionHandler<GameStoreNotFoundExceptionHandler>();
 
         var mapperConfig = new MapperConfiguration(mc =>
         {
@@ -46,6 +50,7 @@ public class Startup(IConfiguration configuration)
             app.UseSwaggerUI();
         }
 
+        app.UseExceptionHandler(_ => { });
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseAuthorization();

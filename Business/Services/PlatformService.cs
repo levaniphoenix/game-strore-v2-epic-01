@@ -24,11 +24,13 @@ namespace Business.Services
 			await ValidatePlatform(model);
 			var platform = mapper.Map<Platform>(model);
 			await unitOfWork.PlatformRepository!.AddAsync(platform);
+			await unitOfWork.SaveAsync();
 		}
 
 		public async Task DeleteAsync(object modelId)
 		{
 			await unitOfWork.PlatformRepository!.DeleteByIdAsync(modelId);
+			await unitOfWork.SaveAsync();
 		}
 
 		public async Task<IEnumerable<PlatformModel>>GetAllAsync()
@@ -43,18 +45,25 @@ namespace Business.Services
 			return mapper.Map<PlatformModel?>(platform);
 		}
 
+		public async Task<IEnumerable<GameModel?>> GetGamesByGenreIdAsync(Guid id)
+		{
+			var games = await unitOfWork.GameRepository!.GetAllAsync(g => g.Platforms.Select(g => g.Id).Contains(id));
+			return mapper.Map<IEnumerable<GameModel?>>(games);
+		}
+
 		public async Task UpdateAsync(PlatformModel model)
 		{
 			await ValidatePlatform(model);
 			var platform = mapper.Map<Platform>(model);
 			unitOfWork.PlatformRepository!.Update(platform);
+			await unitOfWork.SaveAsync();
 		}
 
 		public async Task ValidatePlatform(PlatformModel model)
 		{
-			var existingPlatform = (await unitOfWork.PlatformRepository!.GetAllAsync(g => g.Type == model.Type)).Single();
+			var existingPlatform = (await unitOfWork.PlatformRepository!.GetAllAsync(g => g.Type == model.Platform.Type)).SingleOrDefault();
 
-			if (existingPlatform is not null) throw new GameStoreException(ErrorMessages.PlatformTypeAlreadyExists);
+			if (existingPlatform is not null) throw new GameStoreValidationException(ErrorMessages.PlatformTypeAlreadyExists);
 		}
 	}
 }

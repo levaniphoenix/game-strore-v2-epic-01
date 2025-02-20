@@ -1,25 +1,24 @@
-﻿using Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace Business.Models
 {
+	[DataContract]
 	public class GenreModel
 	{
-		public Guid Id { get; set; }
+		[DataMember(Name = "genre")]
+		public GenreDetails Genre { get; set; } = new GenreDetails();
 
-		[Required]
-		[StringLength(50)]
-		public String Name { get; set; } = default!;
+		[DataContract]
+		public class GenreDetails
+		{
+			public Guid Id { get; set; }
 
-		public Guid? ParentGenreId { get; set; }
+			[Required]
+			[StringLength(50)]
+			public string Name { get; set; } = default!;
 
-		public virtual Genre Parent { get; set; } = default!;
-
-		public virtual ICollection<Genre> Children { get; set; } = new List<Genre>();
-
-		public ICollection<Game> Games { get; set; } = new List<Game>();
+			public Guid? ParentGenreId { get; set; }
+		}
 	}
 }

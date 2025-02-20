@@ -1,11 +1,11 @@
 ﻿namespace Business.Exceptions
 {
-	public class GameStoreException : Exception
+	public abstract class GameStoreException : Exception
 	{
-		public GameStoreException() { }
+		protected GameStoreException() { }
 
-		public GameStoreException(string message) : base(message) { }
+		protected GameStoreException(string message) : base(message) { }
 
-		public GameStoreException(string message, Exception innerException) : base(message, innerException) { }
+		protected GameStoreException(string message, Exception innerException) : base(message, innerException) { }
 	}
 }

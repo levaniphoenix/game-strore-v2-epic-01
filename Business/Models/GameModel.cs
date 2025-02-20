@@ -1,24 +1,17 @@
-﻿using Data.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Runtime.Serialization;
 
 namespace Business.Models
 {
+	[DataContract]
 	public class GameModel
 	{
-		public Guid Id { get; set; }
+		[DataMember(Name = "game")]
+		public GameDetails Game { get; set; } = new GameDetails();
 
-		[Required]
-		[StringLength(100)]
-		public string Name { get; set; } = default!;
-
-		[StringLength(100)]
-		public string? Key { get; set; }
-
-		[StringLength(5000)]
-		public string? Description { get; set; }
-
-		public ICollection<Guid>? PlatformIds { get; set; } = new List<Guid>();
-
+		[DataMember(Name = "genres")]
 		public ICollection<Guid>? GenreIds { get; set; } = new List<Guid>();
+
+		[DataMember(Name = "platforms")]
+		public ICollection<Guid>? PlatformIds { get; set; } = new List<Guid>();
 	}
 }

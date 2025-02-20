@@ -24,6 +24,7 @@ namespace Business.Services
 		public async Task AddAsync(GameModel model)
 		{
 			if(model == null) throw new ArgumentNullException(nameof(model));
+			model.Game.Id = null;
 			
 			await ValidateGame(model);
 
@@ -31,7 +32,7 @@ namespace Business.Services
 
 			if (game.Key is null)
 			{
-				game.Key = GenerateKey(model.Name);
+				game.Key = GenerateKey(model.Game.Name);
 			}
 
 			await PopulateNavigationProperties(model,game);
@@ -50,6 +51,27 @@ namespace Business.Services
 		{
 			var games = await unitOfWork.GameRepository!.GetAllAsync();
 			return mapper.Map<IEnumerable<GameModel>>(games);
+		}
+
+		public async Task<GameModel?> GetAllByKeyAsync(string key)
+		{
+			if (key.IsNullOrEmpty()) throw new ArgumentNullException(nameof(key));
+			var games = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
+			return mapper.Map<GameModel?>(games);
+		}
+
+		public async Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key)
+		{
+			if (key.IsNullOrEmpty()) throw new ArgumentNullException(nameof(key));
+			var genres = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key,includeProperties: "Genres")).SelectMany(g => g.Genres);
+			return mapper.Map<IEnumerable<GenreModel>>(genres);
+		}
+
+		public async Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key)
+		{
+			if (key.IsNullOrEmpty()) throw new ArgumentNullException(nameof(key));
+			var platforms = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Platforms")).SelectMany(g => g.Platforms);
+			return mapper.Map<IEnumerable<PlatformModel>>(platforms);
 		}
 
 		public async Task<GameModel?> GetByIdAsync(object id)
@@ -76,7 +98,7 @@ namespace Business.Services
 			
 			if (game.Key is null)
 			{
-				game.Key = GenerateKey(model.Name);
+				game.Key = GenerateKey(model.Game.Name);
 			}
 
 			await PopulateNavigationProperties(model, game);
@@ -96,20 +118,20 @@ namespace Business.Services
 
 		public async Task ValidateGame(GameModel model)
 		{
-			var existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == model.Name)).SingleOrDefault();
+			var existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == model.Game.Name)).SingleOrDefault();
 
-			if (existingGame is not null) throw new GameStoreException(ErrorMessages.GameNameAlreadyExists);
+			if (existingGame is not null) throw new GameStoreValidationException(ErrorMessages.GameNameAlreadyExists);
 
-			var key = model.Key;
+			var key = model.Game.Key;
 
 			if(key is null)
 			{
-				key = GenerateKey(model.Name);
+				key = GenerateKey(model.Game.Name);
 			}
 
 			existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
 
-			if (existingGame is not null) throw new GameStoreException(ErrorMessages.GameKeyAlreadyExists);
+			if (existingGame is not null) throw new GameStoreValidationException(ErrorMessages.GameKeyAlreadyExists);
 		}
 
 		public async Task PopulateNavigationProperties(GameModel model,Game game)
@@ -122,7 +144,7 @@ namespace Business.Services
 				{
 					if(!platforms.Select(p => p.Id).Contains(platfromID))
 					{
-						throw new GameStoreException(string.Format(ErrorMessages.PlatformDoesNotExist,platfromID));
+						throw new GameStoreValidationException(string.Format(ErrorMessages.PlatformDoesNotExist,platfromID));
 					}
 				}
 				
@@ -137,10 +159,9 @@ namespace Business.Services
 				{
 					if (!genres.Select(p => p.Id).Contains(genreID))
 					{
-						throw new GameStoreException(string.Format(ErrorMessages.GenreDoesNotExist, genreID));
+						throw new GameStoreValidationException(string.Format(ErrorMessages.GenreDoesNotExist, genreID));
 					}
 				}
-
 
 				game.Genres = genres;
 			}

@@ -39,8 +39,11 @@ namespace Gamestore.Tests.IntegrationTests
 		{
 			var game = new GameModel
 			{
-				Name = "TestGame",
-				Description = "TestDescription",
+				Game = new GameDetails
+				{
+					Name = "TestGame",
+					Description = "TestDescription",
+				},
 			};
 			var json = JsonConvert.SerializeObject(game);
 			var data = new StringContent(json, Encoding.UTF8, "application/json");

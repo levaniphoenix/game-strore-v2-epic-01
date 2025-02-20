@@ -34,7 +34,7 @@ namespace Gamestore.Tests.BusinessTests
 		[Test]
 		public async Task GameSercviceAddAsyncAddsGameToDB()
 		{
-			var game = new GameModel() { Name = "a new Game", Description = "Test Game desc", GenreIds = [DBSeeder.Genres[0].Id], PlatformIds = [DBSeeder.Platforms[0].Id, DBSeeder.Platforms[1].Id] };
+			var game = new GameModel() { Game = new GameDetails { Name = "a new Game", Description = "Test Game desc", }, GenreIds = [DBSeeder.Genres[0].Id], PlatformIds = [DBSeeder.Platforms[0].Id, DBSeeder.Platforms[1].Id] };
 
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			mockUnitOfWork.Setup(m => m.GameRepository!.AddAsync(It.IsAny<Game>()));
@@ -47,7 +47,7 @@ namespace Gamestore.Tests.BusinessTests
 			await gameService.AddAsync(game);
 			
 			mockUnitOfWork.Verify(x => x.GameRepository!.AddAsync(It.Is<Game>(x =>
-				x.Name == game.Name && x.Description == game.Description)),Times.Once);
+				x.Name == game.Game.Name && x.Description == game.Game.Description)),Times.Once);
 			mockUnitOfWork.Verify(x => x.SaveAsync(), Times.Once);
 		}
 
@@ -73,7 +73,7 @@ namespace Gamestore.Tests.BusinessTests
 			mockUnitOfWork.Setup(m => m.GameRepository!.AddAsync(It.IsAny<Game>()));
 			UnitTestHelper.SetUpMockGameRepository(mockUnitOfWork, DBSeeder.Games);
 			
-			GameModel game = new GameModel() { Name = "Test Game", Description = "Test Game desc" };		
+			GameModel game = new GameModel() { Game = new GameDetails { Name = "Test Game", Description = "Test Game desc" } };		
 
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
 

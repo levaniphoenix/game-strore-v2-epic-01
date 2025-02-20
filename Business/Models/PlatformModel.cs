@@ -1,15 +1,23 @@
 ﻿using Data.Entities;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace Business.Models
 {
+	[DataContract]
 	public class PlatformModel
 	{
-		public Guid Id { get; set; }
+		[DataMember(Name = "platform")]
+		public PlatformDetails Platform { get; set; } = new PlatformDetails();
 
-		[Required]
-		public String Type { get; set; } = default!;
-
-		public ICollection<Game> Games { get; set; } = new List<Game>();
+		[DataContract]
+		public class PlatformDetails
+		{
+			public Guid? Id { get; set; }
+			
+			[Required]
+			[StringLength(50)]
+			public string Type { get; set; } = default!;
+		}
 	}
 }
