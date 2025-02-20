@@ -58,24 +58,24 @@ namespace Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GameGenre",
+                name: "GameGenres",
                 columns: table => new
                 {
-                    GamesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GenresId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GenreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GameGenre", x => new { x.GamesId, x.GenresId });
+                    table.PrimaryKey("PK_GameGenres", x => new { x.GameId, x.GenreId });
                     table.ForeignKey(
-                        name: "FK_GameGenre_Games_GamesId",
-                        column: x => x.GamesId,
+                        name: "FK_GameGenres_Games_GameId",
+                        column: x => x.GameId,
                         principalTable: "Games",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GameGenre_Genres_GenresId",
-                        column: x => x.GenresId,
+                        name: "FK_GameGenres_Genres_GenreId",
+                        column: x => x.GenreId,
                         principalTable: "Genres",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -85,24 +85,34 @@ namespace Data.Migrations
                 name: "GamePlatforms",
                 columns: table => new
                 {
-                    GamesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PlatformsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlatformId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GamePlatforms", x => new { x.GamesId, x.PlatformsId });
+                    table.PrimaryKey("PK_GamePlatforms", x => new { x.GameId, x.PlatformId });
                     table.ForeignKey(
-                        name: "FK_GamePlatforms_Games_GamesId",
-                        column: x => x.GamesId,
+                        name: "FK_GamePlatforms_Games_GameId",
+                        column: x => x.GameId,
                         principalTable: "Games",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GamePlatforms_Platforms_PlatformsId",
-                        column: x => x.PlatformsId,
+                        name: "FK_GamePlatforms_Platforms_PlatformId",
+                        column: x => x.PlatformId,
                         principalTable: "Platforms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Games",
+                columns: new[] { "Id", "Description", "Key", "Name" },
+                values: new object[,]
+                {
+                    { new Guid("3d5d2761-71b7-4c58-8d0c-49c4c00aa1f6"), "This is a test game 3", "test_game_3", "Test Game 3" },
+                    { new Guid("74c673ee-af55-4f16-aed9-147a93fbe2ae"), "This is a test game", "test_game", "Test Game" },
+                    { new Guid("c5ee03cb-e9f5-4a52-a8a7-981698f5e228"), "This is a test game 2", "test_game_2", "Test Game 2" }
                 });
 
             migrationBuilder.InsertData(
@@ -110,11 +120,11 @@ namespace Data.Migrations
                 columns: new[] { "Id", "Name", "ParentGenreId" },
                 values: new object[,]
                 {
-                    { new Guid("056341d2-838e-40f3-b3ea-6c64c50922d2"), "Strategy", null },
-                    { new Guid("81cbf5ee-fb01-412a-97cd-79bf741b5220"), "Action", null },
-                    { new Guid("d4420df2-0630-4783-a203-2ff20a0bb388"), "Adventure", null },
-                    { new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa"), "Sports Races", null },
-                    { new Guid("e5a464d8-2bfc-41bc-8bba-e2efbc028231"), "Skill", null }
+                    { new Guid("35f416fd-5fe3-475d-b484-0ce8b96acce1"), "Skill", null },
+                    { new Guid("6856a56c-93e8-47a4-845e-f4c81b4cc7b7"), "Sports Races", null },
+                    { new Guid("93eaaa3c-a24c-4ff6-aee0-e9932805b722"), "Strategy", null },
+                    { new Guid("cbe02a7e-a369-4b96-9b22-badab86aab9f"), "Adventure", null },
+                    { new Guid("ecee198c-3567-4e5d-a772-bcca1711b858"), "Action", null }
                 });
 
             migrationBuilder.InsertData(
@@ -122,10 +132,32 @@ namespace Data.Migrations
                 columns: new[] { "Id", "Type" },
                 values: new object[,]
                 {
-                    { new Guid("5d20764d-94a4-4c8b-b2e3-abef4cd84b2c"), "Console" },
-                    { new Guid("64d99402-5850-42b1-ba04-659c2c56afa2"), "Desktop" },
-                    { new Guid("a6b26716-5b71-46f7-b2f8-a19c0dd573c6"), "Mobile" },
-                    { new Guid("fd1daa9a-6e5b-4d16-9b4e-9890f6247fdf"), "Browser" }
+                    { new Guid("414bb869-2ea7-4107-909f-7e4b3601b1e0"), "Browser" },
+                    { new Guid("8a0cb8d9-757a-4b2c-9a34-cb65d3d17d66"), "Console" },
+                    { new Guid("9fa91cb5-a91b-49c9-85b3-84aec784efb8"), "Mobile" },
+                    { new Guid("d4185120-0652-4e8f-9bba-2299a4508317"), "Desktop" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "GameGenres",
+                columns: new[] { "GameId", "GenreId" },
+                values: new object[,]
+                {
+                    { new Guid("3d5d2761-71b7-4c58-8d0c-49c4c00aa1f6"), new Guid("ecee198c-3567-4e5d-a772-bcca1711b858") },
+                    { new Guid("74c673ee-af55-4f16-aed9-147a93fbe2ae"), new Guid("6856a56c-93e8-47a4-845e-f4c81b4cc7b7") },
+                    { new Guid("74c673ee-af55-4f16-aed9-147a93fbe2ae"), new Guid("93eaaa3c-a24c-4ff6-aee0-e9932805b722") },
+                    { new Guid("c5ee03cb-e9f5-4a52-a8a7-981698f5e228"), new Guid("6856a56c-93e8-47a4-845e-f4c81b4cc7b7") }
+                });
+
+            migrationBuilder.InsertData(
+                table: "GamePlatforms",
+                columns: new[] { "GameId", "PlatformId" },
+                values: new object[,]
+                {
+                    { new Guid("3d5d2761-71b7-4c58-8d0c-49c4c00aa1f6"), new Guid("414bb869-2ea7-4107-909f-7e4b3601b1e0") },
+                    { new Guid("74c673ee-af55-4f16-aed9-147a93fbe2ae"), new Guid("414bb869-2ea7-4107-909f-7e4b3601b1e0") },
+                    { new Guid("74c673ee-af55-4f16-aed9-147a93fbe2ae"), new Guid("9fa91cb5-a91b-49c9-85b3-84aec784efb8") },
+                    { new Guid("c5ee03cb-e9f5-4a52-a8a7-981698f5e228"), new Guid("414bb869-2ea7-4107-909f-7e4b3601b1e0") }
                 });
 
             migrationBuilder.InsertData(
@@ -133,27 +165,27 @@ namespace Data.Migrations
                 columns: new[] { "Id", "Name", "ParentGenreId" },
                 values: new object[,]
                 {
-                    { new Guid("1b433802-d162-4a34-92f0-1cedc54f5788"), "RPG", new Guid("056341d2-838e-40f3-b3ea-6c64c50922d2") },
-                    { new Guid("28e19936-9787-4ee9-8361-d1698515563a"), "Formula", new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa") },
-                    { new Guid("3d3179bd-c77b-4d04-8e9b-5e38186ca7e7"), "FPS", new Guid("81cbf5ee-fb01-412a-97cd-79bf741b5220") },
-                    { new Guid("44d96f8e-7ae8-4f21-a836-8d2f018da989"), "RTS", new Guid("056341d2-838e-40f3-b3ea-6c64c50922d2") },
-                    { new Guid("57f45cec-c522-4c29-a802-ee93f33b2cff"), "TPS", new Guid("81cbf5ee-fb01-412a-97cd-79bf741b5220") },
-                    { new Guid("7379c31b-3085-43af-afee-d004f19df8b1"), "Off-road", new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa") },
-                    { new Guid("74db4762-d154-4d64-97d4-33ae1518fe83"), "TBS", new Guid("056341d2-838e-40f3-b3ea-6c64c50922d2") },
-                    { new Guid("8669663c-4678-40e9-8f37-ddd4465a9cf9"), "Arcade", new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa") },
-                    { new Guid("a3877603-c23a-410b-8193-d6acc78b98d1"), "Puzzle", new Guid("d4420df2-0630-4783-a203-2ff20a0bb388") },
-                    { new Guid("a448d817-2740-4a88-a36a-f7e3f9aa1ce1"), "Rally", new Guid("d4cfd6a1-5fe8-4c13-a22f-ed34169003fa") }
+                    { new Guid("2d40e04d-83b8-425b-bfed-1c92c9b59228"), "Puzzle", new Guid("cbe02a7e-a369-4b96-9b22-badab86aab9f") },
+                    { new Guid("49787733-14d7-4386-b34c-dc7df00ae9c4"), "Arcade", new Guid("6856a56c-93e8-47a4-845e-f4c81b4cc7b7") },
+                    { new Guid("89fbe7c2-3fe1-4d68-8257-575314bea5a6"), "RPG", new Guid("93eaaa3c-a24c-4ff6-aee0-e9932805b722") },
+                    { new Guid("8ef07862-b216-4c6c-bed1-986a0ffe0908"), "RTS", new Guid("93eaaa3c-a24c-4ff6-aee0-e9932805b722") },
+                    { new Guid("97569ead-61c6-4182-8875-70fc0d261868"), "FPS", new Guid("ecee198c-3567-4e5d-a772-bcca1711b858") },
+                    { new Guid("a0c078ff-edcc-4633-9ca1-acad8e851a6d"), "TBS", new Guid("93eaaa3c-a24c-4ff6-aee0-e9932805b722") },
+                    { new Guid("a4039240-2da5-4f0b-b0dd-a46e7775a377"), "Off-road", new Guid("6856a56c-93e8-47a4-845e-f4c81b4cc7b7") },
+                    { new Guid("b2d28ffc-78e4-44a2-9848-c9547c93110b"), "Formula", new Guid("6856a56c-93e8-47a4-845e-f4c81b4cc7b7") },
+                    { new Guid("f07a75a1-4952-4237-8c52-0dc0e6689f76"), "Rally", new Guid("6856a56c-93e8-47a4-845e-f4c81b4cc7b7") },
+                    { new Guid("f92b6381-4707-4173-9b4f-db050e552bc9"), "TPS", new Guid("ecee198c-3567-4e5d-a772-bcca1711b858") }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_GameGenre_GenresId",
-                table: "GameGenre",
-                column: "GenresId");
+                name: "IX_GameGenres_GenreId",
+                table: "GameGenres",
+                column: "GenreId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GamePlatforms_PlatformsId",
+                name: "IX_GamePlatforms_PlatformId",
                 table: "GamePlatforms",
-                column: "PlatformsId");
+                column: "PlatformId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Games_Key",
@@ -189,7 +221,7 @@ namespace Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GameGenre");
+                name: "GameGenres");
 
             migrationBuilder.DropTable(
                 name: "GamePlatforms");
