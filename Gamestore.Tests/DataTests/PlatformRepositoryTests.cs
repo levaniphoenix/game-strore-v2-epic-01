@@ -119,5 +119,30 @@ namespace Gamestore.Tests.DataTests
 			//assert
 			Assert.That(result, Is.Null, message: "DeleteAsync method is inccorect");
 		}
+
+		[Test]
+		public async Task AddingPlatformWithDuplicateTypeThrowsException()
+		{
+			// Arrange
+			var unitOfWork = new UnitOfWork(context);
+			var platform = new Platform { Type = "Mobile" };
+			//act
+			await unitOfWork.PlatformRepository.AddAsync(platform);
+			//assert
+			Assert.ThrowsAsync<DbUpdateException>(() => unitOfWork.SaveAsync());
+		}
+
+		[Test]
+		public void UpdatingPlatformWithDuplicateTypeThrowsException()
+		{
+			// Arrange
+			var unitOfWork = new UnitOfWork(context);
+			var platform = DBSeeder.Platforms[0];
+			platform.Type = "Console";
+			//act
+			unitOfWork.PlatformRepository.Update(platform);
+			//assert
+			Assert.ThrowsAsync<DbUpdateException>(() => unitOfWork.SaveAsync());
+		}
 	}
 }

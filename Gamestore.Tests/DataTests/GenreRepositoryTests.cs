@@ -119,5 +119,30 @@ namespace Gamestore.Tests.DataTests
 			//assert
 			Assert.That(result, Is.EqualTo(genre).Using(new GenreEqualityComparer()), message: "Update method is inccorect");
 		}
+
+		[Test]
+		public async Task AddingGenreWithDuplicateNameThrowsException()
+		{
+			// Arrange
+			var unitOfWork = new UnitOfWork(context);
+			var genre = new Genre { Name = "Strategy", Id = Guid.NewGuid() };
+			//act
+			await unitOfWork.GenreRepository.AddAsync(genre);
+			//assert
+			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+		}
+
+		[Test]
+		public void UpdatingGenreWithDuplicateNameThrowsException()
+		{
+			// Arrange
+			var unitOfWork = new UnitOfWork(context);
+			var genre = DBSeeder.Genres[0];
+			genre.Name = "Action";
+			//act
+			unitOfWork.GenreRepository.Update(genre);
+			//assert
+			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+		}
 	}
 }
