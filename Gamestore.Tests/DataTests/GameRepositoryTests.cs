@@ -191,5 +191,26 @@ namespace Gamestore.Tests.DataTests
 			await unitOfWork.GameRepository.AddAsync(game);
 			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
 		}
+
+
+		[Test]
+		public void UpdatingGameWithDuplicateNameThrowsException()
+		{
+			var unitOfWork = new UnitOfWork(context);
+			var game = DBSeeder.Games[0];
+			game.Name = "Test Game 2";
+			unitOfWork.GameRepository.Update(game);
+			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+		}
+
+		[Test]
+		public void UpdatingGameWithDuplicateKeyThrowsException()
+		{
+			var unitOfWork = new UnitOfWork(context);
+			var game = DBSeeder.Games[0];
+			game.Key = "test_game_2";
+			unitOfWork.GameRepository.Update(game);
+			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+		}
 	}
 }
