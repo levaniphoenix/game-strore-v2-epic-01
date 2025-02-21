@@ -53,7 +53,7 @@ namespace Business.Services
 			return mapper.Map<IEnumerable<GameModel>>(games);
 		}
 
-		public async Task<GameModel?> GetAllByKeyAsync(string key)
+		public async Task<GameModel?> GetByKeyAsync(string key)
 		{
 			if (key.IsNullOrEmpty()) throw new ArgumentNullException(nameof(key));
 			var games = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
@@ -81,7 +81,7 @@ namespace Business.Services
 			return mapper.Map<GameModel?>(game);
 		}
 
-		public async Task<GameModel?> GetByName(string gameName)
+		public async Task<GameModel?> GetByNameAsync(string gameName)
 		{
 			if (gameName.IsNullOrEmpty()) throw new ArgumentNullException(nameof(gameName));
 			var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == gameName)).SingleOrDefault();
@@ -111,7 +111,7 @@ namespace Business.Services
 		{
 			if(gameName.IsNullOrEmpty()) throw new ArgumentNullException(nameof(gameName));
 
-			var key = gameName.Split(" ").Select(s => s.ToUpperInvariant());
+			var key = gameName.Split(" ").Select(s => string.Concat(s[0].ToString().ToUpperInvariant(), s.AsSpan(1)));
 
 			return string.Join("", key);
 		}

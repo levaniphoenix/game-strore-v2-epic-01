@@ -22,7 +22,7 @@ public class GamesController(IGameService gameService) : ControllerBase
     [HttpGet("{key}")]
     public async Task<GameDetails?> Get(string key)
     {
-        var game = (await _gameService.GetAllByKeyAsync(key)) ?? throw new GameStoreNotFoundException(ErrorMessages.GameNotFound);
+        var game = (await _gameService.GetByKeyAsync(key)) ?? throw new GameStoreNotFoundException(ErrorMessages.GameNotFound);
         return game.Game;
     }
 
@@ -48,7 +48,7 @@ public class GamesController(IGameService gameService) : ControllerBase
     [HttpGet("{key}/file")]
     public async Task<FileContentResult> GetFile(string key)
     {
-        var game = (await _gameService.GetAllByKeyAsync(key)) ?? throw new GameStoreNotFoundException(ErrorMessages.GameNotFound);
+        var game = (await _gameService.GetByKeyAsync(key)) ?? throw new GameStoreNotFoundException(ErrorMessages.GameNotFound);
         var fileName = $"_{key}.txt";
         var fileContent = $"{game.Game.Name}\n{game.Game.Description}";
         var fileBytes = Encoding.UTF8.GetBytes(fileContent);

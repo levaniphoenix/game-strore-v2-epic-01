@@ -6,9 +6,9 @@ namespace Business.Interfaces
 	{
 		String GenerateKey(string gameName);
 
-		Task<GameModel?> GetByName(string gameName);
+		Task<GameModel?> GetByNameAsync(string gameName);
 
-		Task<GameModel?> GetAllByKeyAsync(string key);
+		Task<GameModel?> GetByKeyAsync(string key);
 
 		Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key);
 
