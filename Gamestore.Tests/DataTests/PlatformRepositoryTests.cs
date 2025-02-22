@@ -138,11 +138,13 @@ namespace Gamestore.Tests.DataTests
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
 			var platform = DBSeeder.Platforms[0];
+			var originalType = platform.Type;
 			platform.Type = "Console";
 			//act
 			unitOfWork.PlatformRepository.Update(platform);
 			//assert
 			Assert.ThrowsAsync<DbUpdateException>(() => unitOfWork.SaveAsync());
+			platform.Type = originalType;
 		}
 	}
 }

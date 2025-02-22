@@ -138,11 +138,13 @@ namespace Gamestore.Tests.DataTests
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
 			var genre = DBSeeder.Genres[0];
+			var originalName = genre.Name;
 			genre.Name = "Action";
 			//act
 			unitOfWork.GenreRepository.Update(genre);
 			//assert
 			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			genre.Name = originalName;
 		}
 	}
 }

@@ -1,8 +1,10 @@
 ﻿using Data.Data;
+using Data.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Gamestore.Tests.IntegrationTests
@@ -15,20 +17,30 @@ namespace Gamestore.Tests.IntegrationTests
 			{
 				RemoveLibraryDbContextRegistration(services);
 
-				var serviceProvider = GetInMemoryServiceProvider();
+				//var serviceProvider = GetInMemoryServiceProvider();
 
-				services.AddDbContextPool<GamestoreDBContext>(options =>
-				{
-					options.UseInMemoryDatabase(Guid.Empty.ToString());
-					options.UseInternalServiceProvider(serviceProvider);
-				});
+				//services.AddDbContextPool<GamestoreDBContext>(options =>
+				//{
+				//	options.UseInMemoryDatabase(Guid.Empty.ToString());
+				//	options.UseInternalServiceProvider(serviceProvider);
+				//});
 
-				using (var scope = services.BuildServiceProvider().CreateScope())
-				{
-					var context = scope.ServiceProvider.GetRequiredService<GamestoreDBContext>();
+				//using (var scope = services.BuildServiceProvider().CreateScope())
+				//{
+				//	var context = scope.ServiceProvider.GetRequiredService<GamestoreDBContext>();
 
-					SeedData(context);
-				}
+				//	SeedData(context);
+				//}
+
+				var connectionString = "Server=(localdb)\\mssqllocaldb;Database=INTEGRATIONTEST_GamestoreDB;Trusted_Connection=True;MultipleActiveResultSets=true";
+				services.AddDbContext<GamestoreDBContext>(options =>
+					options.UseSqlServer(connectionString));
+
+				using var scope = services.BuildServiceProvider().CreateScope();
+				var scopedServices = scope.ServiceProvider;
+				var db = scopedServices.GetRequiredService<GamestoreDBContext>();
+				db.Database.EnsureDeleted();
+				db.Database.EnsureCreated();
 
 			});
 		}

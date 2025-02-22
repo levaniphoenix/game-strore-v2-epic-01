@@ -198,9 +198,11 @@ namespace Gamestore.Tests.DataTests
 		{
 			var unitOfWork = new UnitOfWork(context);
 			var game = DBSeeder.Games[0];
+			var originalName = game.Name;
 			game.Name = "Test Game 2";
 			unitOfWork.GameRepository.Update(game);
 			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			game.Name = originalName;
 		}
 
 		[Test]
@@ -208,9 +210,11 @@ namespace Gamestore.Tests.DataTests
 		{
 			var unitOfWork = new UnitOfWork(context);
 			var game = DBSeeder.Games[0];
+			var originalKey = game.Key;
 			game.Key = "test_game_2";
 			unitOfWork.GameRepository.Update(game);
 			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			game.Key = originalKey;
 		}
 	}
 }

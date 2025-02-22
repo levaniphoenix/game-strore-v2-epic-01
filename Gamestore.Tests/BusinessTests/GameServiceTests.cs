@@ -5,10 +5,8 @@ using Data.Data;
 using Data.Entities;
 using Data.Interfaces;
 using FluentAssertions;
-using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Gamestore.Tests.BusinessTests
@@ -16,6 +14,25 @@ namespace Gamestore.Tests.BusinessTests
 	[TestFixture]
 	public class GameServiceTests
 	{
+		//weird fix to force efc to use the correct game context
+		private GamestoreDBContext context;
+
+		[SetUp]
+		public void Setup()
+		{
+			context = new GamestoreDBContext(UnitTestHelper.GetUnitTestDbOptions());
+			context.Database.OpenConnection();
+			context.Database.EnsureDeleted();
+			context.Database.EnsureCreated();
+		}
+
+		[TearDown]
+		public void Teardown()
+		{
+			context.Database.CloseConnection();
+			context.Dispose();
+		}
+
 		[Test]
 		public async Task GameSercviceGetAllAsyncReturnsGamesFromDB()
 		{

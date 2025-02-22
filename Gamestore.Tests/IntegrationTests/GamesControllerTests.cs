@@ -1,6 +1,5 @@
 ﻿using Business.Models;
 using Data.Data;
-using Data.Entities;
 using FluentAssertions;
 using Newtonsoft.Json;
 using System.Text;
@@ -22,6 +21,7 @@ namespace Gamestore.Tests.IntegrationTests
 			_client = _factory.CreateClient();
 		}
 
+		[Ignore("ignore until integration tests can be run on CI")]
 		[Test]
 		public async Task GamesControllerGetAllReturnsAllFromDb()
 		{
