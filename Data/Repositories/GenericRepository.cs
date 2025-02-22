@@ -7,6 +7,8 @@ namespace Data.Repositories
 {
 	public abstract class GenericRepository<TEntity>(GamestoreDBContext context) : IRepository<TEntity> where TEntity : class
 	{
+		public GamestoreDBContext Context => context;
+
 		internal DbSet<TEntity> dbSet = context.Set<TEntity>();
 
 		public virtual async Task<IEnumerable<TEntity>> GetAllAsync(
