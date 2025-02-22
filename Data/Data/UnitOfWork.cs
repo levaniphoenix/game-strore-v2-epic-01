@@ -6,7 +6,6 @@ namespace Data.Data
 {
 	public class UnitOfWork(GamestoreDBContext context) : IUnitOfWork
 	{
-		private readonly GamestoreDBContext context = context;
 		private IRepository<Game>? gameRepository;
 		private IRepository<Platform>? platformRepository;
 		private IRepository<Genre>? genreRepository;

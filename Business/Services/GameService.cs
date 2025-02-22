@@ -10,7 +10,6 @@ namespace Business.Services;
 
 public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 {
-
 	public async Task AddAsync(GameModel model)
 	{
 		ArgumentNullException.ThrowIfNull(model);
