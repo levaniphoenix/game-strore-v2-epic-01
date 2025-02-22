@@ -26,7 +26,7 @@ namespace Data.Data
 			modelBuilder.Entity<GameGenre>().HasData(gameGenres);
 		}
 
-		private static Platform[] platforms = new Platform[]
+		private static readonly Platform[] platforms = new Platform[]
 		{
 			new Platform { Type = "Mobile", Id = Guid.NewGuid() },
 			new Platform { Type = "Browser", Id = Guid.NewGuid() },
@@ -34,7 +34,7 @@ namespace Data.Data
 			new Platform { Type = "Console", Id = Guid.NewGuid() }
 		};
 
-		private static Genre[] genres = new Genre[]
+		private static readonly Genre[] genres = new Genre[]
 			{
 				new Genre { Name = "Strategy" , Id = Guid.NewGuid()},
 				new Genre { Name = "Sports Races", Id = Guid.NewGuid() },
@@ -43,7 +43,7 @@ namespace Data.Data
 				new Genre { Name = "Skill", Id = Guid.NewGuid() }
 			};
 
-		private static Genre[] subGenres = new Genre[]
+		private static readonly Genre[] subGenres = new Genre[]
 		{
 				new Genre { Name = "RTS", ParentGenreId = genres[0].Id , Id = Guid.NewGuid()},
 				new Genre { Name = "TBS", ParentGenreId = genres[0].Id, Id = Guid.NewGuid() },
@@ -57,14 +57,14 @@ namespace Data.Data
 				new Genre { Name = "Puzzle", ParentGenreId = genres[3].Id, Id = Guid.NewGuid() },
 		};
 
-		private static Game[] games = new Game[]
+		private static readonly Game[] games = new Game[]
 			{
 			 new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(),} ,
 			 new Game { Name = "Test Game 2", Key = "test_game_2", Description = "This is a test game 2", Id = Guid.NewGuid(),} ,
 			 new Game { Name = "Test Game 3", Key = "test_game_3", Description = "This is a test game 3", Id = Guid.NewGuid(),}
 			};
 
-		private static GamePlatform[] gamePlatforms = new GamePlatform[]
+		private static readonly GamePlatform[] gamePlatforms = new GamePlatform[]
 			{
 			new GamePlatform { GameId = games[0].Id, PlatformId = platforms[0].Id},
 			new GamePlatform { GameId = games[0].Id, PlatformId = platforms[1].Id},
@@ -72,7 +72,7 @@ namespace Data.Data
 			new GamePlatform { GameId = games[2].Id, PlatformId = platforms[1].Id},
 			};
 
-		private static GameGenre[] gameGenres = new GameGenre[]
+		private static readonly GameGenre[] gameGenres = new GameGenre[]
 			{
 			new GameGenre { GameId = games[0].Id, GenreId = genres[0].Id},
 			new GameGenre { GameId = games[0].Id, GenreId = genres[1].Id},

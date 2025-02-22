@@ -3,12 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Data
 {
-	public class GamestoreDBContext : DbContext
+	public class GamestoreDBContext(DbContextOptions<GamestoreDBContext> options) : DbContext(options)
 	{
-		public GamestoreDBContext(DbContextOptions<GamestoreDBContext> options) : base(options)
-		{
-		}
-
 		public DbSet<Game> Games { get; set; } = default!;
 		public DbSet<Genre> Genres { get; set; } = default!;
 		public DbSet<Platform> Platforms { get; set; } = default!;

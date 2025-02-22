@@ -11,14 +11,14 @@ namespace Data.Entities
 		[Required]
 		[Column(TypeName = "VARCHAR(50)")]
 		//unique
-		public String Name { get; set; } = default!;
+		public string Name { get; set; } = default!;
 
 		public Guid? ParentGenreId { get; set; }
 
 		public virtual Genre Parent { get; set; } = default!;
 
-		public virtual ICollection<Genre> Children { get; set; } = new List<Genre>();
+		public virtual ICollection<Genre> Children { get; set; } = [];
 
-		public ICollection<Game> Games { get; set; } = new List<Game>();
+		public ICollection<Game> Games { get; set; } = [];
 	}
 }

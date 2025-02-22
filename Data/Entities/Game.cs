@@ -11,17 +11,17 @@ namespace Data.Entities
 
 		[Required]
 		[Column(TypeName = "VARCHAR(100)")]
-		public String Name { get; set; } = default!;
+		public string Name { get; set; } = default!;
 
 		[Required]
 		//unique
-		public String Key { get; set; } = default!;
+		public string Key { get; set; } = default!;
 
 		[Column(TypeName = "VARCHAR(5000)")]
-		public String? Description { get; set; }
+		public string? Description { get; set; }
 
-		public ICollection<Platform> Platforms { get; set; } = new List<Platform>();
+		public ICollection<Platform> Platforms { get; set; } = [];
 
-		public ICollection<Genre> Genres { get; set; } = new List<Genre>();
+		public ICollection<Genre> Genres { get; set; } = [];
 	}
 }

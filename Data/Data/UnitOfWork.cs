@@ -4,26 +4,18 @@ using Data.Repositories;
 
 namespace Data.Data
 {
-	public class UnitOfWork : IUnitOfWork
+	public class UnitOfWork(GamestoreDBContext context) : IUnitOfWork
 	{
-		private readonly GamestoreDBContext context;
+		private readonly GamestoreDBContext context = context;
 		private IRepository<Game>? gameRepository;
 		private IRepository<Platform>? platformRepository;
 		private IRepository<Genre>? genreRepository;
-
-		public UnitOfWork(GamestoreDBContext context)
-		{
-			this.context = context;
-		}
 
 		public IRepository<Game> GameRepository
 		{
 			get
 			{
-				if (this.gameRepository == null)
-				{
-					this.gameRepository = new GameRepository(context);
-				}
+				gameRepository ??= new GameRepository(context);
 				return gameRepository;
 			}
 		}
@@ -31,10 +23,7 @@ namespace Data.Data
 		{
 			get
 			{
-				if (this.platformRepository == null)
-				{
-					this.platformRepository = new PlatformRepository(context);
-				}
+				platformRepository ??= new PlatformRepository(context);
 				return platformRepository;
 			}
 		}
@@ -42,10 +31,7 @@ namespace Data.Data
 		{
 			get
 			{
-				if (this.genreRepository == null)
-				{
-					this.genreRepository = new GenreRepository(context);
-				}
+				genreRepository ??= new GenreRepository(context);
 				return genreRepository;
 			}
 		}

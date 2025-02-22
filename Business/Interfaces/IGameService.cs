@@ -4,7 +4,7 @@ namespace Business.Interfaces
 {
 	public interface IGameService : ICrud<GameModel>
 	{
-		String GenerateKey(string gameName);
+		string GenerateKey(string gameName);
 
 		Task<GameModel?> GetByNameAsync(string gameName);
 
