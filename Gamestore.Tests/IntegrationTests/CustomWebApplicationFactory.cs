@@ -1,36 +1,18 @@
 ﻿using Data.Data;
-using Data.Entities;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Gamestore.Tests.IntegrationTests
 {
-	internal class CustomWebApplicationFactory : WebApplicationFactory<Startup>
+	internal sealed class CustomWebApplicationFactory : WebApplicationFactory<Startup>
 	{
 		protected override void ConfigureWebHost(IWebHostBuilder builder)
 		{
 			builder.ConfigureServices(services =>
 			{
 				RemoveLibraryDbContextRegistration(services);
-
-				//var serviceProvider = GetInMemoryServiceProvider();
-
-				//services.AddDbContextPool<GamestoreDBContext>(options =>
-				//{
-				//	options.UseInMemoryDatabase(Guid.Empty.ToString());
-				//	options.UseInternalServiceProvider(serviceProvider);
-				//});
-
-				//using (var scope = services.BuildServiceProvider().CreateScope())
-				//{
-				//	var context = scope.ServiceProvider.GetRequiredService<GamestoreDBContext>();
-
-				//	SeedData(context);
-				//}
 
 				var connectionString = "Server=(localdb)\\mssqllocaldb;Database=INTEGRATIONTEST_GamestoreDB;Trusted_Connection=True;MultipleActiveResultSets=true";
 				services.AddDbContext<GamestoreDBContext>(options =>
@@ -45,13 +27,6 @@ namespace Gamestore.Tests.IntegrationTests
 			});
 		}
 
-		private static ServiceProvider GetInMemoryServiceProvider()
-		{
-			return new ServiceCollection()
-				.AddEntityFrameworkInMemoryDatabase()
-				.BuildServiceProvider();
-		}
-
 		private static void RemoveLibraryDbContextRegistration(IServiceCollection services)
 		{
 			var descriptor = services.SingleOrDefault(
@@ -62,21 +37,6 @@ namespace Gamestore.Tests.IntegrationTests
 			{
 				services.Remove(descriptor);
 			}
-		}
-
-		private static void SeedData(GamestoreDBContext context)
-		{
-			context.Genres.AddRange(DBSeeder.Genres);
-
-			context.Platforms.AddRange(DBSeeder.Platforms);
-
-			context.Games.AddRange(DBSeeder.Games);
-
-			context.GamePlatforms.AddRange(DBSeeder.GamePlatforms);
-
-			context.GameGenres.AddRange(DBSeeder.GameGenres);
-
-			context.SaveChanges();
 		}
 	}
 }

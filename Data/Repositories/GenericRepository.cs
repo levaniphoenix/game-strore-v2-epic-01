@@ -5,18 +5,12 @@ using System.Linq.Expressions;
 
 namespace Data.Repositories
 {
-	public abstract class GenericRepository<TEntity>: IRepository<TEntity> where TEntity: class
+	public abstract class GenericRepository<TEntity>(GamestoreDBContext context) : IRepository<TEntity> where TEntity: class
 	{
-		internal GamestoreDBContext context;
-		internal DbSet<TEntity> dbSet;
+		internal GamestoreDBContext context = context;
+		internal DbSet<TEntity> dbSet = context.Set<TEntity>();
 
-		protected GenericRepository(GamestoreDBContext context)
-		{
-			this.context = context;
-			this.dbSet = context.Set<TEntity>();
-		}
-
-		public async virtual Task<IEnumerable<TEntity>> GetAllAsync(
+		public virtual async Task<IEnumerable<TEntity>> GetAllAsync(
 			Expression<Func<TEntity, bool>>? filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
 			string includeProperties = "")
@@ -34,27 +28,20 @@ namespace Data.Repositories
 				query = query.Include(includeProperty);
 			}
 
-			if (orderBy != null)
-			{
-				return await orderBy(query).ToListAsync();
-			}
-			else
-			{
-				return await query.ToListAsync();
-			}
+			return orderBy != null ? await orderBy(query).ToListAsync() : (IEnumerable<TEntity>)await query.ToListAsync();
 		}
 
-		public async virtual Task<TEntity?> GetByIDAsync(object id)
+		public virtual async Task<TEntity?> GetByIDAsync(object id)
 		{
 			return await dbSet.FindAsync(id);
 		}
 
-		public async virtual Task AddAsync(TEntity entity)
+		public virtual async Task AddAsync(TEntity entity)
 		{
 			await dbSet.AddAsync(entity);
 		}
 
-		public async virtual Task DeleteByIdAsync(object id)
+		public virtual async Task DeleteByIdAsync(object id)
 		{
 			TEntity? entityToDelete = await dbSet.FindAsync(id);
 			if (entityToDelete != null)

@@ -10,50 +10,50 @@ namespace Gamestore.Controllers;
 [ApiController]
 public class PlatformsController(IPlatformService platformService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IEnumerable<PlatformDetails>> Get()
-    {
-        return (await platformService.GetAllAsync()).Select(p => p.Platform);
-    }
+	[HttpGet]
+	public async Task<IEnumerable<PlatformDetails>> Get()
+	{
+		return (await platformService.GetAllAsync()).Select(p => p.Platform);
+	}
 
-    [HttpGet("{id}")]
-    public async Task<PlatformDetails?> Get(Guid id)
-    {
-        var platform = (await platformService.GetByIdAsync(id)) ?? throw new GameStoreNotFoundException(ErrorMessages.PlatformNotFound);
-        return platform.Platform;
-    }
+	[HttpGet("{id}")]
+	public async Task<PlatformDetails?> Get(Guid id)
+	{
+		var platform = (await platformService.GetByIdAsync(id)) ?? throw new GameStoreNotFoundException(ErrorMessages.PlatformNotFound);
+		return platform.Platform;
+	}
 
-    [HttpGet("{id}/games")]
-    public async Task<IEnumerable<GameDetails?>> GetGamesByPlatform(Guid id)
-    {
-        return (await platformService.GetGamesByGenreIdAsync(id)).Select(g => g.Game);
-    }
+	[HttpGet("{id}/games")]
+	public async Task<IEnumerable<GameDetails?>> GetGamesByPlatform(Guid id)
+	{
+		return (await platformService.GetGamesByGenreIdAsync(id)).Select(g => g.Game);
+	}
 
-    [HttpPost]
-    public async Task Post([FromBody] PlatformModel platform)
-    {
-        if (!ModelState.IsValid)
-        {
-            throw new GameStoreModelStateException("Model is not valid");
-        }
+	[HttpPost]
+	public async Task Post([FromBody] PlatformModel platform)
+	{
+		if (!ModelState.IsValid)
+		{
+			throw new GameStoreModelStateException("Model is not valid");
+		}
 
-        await platformService.AddAsync(platform);
-    }
+		await platformService.AddAsync(platform);
+	}
 
-    [HttpPut]
-    public async Task Put([FromBody] PlatformModel platform)
-    {
-        if (!ModelState.IsValid)
-        {
-            throw new GameStoreModelStateException("Model is not valid");
-        }
+	[HttpPut]
+	public async Task Put([FromBody] PlatformModel platform)
+	{
+		if (!ModelState.IsValid)
+		{
+			throw new GameStoreModelStateException("Model is not valid");
+		}
 
-        await platformService.UpdateAsync(platform);
-    }
+		await platformService.UpdateAsync(platform);
+	}
 
-    [HttpDelete("{id}")]
-    public async Task Delete(Guid id)
-    {
-        await platformService.DeleteAsync(id);
-    }
+	[HttpDelete("{id}")]
+	public async Task Delete(Guid id)
+	{
+		await platformService.DeleteAsync(id);
+	}
 }

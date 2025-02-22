@@ -1,13 +1,9 @@
 ﻿using Data.Data;
 using Data.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
 {
-	internal class GameRepository : GenericRepository<Game>
+	internal sealed class GameRepository(GamestoreDBContext context) : GenericRepository<Game>(context)
 	{
-		public GameRepository(GamestoreDBContext context) : base(context)
-		{
-		}
 	}
 }

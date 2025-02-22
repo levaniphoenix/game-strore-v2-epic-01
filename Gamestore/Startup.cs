@@ -11,52 +11,52 @@ namespace Gamestore;
 
 public class Startup(IConfiguration configuration)
 {
-    public IConfiguration Configuration { get; } = configuration;
+	public IConfiguration Configuration { get; } = configuration;
 
-    public void ConfigureServices(IServiceCollection services)
-    {
-        services.AddControllers();
+	public void ConfigureServices(IServiceCollection services)
+	{
+		services.AddControllers();
 
-        var connectionString = Configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<GamestoreDBContext>(options =>
-            options.UseSqlServer(connectionString));
+		var connectionString = Configuration.GetConnectionString("DefaultConnection");
+		services.AddDbContext<GamestoreDBContext>(options =>
+			options.UseSqlServer(connectionString));
 
-        services.AddExceptionHandler<GameStoreValidationExceptionHandler>();
-        services.AddExceptionHandler<GameStoreNotFoundExceptionHandler>();
+		services.AddExceptionHandler<GameStoreValidationExceptionHandler>();
+		services.AddExceptionHandler<GameStoreNotFoundExceptionHandler>();
 
-        var mapperConfig = new MapperConfiguration(mc =>
-        {
-            mc.AddProfile(new AutomapperProfile());
-        });
-        IMapper mapper = mapperConfig.CreateMapper();
-        services.AddSingleton(mapper);
+		var mapperConfig = new MapperConfiguration(mc =>
+		{
+			mc.AddProfile(new AutomapperProfile());
+		});
+		IMapper mapper = mapperConfig.CreateMapper();
+		services.AddSingleton(mapper);
 
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IGameService, GameService>();
-        services.AddScoped<IPlatformService, PlatformService>();
-        services.AddScoped<IGenreService, GenreService>();
+		services.AddScoped<IUnitOfWork, UnitOfWork>();
+		services.AddScoped<IGameService, GameService>();
+		services.AddScoped<IPlatformService, PlatformService>();
+		services.AddScoped<IGenreService, GenreService>();
 
-        services.AddControllers();
+		services.AddControllers();
 
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-    }
+		services.AddEndpointsApiExplorer();
+		services.AddSwaggerGen();
+	}
 
-    public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-        if (env.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+	public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+	{
+		if (env.IsDevelopment())
+		{
+			app.UseSwagger();
+			app.UseSwaggerUI();
+		}
 
-        app.UseExceptionHandler(_ => { });
-        app.UseHttpsRedirection();
-        app.UseRouting();
-        app.UseAuthorization();
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
-    }
+		app.UseExceptionHandler(_ => { });
+		app.UseHttpsRedirection();
+		app.UseRouting();
+		app.UseAuthorization();
+		app.UseEndpoints(endpoints =>
+		{
+			endpoints.MapControllers();
+		});
+	}
 }

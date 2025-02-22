@@ -3,10 +3,7 @@ using Data.Entities;
 
 namespace Data.Repositories
 {
-	internal class PlatformRepository : GenericRepository<Platform>
+	internal sealed class PlatformRepository(GamestoreDBContext context) : GenericRepository<Platform>(context)
 	{
-		public PlatformRepository(GamestoreDBContext context) : base(context)
-		{
-		}
 	}
 }

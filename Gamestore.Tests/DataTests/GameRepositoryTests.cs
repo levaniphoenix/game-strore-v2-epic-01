@@ -161,15 +161,17 @@ namespace Gamestore.Tests.DataTests
 
 			//act
 			var result = await unitOfWork.GameRepository.GetAllAsync(includeProperties: "Platforms,Genres");
-			//assert
+			Assert.Multiple(() =>
+			{
+				//assert
+				Assert.That(result.SelectMany(i => i.Platforms).OrderBy(i => i.Id),
+					Is.EqualTo(expectedPlatforms).Using(new PlatformEqualityComparer()), message: "GetAllAsync does not return inclided entities");
 
-			Assert.That(result.SelectMany(i => i.Platforms).OrderBy(i => i.Id),
-				Is.EqualTo(expectedPlatforms).Using(new PlatformEqualityComparer()), message: "GetAllAsync does not return inclided entities");
+				Assert.That(result.SelectMany(i => i.Genres).OrderBy(i => i.Id),
+					Is.EqualTo(expectedGenres).Using(new GenreEqualityComparer()), message: "GetAllAsync does not return included entities");
 
-			Assert.That(result.SelectMany(i => i.Genres).OrderBy(i => i.Id),
-				Is.EqualTo(expectedGenres).Using(new GenreEqualityComparer()), message: "GetAllAsync does not return included entities");
-
-			Assert.That(result, Is.EquivalentTo(expected).Using(new GameEqualityComparer()), message: "GetAllAsync does not work");
+				Assert.That(result, Is.EquivalentTo(expected).Using(new GameEqualityComparer()), message: "GetAllAsync does not work");
+			});
 		}
 
 		[Test]
@@ -179,7 +181,7 @@ namespace Gamestore.Tests.DataTests
 			var game = new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(), };
 
 			await unitOfWork.GameRepository.AddAsync(game);
-			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			Assert.ThrowsAsync<DbUpdateException>(unitOfWork.SaveAsync);
 		}
 
 		[Test]
@@ -189,7 +191,7 @@ namespace Gamestore.Tests.DataTests
 			var game = new Game { Name = "Test Game123", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(), };
 
 			await unitOfWork.GameRepository.AddAsync(game);
-			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			Assert.ThrowsAsync<DbUpdateException>(unitOfWork.SaveAsync);
 		}
 
 
@@ -201,7 +203,7 @@ namespace Gamestore.Tests.DataTests
 			var originalName = game.Name;
 			game.Name = "Test Game 2";
 			unitOfWork.GameRepository.Update(game);
-			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			Assert.ThrowsAsync<DbUpdateException>(unitOfWork.SaveAsync);
 			game.Name = originalName;
 		}
 
@@ -213,7 +215,7 @@ namespace Gamestore.Tests.DataTests
 			var originalKey = game.Key;
 			game.Key = "test_game_2";
 			unitOfWork.GameRepository.Update(game);
-			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			Assert.ThrowsAsync<DbUpdateException>(unitOfWork.SaveAsync);
 			game.Key = originalKey;
 		}
 	}

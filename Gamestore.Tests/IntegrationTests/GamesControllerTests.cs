@@ -34,7 +34,8 @@ namespace Gamestore.Tests.IntegrationTests
 			actual.Count.Should().Be(DBSeeder.Games.Length);
 		}
 
-		//[Test]
+		[Ignore("ignore until integration tests can be run on CI")]
+		[Test]
 		public async Task GameControllerAddsGameToDB()
 		{
 			var game = new GameModel
@@ -51,6 +52,7 @@ namespace Gamestore.Tests.IntegrationTests
 			response.EnsureSuccessStatusCode();
 			var stingResponse = await response.Content.ReadAsStringAsync();
 			var actual = JsonConvert.DeserializeObject<GameModel>(stingResponse);
+			actual.Should().NotBeNull();
 		}
 
 		[TearDown]

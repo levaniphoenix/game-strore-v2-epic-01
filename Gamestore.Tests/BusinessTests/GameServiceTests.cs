@@ -203,7 +203,7 @@ namespace Gamestore.Tests.BusinessTests
 			UnitTestHelper.SetUpMockGameRepository(mockUnitOfWork, DBSeeder.Games);
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
 			var act = async () => await gameService.GetPlatformsByGamekey("");
-			await act.Should().ThrowAsync<ArgumentNullException>();
+			await act.Should().ThrowAsync<ArgumentException>();
 		}
 
 		[Test]
@@ -261,7 +261,7 @@ namespace Gamestore.Tests.BusinessTests
 			UnitTestHelper.SetUpMockGameRepository(mockUnitOfWork, DBSeeder.Games);
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
 			var act = async () => await gameService.GetByNameAsync("");
-			await act.Should().ThrowAsync<ArgumentNullException>();
+			await act.Should().ThrowAsync<ArgumentException>();
 		}
 
 		[Test]
