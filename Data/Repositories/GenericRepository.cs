@@ -1,13 +1,12 @@
-﻿using Data.Data;
+﻿using System.Linq.Expressions;
+using Data.Data;
 using Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace Data.Repositories
 {
-	public abstract class GenericRepository<TEntity>(GamestoreDBContext context) : IRepository<TEntity> where TEntity: class
+	public abstract class GenericRepository<TEntity>(GamestoreDBContext context) : IRepository<TEntity> where TEntity : class
 	{
-		internal GamestoreDBContext context = context;
 		internal DbSet<TEntity> dbSet = context.Set<TEntity>();
 
 		public virtual async Task<IEnumerable<TEntity>> GetAllAsync(

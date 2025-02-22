@@ -11,13 +11,11 @@ namespace Gamestore;
 
 public class Startup(IConfiguration configuration)
 {
-	public IConfiguration Configuration { get; } = configuration;
-
 	public void ConfigureServices(IServiceCollection services)
 	{
 		services.AddControllers();
 
-		var connectionString = Configuration.GetConnectionString("DefaultConnection");
+		var connectionString = configuration.GetConnectionString("DefaultConnection");
 		services.AddDbContext<GamestoreDBContext>(options =>
 			options.UseSqlServer(connectionString));
 

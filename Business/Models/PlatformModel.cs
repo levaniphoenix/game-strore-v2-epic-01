@@ -1,5 +1,4 @@
-﻿using Data.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Business.Models
@@ -14,7 +13,7 @@ namespace Business.Models
 		public class PlatformDetails
 		{
 			public Guid? Id { get; set; }
-			
+
 			[Required]
 			[StringLength(50)]
 			public string Type { get; set; } = default!;

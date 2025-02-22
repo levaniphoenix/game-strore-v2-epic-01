@@ -6,7 +6,7 @@ namespace Business
 {
 	public class AutomapperProfile : Profile
 	{
-		public AutomapperProfile() 
+		public AutomapperProfile()
 		{
 			CreateMap<GameModel, Game>()
 				.ForMember(to => to.Id, from => from.MapFrom(x => x.Game.Id))

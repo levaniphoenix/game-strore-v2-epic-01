@@ -10,9 +10,6 @@ namespace Business.Services;
 
 public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 {
-	private readonly IUnitOfWork unitOfWork = unitOfWork;
-
-	private IMapper Mapper { get; } = mapper;
 
 	public async Task AddAsync(GameModel model)
 	{
@@ -20,7 +17,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 		model.Game.Id = null;
 		await ValidateGame(model);
 
-		var game = Mapper.Map<Game>(model);
+		var game = mapper.Map<Game>(model);
 
 		game.Key ??= GenerateKey(model.Game.Name);
 
@@ -39,7 +36,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 	public async Task<IEnumerable<GameModel>> GetAllAsync()
 	{
 		var games = await unitOfWork.GameRepository!.GetAllAsync();
-		return Mapper.Map<IEnumerable<GameModel>>(games);
+		return mapper.Map<IEnumerable<GameModel>>(games);
 	}
 
 	public async Task<GameModel?> GetByKeyAsync(string key)
@@ -50,7 +47,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 		}
 
 		var games = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
-		return Mapper.Map<GameModel?>(games);
+		return mapper.Map<GameModel?>(games);
 	}
 
 	public async Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key)
@@ -61,29 +58,29 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 		}
 
 		var genres = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Genres")).SelectMany(g => g.Genres);
-		return Mapper.Map<IEnumerable<GenreModel>>(genres);
+		return mapper.Map<IEnumerable<GenreModel>>(genres);
 	}
 
 	public async Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(key);
 		var platforms = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Platforms")).SelectMany(g => g.Platforms);
-		return Mapper.Map<IEnumerable<PlatformModel>>(platforms);
+		return mapper.Map<IEnumerable<PlatformModel>>(platforms);
 	}
 
 	public async Task<GameModel?> GetByIdAsync(object id)
 	{
 		ArgumentNullException.ThrowIfNull(id);
 		var game = await unitOfWork.GameRepository!.GetByIDAsync(id);
-		return Mapper.Map<GameModel?>(game);
+		return mapper.Map<GameModel?>(game);
 	}
 
 	public async Task<GameModel?> GetByNameAsync(string gameName)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(gameName);
-		
+
 		var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == gameName)).SingleOrDefault();
-		return Mapper.Map<GameModel>(game);
+		return mapper.Map<GameModel>(game);
 	}
 
 	public async Task UpdateAsync(GameModel model)
@@ -92,7 +89,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
 		await ValidateGame(model);
 
-		var game = Mapper.Map<Game>(model);
+		var game = mapper.Map<Game>(model);
 		game.Key ??= GenerateKey(model.Game.Name);
 
 		await PopulateNavigationProperties(model, game);

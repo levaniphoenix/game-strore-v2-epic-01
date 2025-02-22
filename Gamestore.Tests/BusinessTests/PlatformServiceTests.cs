@@ -5,7 +5,6 @@ using Data.Data;
 using Data.Entities;
 using Data.Interfaces;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using static Business.Models.PlatformModel;
 

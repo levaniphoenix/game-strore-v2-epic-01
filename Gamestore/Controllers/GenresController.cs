@@ -10,30 +10,28 @@ namespace Gamestore.Controllers;
 [ApiController]
 public class GenresController(IGenreService genreService) : ControllerBase
 {
-	private readonly IGenreService _genreService = genreService;
-
 	[HttpGet]
 	public async Task<IEnumerable<GenreDetails>> Get()
 	{
-		return (await _genreService.GetAllAsync()).Select(g => g.Genre);
+		return (await genreService.GetAllAsync()).Select(g => g.Genre);
 	}
 
 	[HttpGet("{id}")]
 	public async Task<GenreModel?> Get(Guid id)
 	{
-		return await _genreService.GetByIdAsync(id);
+		return await genreService.GetByIdAsync(id);
 	}
 
 	[HttpGet("{id}/games")]
 	public async Task<IEnumerable<GameDetails?>> GetGamesByGenre(Guid id)
 	{
-		return (await _genreService.GetGamesByGenreIdAsync(id)).Select(g => g.Game);
+		return (await genreService.GetGamesByGenreIdAsync(id)).Select(g => g.Game);
 	}
 
 	[HttpGet("{id}/genres")]
 	public async Task<IEnumerable<GenreDetails?>> GetGenresByParentId(Guid id)
 	{
-		var genres = await _genreService.GetGenresByParentId(id) ?? throw new GameStoreNotFoundException(ErrorMessages.GenreNotFound);
+		var genres = await genreService.GetGenresByParentId(id) ?? throw new GameStoreNotFoundException(ErrorMessages.GenreNotFound);
 		return genres.Select(g => g.Genre);
 	}
 
@@ -45,7 +43,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 			throw new GameStoreModelStateException("Model is not valid");
 		}
 
-		await _genreService.AddAsync(genre);
+		await genreService.AddAsync(genre);
 	}
 
 	[HttpPut]
@@ -56,12 +54,12 @@ public class GenresController(IGenreService genreService) : ControllerBase
 			throw new GameStoreModelStateException("Model is not valid");
 		}
 
-		await _genreService.UpdateAsync(genre);
+		await genreService.UpdateAsync(genre);
 	}
 
 	[HttpDelete("{id}")]
 	public async Task Delete(Guid id)
 	{
-		await _genreService.DeleteAsync(id);
+		await genreService.DeleteAsync(id);
 	}
 }

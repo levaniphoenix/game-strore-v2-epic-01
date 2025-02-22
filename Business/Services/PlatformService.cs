@@ -9,14 +9,10 @@ namespace Business.Services
 {
 	public class PlatformService(IUnitOfWork unitOfWork, IMapper mapper) : IPlatformService
 	{
-		private readonly IUnitOfWork unitOfWork = unitOfWork;
-
-		private IMapper Mapper { get; } = mapper;
-
 		public async Task AddAsync(PlatformModel model)
 		{
 			await ValidatePlatform(model);
-			var platform = Mapper.Map<Platform>(model);
+			var platform = mapper.Map<Platform>(model);
 			await unitOfWork.PlatformRepository!.AddAsync(platform);
 			await unitOfWork.SaveAsync();
 		}
@@ -30,25 +26,25 @@ namespace Business.Services
 		public async Task<IEnumerable<PlatformModel>> GetAllAsync()
 		{
 			var platforms = await unitOfWork.PlatformRepository!.GetAllAsync();
-			return Mapper.Map<IEnumerable<PlatformModel>>(platforms);
+			return mapper.Map<IEnumerable<PlatformModel>>(platforms);
 		}
 
 		public async Task<PlatformModel?> GetByIdAsync(object id)
 		{
 			var platform = await unitOfWork.PlatformRepository!.GetByIDAsync(id);
-			return Mapper.Map<PlatformModel?>(platform);
+			return mapper.Map<PlatformModel?>(platform);
 		}
 
 		public async Task<IEnumerable<GameModel?>> GetGamesByGenreIdAsync(Guid id)
 		{
 			var games = await unitOfWork.GameRepository!.GetAllAsync(g => g.Platforms.Select(g => g.Id).Contains(id));
-			return Mapper.Map<IEnumerable<GameModel?>>(games);
+			return mapper.Map<IEnumerable<GameModel?>>(games);
 		}
 
 		public async Task UpdateAsync(PlatformModel model)
 		{
 			await ValidatePlatform(model);
-			var platform = Mapper.Map<Platform>(model);
+			var platform = mapper.Map<Platform>(model);
 			unitOfWork.PlatformRepository!.Update(platform);
 			await unitOfWork.SaveAsync();
 		}

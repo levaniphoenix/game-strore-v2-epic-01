@@ -1,4 +1,5 @@
-﻿using Business.Exceptions;
+﻿using System.Linq.Expressions;
+using Business.Exceptions;
 using Business.Models;
 using Business.Services;
 using Data.Data;
@@ -7,7 +8,6 @@ using Data.Interfaces;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System.Linq.Expressions;
 
 namespace Gamestore.Tests.BusinessTests
 {

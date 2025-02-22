@@ -1,8 +1,8 @@
-﻿using Business.Models;
+﻿using System.Text;
+using Business.Models;
 using Data.Data;
 using FluentAssertions;
 using Newtonsoft.Json;
-using System.Text;
 
 namespace Gamestore.Tests.IntegrationTests
 {

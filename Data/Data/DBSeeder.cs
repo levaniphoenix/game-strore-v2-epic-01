@@ -1,10 +1,5 @@
 ﻿using Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Data
 {
@@ -75,7 +70,7 @@ namespace Data.Data
 			new GamePlatform { GameId = games[0].Id, PlatformId = platforms[1].Id},
 			new GamePlatform { GameId = games[1].Id, PlatformId = platforms[1].Id},
 			new GamePlatform { GameId = games[2].Id, PlatformId = platforms[1].Id},
-			};	
+			};
 
 		private static GameGenre[] gameGenres = new GameGenre[]
 			{

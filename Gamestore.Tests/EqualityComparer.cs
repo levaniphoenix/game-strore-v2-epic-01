@@ -1,5 +1,5 @@
-﻿using Data.Entities;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using Data.Entities;
 
 namespace Gamestore.Tests
 {
