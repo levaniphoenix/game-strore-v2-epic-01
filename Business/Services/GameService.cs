@@ -51,11 +51,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
 	public async Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key)
 	{
-		if (key.IsNullOrEmpty())
-		{
-			throw new ArgumentNullException(nameof(key));
-		}
-
+		ArgumentException.ThrowIfNullOrEmpty(key);
 		var genres = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Genres")).SelectMany(g => g.Genres);
 		return mapper.Map<IEnumerable<GenreModel>>(genres);
 	}
