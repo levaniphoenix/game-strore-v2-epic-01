@@ -143,7 +143,7 @@ namespace Gamestore.Tests.BusinessTests
 			UnitTestHelper.SetUpMockGameRepository(mockUnitOfWork, DBSeeder.Games);
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
 			var act = async () => await gameService.GetByKeyAsync("");
-			await act.Should().ThrowAsync<ArgumentNullException>();
+			await act.Should().ThrowAsync<ArgumentException>();
 		}
 
 		[Test]

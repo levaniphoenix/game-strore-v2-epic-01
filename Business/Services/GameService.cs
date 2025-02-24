@@ -4,26 +4,31 @@ using Business.Interfaces;
 using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Services;
 
 public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 {
-	public async Task AddAsync(GameModel model)
+	public Task AddAsync(GameModel model)
 	{
 		ArgumentNullException.ThrowIfNull(model);
 		model.Game.Id = null;
-		await ValidateGame(model);
 
-		var game = mapper.Map<Game>(model);
+		async Task AddGame()
+		{
+			await ValidateGame(model);
 
-		game.Key ??= GenerateKey(model.Game.Name);
+			var game = mapper.Map<Game>(model);
 
-		await PopulateNavigationProperties(model, game);
+			game.Key ??= GenerateKey(model.Game.Name);
 
-		await unitOfWork.GameRepository!.AddAsync(game);
-		await unitOfWork.SaveAsync();
+			await PopulateNavigationProperties(model, game);
+
+			await unitOfWork.GameRepository!.AddAsync(game);
+			await unitOfWork.SaveAsync();
+		}
+
+		return AddGame();
 	}
 
 	public async Task DeleteAsync(object modelId)
@@ -38,59 +43,88 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 		return mapper.Map<IEnumerable<GameModel>>(games);
 	}
 
-	public async Task<GameModel?> GetByKeyAsync(string key)
+	public Task<GameModel?> GetByKeyAsync(string key)
 	{
-		if (key.IsNullOrEmpty())
+		ArgumentException.ThrowIfNullOrEmpty(key);
+
+		async Task<GameModel?> getGameByIdAsync()
 		{
-			throw new ArgumentNullException(nameof(key));
+			var games = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
+			return mapper.Map<GameModel?>(games);
 		}
 
-		var games = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
-		return mapper.Map<GameModel?>(games);
+		return getGameByIdAsync();
 	}
 
-	public async Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key)
+	public Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(key);
-		var genres = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Genres")).SelectMany(g => g.Genres);
-		return mapper.Map<IEnumerable<GenreModel>>(genres);
+		async Task<IEnumerable<GenreModel>> getGenres()
+		{
+			var genres = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Genres")).SelectMany(g => g.Genres);
+			return mapper.Map<IEnumerable<GenreModel>>(genres);
+		}
+
+		return getGenres();
 	}
 
-	public async Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key)
+	public Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(key);
-		var platforms = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Platforms")).SelectMany(g => g.Platforms);
-		return mapper.Map<IEnumerable<PlatformModel>>(platforms);
+
+		async Task<IEnumerable<PlatformModel>> getPlatforms()
+		{
+			var platforms = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Platforms")).SelectMany(g => g.Platforms);
+			return mapper.Map<IEnumerable<PlatformModel>>(platforms);
+		}
+		
+		return getPlatforms();
 	}
 
-	public async Task<GameModel?> GetByIdAsync(object id)
+	public Task<GameModel?> GetByIdAsync(object id)
 	{
 		ArgumentNullException.ThrowIfNull(id);
-		var game = await unitOfWork.GameRepository!.GetByIDAsync(id);
-		return mapper.Map<GameModel?>(game);
+
+		async Task<GameModel?> getById()
+		{
+			var game = await unitOfWork.GameRepository!.GetByIDAsync(id);
+			return mapper.Map<GameModel?>(game);
+		}
+
+		return getById();
 	}
 
-	public async Task<GameModel?> GetByNameAsync(string gameName)
+	public Task<GameModel?> GetByNameAsync(string gameName)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(gameName);
 
-		var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == gameName)).SingleOrDefault();
-		return mapper.Map<GameModel>(game);
+		async Task<GameModel?> GetByName()
+		{
+			var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == gameName)).SingleOrDefault();
+			return mapper.Map<GameModel>(game);
+		}
+
+		return GetByName();
 	}
 
-	public async Task UpdateAsync(GameModel model)
+	public Task UpdateAsync(GameModel model)
 	{
 		ArgumentNullException.ThrowIfNull(model);
 
-		await ValidateGame(model);
+		async Task Update()
+		{
+			await ValidateGame(model);
 
-		var game = mapper.Map<Game>(model);
-		game.Key ??= GenerateKey(model.Game.Name);
+			var game = mapper.Map<Game>(model);
+			game.Key ??= GenerateKey(model.Game.Name);
 
-		await PopulateNavigationProperties(model, game);
+			await PopulateNavigationProperties(model, game);
 
-		unitOfWork.GameRepository!.Update(game);
-		await unitOfWork.SaveAsync();
+			unitOfWork.GameRepository!.Update(game);
+			await unitOfWork.SaveAsync();
+		}
+
+		return Update();
 	}
 
 	public string GenerateKey(string gameName)
