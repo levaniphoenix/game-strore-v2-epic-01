@@ -5,11 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
 {
-	public abstract class GenericRepository<TEntity>(GamestoreDBContext context) : IRepository<TEntity> where TEntity : class
+	public abstract class GenericRepository<TEntity>: IRepository<TEntity> where TEntity : class
 	{
+		private readonly GamestoreDBContext context;
+
 		public GamestoreDBContext Context => context;
 
-		internal DbSet<TEntity> dbSet = context.Set<TEntity>();
+		internal DbSet<TEntity> dbSet;
+
+		protected GenericRepository(GamestoreDBContext context)
+		{
+			this.context = context;
+			dbSet = context.Set<TEntity>();
+		}
 
 		public virtual async Task<IEnumerable<TEntity>> GetAllAsync(
 			Expression<Func<TEntity, bool>>? filter = null,
