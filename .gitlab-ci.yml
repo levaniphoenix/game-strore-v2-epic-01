@@ -1,5 +1,13 @@
+services:
+  - name: docker:dind
+    # explicitly disable tls to avoid docker startup interruption
+    command: ["--tls=false"]
+
 variables:
   PROJECT_NAME: 'Gamestore'
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2
 
 test:
   image: mcr.microsoft.com/dotnet/sdk:8.0

@@ -14,14 +14,15 @@ namespace Gamestore.Tests.IntegrationTests
 
 		private const string BaseUrl = "/games";
 
-		[SetUp]
-		public void Init()
+		[OneTimeSetUp]
+		public async Task Init()
 		{
 			_factory = new CustomWebApplicationFactory();
+			await _factory.StartContainerAsync();
 			_client = _factory.CreateClient();
 		}
 
-		[Ignore("ignore until integration tests can be run on CI")]
+		//[Ignore("ignore until integration tests can be run on CI")]
 		[Test]
 		public async Task GamesControllerGetAllReturnsAllFromDb()
 		{
@@ -34,7 +35,7 @@ namespace Gamestore.Tests.IntegrationTests
 			actual.Count.Should().Be(DBSeeder.Games.Length);
 		}
 
-		[Ignore("ignore until integration tests can be run on CI")]
+		[Ignore("ignore until fix json serialize/deserialize")]
 		[Test]
 		public async Task GameControllerAddsGameToDB()
 		{
@@ -55,10 +56,11 @@ namespace Gamestore.Tests.IntegrationTests
 			actual.Should().NotBeNull();
 		}
 
-		[TearDown]
-		public void TearDown()
+		[OneTimeTearDown]
+		public async Task TearDown()
 		{
-			_factory.Dispose();
+			await _factory.StopContainerAsync();
+			await _factory.DisposeAsync();
 			_client.Dispose();
 		}
 	}
