@@ -6,7 +6,7 @@ services:
 variables:
   TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
   PROJECT_NAME: 'Gamestore'
-  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_HOST: "tcp://docker:2376"
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
 
