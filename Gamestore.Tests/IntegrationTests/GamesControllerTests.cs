@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 
 namespace Gamestore.Tests.IntegrationTests
 {
+	[Ignore("ignore until integration tests can be run on CI")]
+	[TestFixture]
 	public class GamesControllerTests
 	{
 		private HttpClient _client;
@@ -22,7 +24,6 @@ namespace Gamestore.Tests.IntegrationTests
 			_client = _factory.CreateClient();
 		}
 
-		//[Ignore("ignore until integration tests can be run on CI")]
 		[Test]
 		public async Task GamesControllerGetAllReturnsAllFromDb()
 		{
@@ -35,7 +36,6 @@ namespace Gamestore.Tests.IntegrationTests
 			actual.Count.Should().Be(DBSeeder.Games.Length);
 		}
 
-		[Ignore("ignore until fix json serialize/deserialize")]
 		[Test]
 		public async Task GameControllerAddsGameToDB()
 		{
