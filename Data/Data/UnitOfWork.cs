@@ -4,7 +4,7 @@ using Data.Repositories;
 
 namespace Data.Data
 {
-	public class UnitOfWork(GamestoreDBContext context) : IUnitOfWork
+	public class UnitOfWork(GamestoreDBContext context) : IUnitOfWork, IDisposable
 	{
 		private IRepository<Game>? gameRepository;
 		private IRepository<Platform>? platformRepository;
@@ -37,6 +37,23 @@ namespace Data.Data
 		public async Task SaveAsync()
 		{
 			await context.SaveChangesAsync();
+		}
+
+		private bool disposed;
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposed && disposing)
+			{
+				context.Dispose();
+			}
+			disposed = true;
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 	}
 }
