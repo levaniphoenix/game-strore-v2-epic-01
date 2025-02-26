@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -11,42 +10,58 @@ namespace Gamestore.Controllers;
 public class GamesController(IGameService gameService) : ControllerBase
 {
 	[HttpGet]
-	public async Task<IEnumerable<GameDetails>> Get()
+	public async Task<ActionResult<IEnumerable<GameDetails>>> Get()
 	{
 		var games = (await gameService.GetAllAsync()).Select(x => x.Game);
-		return games;
+		return Ok(games);
 	}
 
 	[HttpGet("{key}")]
-	public async Task<GameDetails?> Get(string key)
+	public async Task<ActionResult<GameDetails?>> Get(string key)
 	{
-		var game = (await gameService.GetByKeyAsync(key)) ?? throw new GameStoreNotFoundException(ErrorMessages.GameNotFound);
-		return game.Game;
+		var game = await gameService.GetByKeyAsync(key);
+		if (game is null)
+		{
+			return NotFound("could not find the game with the specified key");
+		}
+
+		return Ok(game.Game);
 	}
 
 	[HttpGet("{key}/genres")]
-	public async Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key)
+	public async Task<ActionResult<IEnumerable<GenreModel>>> GetGenresByGamekey(string key)
 	{
-		return await gameService.GetGenresByGamekey(key);
+		return Ok(await gameService.GetGenresByGamekey(key));
 	}
 
 	[HttpGet("{key}/platforms")]
-	public async Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key)
+	public async Task<ActionResult<IEnumerable<PlatformModel>>> GetPlatformsByGamekey(string key)
 	{
-		return await gameService.GetPlatformsByGamekey(key);
+		return Ok(await gameService.GetPlatformsByGamekey(key));
 	}
 
 	[HttpGet("find/{id}")]
-	public async Task<GameDetails?> GetById(int id)
+	public async Task<ActionResult<GameDetails?>> GetById(int id)
 	{
-		var game = (await gameService.GetByIdAsync(id)) ?? throw new GameStoreNotFoundException(ErrorMessages.GameNotFound);
-		return game.Game;
+		var game = await gameService.GetByIdAsync(id);
+
+		if (game is null)
+		{
+			return NotFound("The game was not found");
+		}
+
+		return Ok(game.Game);
 	}
 
 	[HttpGet("{key}/file")]
-	public async Task<FileContentResult> GetFile(string key)
+	public async Task<ActionResult> GetFile(string key)
 	{
-		var game = (await gameService.GetByKeyAsync(key)) ?? throw new GameStoreNotFoundException(ErrorMessages.GameNotFound);
+		var game = await gameService.GetByKeyAsync(key);
+		if (game is null)
+		{
+			return NotFound("game was not found");
+		}
+
 		var fileName = $"_{key}.txt";
 		var fileContent = $"{game.Game.Name}\n{game.Game.Description}";
 		var fileBytes = Encoding.UTF8.GetBytes(fileContent);
@@ -56,32 +71,35 @@ public class GamesController(IGameService gameService) : ControllerBase
 
 	// POST: games/
 	[HttpPost]
-	public async Task Post([FromBody] GameModel game)
+	public async Task<ActionResult> Post([FromBody] GameModel game)
 	{
 		if (!ModelState.IsValid)
 		{
-			throw new GameStoreModelStateException("Model is not valid");
+			return BadRequest(ModelState);
 		}
 
 		await gameService.AddAsync(game);
+		return Ok();
 	}
 
 	// PUT: games/
 	[HttpPut]
-	public async Task Put([FromBody] GameModel game)
+	public async Task<ActionResult> Put([FromBody] GameModel game)
 	{
 		if (!ModelState.IsValid)
 		{
-			throw new GameStoreModelStateException("Model is not valid");
+			return BadRequest(ModelState);
 		}
 
 		await gameService.UpdateAsync(game);
+		return Ok();
 	}
 
 	// DELETE: games/1
 	[HttpDelete("{id}")]
-	public async Task Delete(Guid id)
+	public async Task<ActionResult> Delete(Guid id)
 	{
 		await gameService.DeleteAsync(id);
+		return Ok();
 	}
 }
