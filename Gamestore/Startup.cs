@@ -20,7 +20,6 @@ public class Startup(IConfiguration configuration)
 			options.UseSqlServer(connectionString));
 
 		services.AddExceptionHandler<GameStoreValidationExceptionHandler>();
-		services.AddExceptionHandler<GameStoreNotFoundExceptionHandler>();
 
 		var mapperConfig = new MapperConfiguration(mc =>
 		{
