@@ -41,7 +41,7 @@ public class GamesController(IGameService gameService) : ControllerBase
 	}
 
 	[HttpGet("find/{id}")]
-	public async Task<ActionResult<GameDetails?>> GetById(int id)
+	public async Task<ActionResult<GameDetails?>> GetById(Guid id)
 	{
 		var game = await gameService.GetByIdAsync(id);
 
