@@ -30,7 +30,7 @@ public class PlatformsController(IPlatformService platformService) : ControllerB
 	[HttpGet("{id}/games")]
 	public async Task<ActionResult<IEnumerable<GameDetails?>>> GetGamesByPlatform(Guid id)
 	{
-		return Ok((await platformService.GetGamesByGenreIdAsync(id)).Select(g => g.Game));
+		return Ok((await platformService.GetGamesByPlatformIdAsync(id)).Select(g => g.Game));
 	}
 
 	[HttpPost]

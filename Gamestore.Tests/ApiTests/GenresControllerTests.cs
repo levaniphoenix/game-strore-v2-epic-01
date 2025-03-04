@@ -76,8 +76,6 @@ public class GenresControllerTests
 		var id = Guid.Parse("00000000-0000-0000-0000-000000000001");
 		var result = await genresController.Get(id);
 
-		var okResult = result.Result as NotFoundObjectResult;
-
 		result.Result.Should().BeOfType<NotFoundObjectResult>();
 	}
 

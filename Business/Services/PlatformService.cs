@@ -35,7 +35,7 @@ namespace Business.Services
 			return mapper.Map<PlatformModel?>(platform);
 		}
 
-		public async Task<IEnumerable<GameModel?>> GetGamesByGenreIdAsync(Guid id)
+		public async Task<IEnumerable<GameModel?>> GetGamesByPlatformIdAsync(Guid id)
 		{
 			var games = await unitOfWork.GameRepository!.GetAllAsync(g => g.Platforms.Select(g => g.Id).Contains(id));
 			return mapper.Map<IEnumerable<GameModel?>>(games);
