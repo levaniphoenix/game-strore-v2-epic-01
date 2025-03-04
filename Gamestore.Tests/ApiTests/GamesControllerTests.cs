@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using Business.Interfaces;
 using Business.Models;
 using Data.Data;
-using Data.Entities;
 using FluentAssertions;
 using Gamestore.Controllers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 

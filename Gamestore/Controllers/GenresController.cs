@@ -38,7 +38,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 	public async Task<ActionResult<IEnumerable<GenreDetails?>>> GetGenresByParentId(Guid id)
 	{
 		var genres = await genreService.GetGenresByParentId(id);
-		if (genres is null)
+		if (!genres.Any())
 		{
 			return NotFound("genres not found");
 		}
