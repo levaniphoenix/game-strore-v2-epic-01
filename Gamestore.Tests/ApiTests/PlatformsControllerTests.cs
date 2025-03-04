@@ -2,12 +2,10 @@
 using Business.Interfaces;
 using Business.Models;
 using Data.Data;
-using Data.Entities;
 using FluentAssertions;
 using Gamestore.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using static Business.Models.GenreModel;
 using static Business.Models.PlatformModel;
 
 namespace Gamestore.Tests.ApiTests;
