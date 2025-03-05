@@ -19,6 +19,11 @@ namespace Data.Repositories
 			dbSet = context.Set<TEntity>();
 		}
 
+		public virtual async Task<int> GetTotalCountAsync()
+		{
+			return await dbSet.CountAsync();
+		}
+
 		public virtual async Task<IEnumerable<TEntity>> GetAllAsync(
 			Expression<Func<TEntity, bool>>? filter = null,
 			Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,

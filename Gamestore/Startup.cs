@@ -5,6 +5,7 @@ using Business.Services;
 using Data.Data;
 using Data.Interfaces;
 using Gamestore.ExeptionHandlers;
+using Gamestore.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore;
@@ -33,7 +34,10 @@ public class Startup(IConfiguration configuration)
 		services.AddScoped<IPlatformService, PlatformService>();
 		services.AddScoped<IGenreService, GenreService>();
 
-		services.AddControllers();
+		services.AddControllers(options =>
+		{
+			options.Filters.Add<TotalGamesHeaderFilter>();
+		});
 
 		services.AddEndpointsApiExplorer();
 		services.AddSwaggerGen();

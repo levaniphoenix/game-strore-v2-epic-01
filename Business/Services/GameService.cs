@@ -9,6 +9,11 @@ namespace Business.Services;
 
 public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 {
+	public async Task<int> GetTotalGamesCountAsync()
+	{
+		return await unitOfWork.GameRepository.GetTotalCountAsync();
+	}
+
 	public Task AddAsync(GameModel model)
 	{
 		ArgumentNullException.ThrowIfNull(model);

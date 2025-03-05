@@ -15,5 +15,7 @@ namespace Data.Interfaces
 		Task DeleteByIdAsync(object id);
 
 		void Update(TEntity entityToUpdate);
+
+		Task<int> GetTotalCountAsync();
 	}
 }

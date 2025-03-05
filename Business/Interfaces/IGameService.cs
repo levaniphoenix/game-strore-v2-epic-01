@@ -13,5 +13,7 @@ namespace Business.Interfaces
 		Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key);
 
 		Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key);
+
+		Task<int> GetTotalGamesCountAsync();
 	}
 }
