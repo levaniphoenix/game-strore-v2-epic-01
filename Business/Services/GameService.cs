@@ -4,13 +4,15 @@ using Business.Interfaces;
 using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Business.Services;
 
-public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
+public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameService> logger) : IGameService
 {
 	public async Task<int> GetTotalGamesCountAsync()
 	{
+		logger.LogInformation("Fetching total games count");
 		return await unitOfWork.GameRepository.GetTotalCountAsync();
 	}
 
@@ -21,6 +23,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
 		async Task AddGame()
 		{
+			logger.LogInformation("Adding a new game: {GameName}", model.Game.Name);
 			await ValidateGame(model);
 
 			var game = mapper.Map<Game>(model);
@@ -31,6 +34,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
 			await unitOfWork.GameRepository!.AddAsync(game);
 			await unitOfWork.SaveAsync();
+			logger.LogInformation("Game {GameName} added successfully with key {GameKey}", model.Game.Name, game.Key);
 		}
 
 		return AddGame();
@@ -38,12 +42,15 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
 	public async Task DeleteAsync(object modelId)
 	{
+		logger.LogInformation("Deleting game with ID: {GameId}", modelId);
 		await unitOfWork.GameRepository!.DeleteByIdAsync(modelId);
 		await unitOfWork.SaveAsync();
+		logger.LogInformation("Game with ID {GameId} deleted successfully", modelId);
 	}
 
 	public async Task<IEnumerable<GameModel>> GetAllAsync()
 	{
+		logger.LogInformation("Fetching all games");
 		var games = await unitOfWork.GameRepository!.GetAllAsync();
 		return mapper.Map<IEnumerable<GameModel>>(games);
 	}
@@ -51,6 +58,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 	public Task<GameModel?> GetByKeyAsync(string key)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(key);
+		logger.LogInformation("Fetching game by key: {GameKey}", key);
 
 		async Task<GameModel?> getGameByIdAsync()
 		{
@@ -64,9 +72,11 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 	public Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(key);
+		logger.LogInformation("Fetching genres by key: {GameKey}", key);
 		async Task<IEnumerable<GenreModel>> getGenres()
 		{
 			var genres = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Genres")).SelectMany(g => g.Genres);
+			logger.LogInformation("Fetched {Count} genres for game key: {GameKey}", genres.Count(), key);
 			return mapper.Map<IEnumerable<GenreModel>>(genres);
 		}
 
@@ -76,10 +86,12 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 	public Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(key);
+		logger.LogInformation("Fetching platforms by key: {GameKey}", key);
 
 		async Task<IEnumerable<PlatformModel>> getPlatforms()
 		{
 			var platforms = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Platforms")).SelectMany(g => g.Platforms);
+			logger.LogInformation("Fetched {Count} platforms for game key: {GameKey}", platforms.Count(), key);
 			return mapper.Map<IEnumerable<PlatformModel>>(platforms);
 		}
 		
@@ -89,6 +101,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 	public Task<GameModel?> GetByIdAsync(object id)
 	{
 		ArgumentNullException.ThrowIfNull(id);
+		logger.LogInformation("Fetching game by ID: {GameId}", id);
 
 		async Task<GameModel?> getById()
 		{
@@ -102,6 +115,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 	public Task<GameModel?> GetByNameAsync(string gameName)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(gameName);
+		logger.LogInformation("Fetching game by name: {GameName}", gameName);
 
 		async Task<GameModel?> GetByName()
 		{
@@ -115,6 +129,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 	public Task UpdateAsync(GameModel model)
 	{
 		ArgumentNullException.ThrowIfNull(model);
+		logger.LogInformation("Updating game: {GameName}", model.Game.Name);
 
 		async Task Update()
 		{
@@ -127,6 +142,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
 			unitOfWork.GameRepository!.Update(game);
 			await unitOfWork.SaveAsync();
+			logger.LogInformation("Game {GameName} updated successfully", model.Game.Name);
 		}
 
 		return Update();
@@ -135,18 +151,23 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 	public string GenerateKey(string gameName)
 	{
 		ArgumentNullException.ThrowIfNull(gameName);
+		logger.LogInformation("Generating key for game name: {GameName}", gameName);
 
 		var key = gameName.Split(" ").Select(s => string.Concat(s[0].ToString().ToUpperInvariant(), s.AsSpan(1)));
-
-		return string.Join("", key);
+		var generatedKey = string.Join("", key);
+		
+		logger.LogInformation("Generated key: {GameKey} for game name: {GameName}", generatedKey, gameName);
+		return generatedKey;
 	}
 
 	public async Task ValidateGame(GameModel model)
 	{
+		logger.LogInformation("Validating game: {GameName}", model.Game.Name);
 		var existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == model.Game.Name)).SingleOrDefault();
 
 		if (existingGame is not null)
 		{
+			logger.LogWarning("Validation failed: Game name {GameName} already exists", model.Game.Name);
 			throw new GameStoreValidationException(ErrorMessages.GameNameAlreadyExists);
 		}
 
@@ -158,12 +179,16 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
 		if (existingGame is not null)
 		{
+			logger.LogWarning("Validation failed: Game key {GameKey} already exists", key);
 			throw new GameStoreValidationException(ErrorMessages.GameKeyAlreadyExists);
 		}
+
+		logger.LogInformation("Validation successful for game: {GameName}", model.Game.Name);
 	}
 
 	public async Task PopulateNavigationProperties(GameModel model, Game game)
 	{
+		logger.LogInformation("Populating navigation properties for game: {GameName}", model.Game.Name);
 		if (model.PlatformIds is not null)
 		{
 			var platforms = (await unitOfWork.PlatformRepository!.GetAllAsync(p => model.PlatformIds.Contains(p.Id))).ToList();
@@ -172,6 +197,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 			{
 				if (!platforms.Select(p => p.Id).Contains(platformID))
 				{
+					logger.LogWarning("Validation failed: Platform ID {PlatformID} does not exist", platformID);
 					throw new GameStoreValidationException(string.Format(ErrorMessages.PlatformDoesNotExist, platformID));
 				}
 			}
@@ -186,6 +212,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 			{
 				if (!genres.Select(p => p.Id).Contains(genreID))
 				{
+					logger.LogWarning("Validation failed: Genre ID {GenreID} does not exist", genreID);
 					throw new GameStoreValidationException(string.Format(ErrorMessages.GenreDoesNotExist, genreID));
 				}
 			}

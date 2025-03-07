@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Business.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
+using Serilog;
 
 namespace Gamestore.ExeptionHandlers;
 
@@ -17,6 +18,7 @@ public class GameStoreValidationExceptionHandler : IExceptionHandler
 			return false;
 		}
 
+		LogExceptionDetails(exception);
 		var exceptionMessage = exception.Message;
 		var statusCode = HttpStatusCode.BadRequest;
 		var error = new { message = exceptionMessage };
@@ -25,5 +27,16 @@ public class GameStoreValidationExceptionHandler : IExceptionHandler
 		httpContext.Response.StatusCode = (int)statusCode;
 		await httpContext.Response.WriteAsync(result, cancellationToken);
 		return true;
+	}
+
+	private static void LogExceptionDetails(Exception ex)
+	{
+		Log.Error(
+			ex,
+			"Exception occurred: {ExceptionType} | Message: {ExceptionMessage} | StackTrace: {StackTrace} | InnerException: {InnerException}",
+			ex.GetType().Name,
+			ex.Message,
+			ex.StackTrace,
+			ex.InnerException?.Message);
 	}
 }

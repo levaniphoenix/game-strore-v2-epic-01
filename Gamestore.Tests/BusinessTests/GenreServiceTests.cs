@@ -5,6 +5,7 @@ using Data.Data;
 using Data.Entities;
 using Data.Interfaces;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using static Business.Models.GenreModel;
 
@@ -13,6 +14,8 @@ namespace Gamestore.Tests.BusinessTests
 	[TestFixture]
 	public class GenreServiceTests
 	{
+		private readonly ILogger<GenreService> logger = Mock.Of<ILogger<GenreService>>();
+
 		[Test]
 		public async Task GenreServiceAddAsyncAddsToDB()
 		{
@@ -20,7 +23,7 @@ namespace Gamestore.Tests.BusinessTests
 			mockUnitOfWork.Setup(u => u.GenreRepository!.AddAsync(It.IsAny<Genre>()));
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
 
-			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
+			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger);
 
 			await genreService.AddAsync(new GenreModel { Genre = new GenreDetails { Name = "VR" } });
 
@@ -35,7 +38,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			mockUnitOfWork.Setup(u => u.GenreRepository!.AddAsync(It.IsAny<Genre>()));
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
-			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
+			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger);
 			Assert.ThrowsAsync<GameStoreValidationException>(() => genreService.AddAsync(new GenreModel { Genre = new GenreDetails { Name = "Action" } }));
 		}
 
@@ -45,7 +48,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			mockUnitOfWork.Setup(u => u.GenreRepository!.DeleteByIdAsync(It.IsAny<object>()));
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
-			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
+			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger);
 
 			var id = DBSeeder.Genres[0].Id;
 
@@ -60,7 +63,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
 			var mapper = UnitTestHelper.CreateMapperProfile();
-			var genreService = new GenreService(mockUnitOfWork.Object, mapper);
+			var genreService = new GenreService(mockUnitOfWork.Object, mapper, logger);
 			var genres = await genreService.GetAllAsync();
 			var expected = mapper.Map<IEnumerable<GenreModel>>(DBSeeder.Genres);
 			genres.Should().BeEquivalentTo(expected);
@@ -72,7 +75,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
 			var mapper = UnitTestHelper.CreateMapperProfile();
-			var genreService = new GenreService(mockUnitOfWork.Object, mapper);
+			var genreService = new GenreService(mockUnitOfWork.Object, mapper, logger);
 			var genres = await genreService.GetGenresByParentId(DBSeeder.Genres[0].Id);
 			var expected = mapper.Map<IEnumerable<GenreModel?>>(DBSeeder.Genres.Where(g => g.ParentGenreId == DBSeeder.Genres[0].Id));
 			genres.Should().NotBeEmpty();
@@ -85,7 +88,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
 			var mapper = UnitTestHelper.CreateMapperProfile();
-			var genreService = new GenreService(mockUnitOfWork.Object, mapper);
+			var genreService = new GenreService(mockUnitOfWork.Object, mapper, logger);
 			var id = Guid.Parse("00000000-0000-0000-0000-000000000001");
 			var genres = await genreService.GetGenresByParentId(id);
 			genres.Should().BeEmpty();
@@ -100,7 +103,7 @@ namespace Gamestore.Tests.BusinessTests
 				.ReturnsAsync((object id) => DBSeeder.Genres.SingleOrDefault(g => g.Id == (Guid)id));
 
 			var mapper = UnitTestHelper.CreateMapperProfile();
-			var genreService = new GenreService(mockUnitOfWork.Object, mapper);
+			var genreService = new GenreService(mockUnitOfWork.Object, mapper, logger);
 			var genre = await genreService.GetByIdAsync(DBSeeder.Genres[0].Id);
 			var expected = mapper.Map<GenreModel?>(DBSeeder.Genres[0]);
 			genre.Should().BeEquivalentTo(expected);
@@ -112,7 +115,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
 			var mapper = UnitTestHelper.CreateMapperProfile();
-			var genreService = new GenreService(mockUnitOfWork.Object, mapper);
+			var genreService = new GenreService(mockUnitOfWork.Object, mapper, logger);
 			var id = Guid.Parse("00000000-0000-0000-0000-000000000001");
 			var genre = await genreService.GetByIdAsync(id);
 			genre.Should().BeNull();
@@ -124,7 +127,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			mockUnitOfWork.Setup(u => u.GenreRepository!.Update(It.IsAny<Genre>()));
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
-			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
+			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger);
 			var genre = new GenreModel { Genre = new GenreDetails { Id = DBSeeder.Genres[0].Id, Name = "VR" } };
 			await genreService.UpdateAsync(genre);
 			mockUnitOfWork.Verify(u => u.GenreRepository!.Update(It.IsAny<Genre>()), Times.Once);
@@ -137,7 +140,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			mockUnitOfWork.Setup(u => u.GenreRepository!.Update(It.IsAny<Genre>()));
 			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
-			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile());
+			var genreService = new GenreService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger);
 			var genre = new GenreModel { Genre = new GenreDetails { Id = DBSeeder.Genres[0].Id, Name = "Action" } };
 			Assert.ThrowsAsync<GameStoreValidationException>(() => genreService.UpdateAsync(genre));
 		}
