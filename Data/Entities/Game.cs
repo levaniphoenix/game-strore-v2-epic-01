@@ -20,8 +20,22 @@ namespace Data.Entities
 		[Column(TypeName = "VARCHAR(5000)")]
 		public string? Description { get; set; }
 
+		[Required]
+		public double Price { get; set; }
+
+		[Required]
+		public int UnitsInStock { get; set; }
+
+		[Required]
+		public int Discount { get; set; }
+
+		[Required]
+		public Guid PublisherId { get; set; }
+
 		public ICollection<Platform> Platforms { get; set; } = [];
 
 		public ICollection<Genre> Genres { get; set; } = [];
+
+		public virtual Publisher Publisher { get; set; } = default!;
 	}
 }

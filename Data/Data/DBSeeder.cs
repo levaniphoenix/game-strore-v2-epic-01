@@ -12,12 +12,15 @@ namespace Data.Data
 
 		public static Game[] Games => games;
 
+		public static Publisher[] Publishers => publishers;
+
 		public static GamePlatform[] GamePlatforms => gamePlatforms;
 
 		public static GameGenre[] GameGenres => gameGenres;
 
 		public static void Seed(ModelBuilder modelBuilder)
 		{
+			modelBuilder.Entity<Publisher>().HasData(publishers);
 			modelBuilder.Entity<Platform>().HasData(platforms);
 			modelBuilder.Entity<Genre>().HasData(genres);
 			modelBuilder.Entity<Genre>().HasData(subGenres);
@@ -25,6 +28,13 @@ namespace Data.Data
 			modelBuilder.Entity<GamePlatform>().HasData(gamePlatforms);
 			modelBuilder.Entity<GameGenre>().HasData(gameGenres);
 		}
+
+		private static readonly Publisher[] publishers = new Publisher[]
+		{
+			new Publisher { CompanyName = "Test Publisher", Id = Guid.NewGuid() },
+			new Publisher { CompanyName = "Test Publisher 2", Id = Guid.NewGuid() },
+			new Publisher { CompanyName = "Test Publisher 3", Id = Guid.NewGuid() }
+		};
 
 		private static readonly Platform[] platforms = new Platform[]
 		{
@@ -59,9 +69,9 @@ namespace Data.Data
 
 		private static readonly Game[] games = new Game[]
 			{
-			 new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(),} ,
-			 new Game { Name = "Test Game 2", Key = "test_game_2", Description = "This is a test game 2", Id = Guid.NewGuid(),} ,
-			 new Game { Name = "Test Game 3", Key = "test_game_3", Description = "This is a test game 3", Id = Guid.NewGuid(),}
+			 new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(), PublisherId = publishers[0].Id } ,
+			 new Game { Name = "Test Game 2", Key = "test_game_2", Description = "This is a test game 2", Id = Guid.NewGuid(), PublisherId = publishers[1].Id} ,
+			 new Game { Name = "Test Game 3", Key = "test_game_3", Description = "This is a test game 3", Id = Guid.NewGuid(), PublisherId = publishers[2].Id}
 			};
 
 		private static readonly GamePlatform[] gamePlatforms = new GamePlatform[]

@@ -8,6 +8,7 @@ namespace Data.Data
 		public DbSet<Game> Games { get; set; } = default!;
 		public DbSet<Genre> Genres { get; set; } = default!;
 		public DbSet<Platform> Platforms { get; set; } = default!;
+		public DbSet<Publisher> Publishers { get; set; } = default!;
 		public DbSet<GamePlatform> GamePlatforms { get; set; } = default!;
 		public DbSet<GameGenre> GameGenres { get; set; } = default!;
 
@@ -55,6 +56,8 @@ namespace Data.Data
 			modelBuilder.Entity<Genre>().HasIndex(g => g.Name).IsUnique(true);
 
 			modelBuilder.Entity<Platform>().HasIndex(p => p.Type).IsUnique(true);
+
+			modelBuilder.Entity<Publisher>().HasIndex(p => p.CompanyName).IsUnique(true);
 
 			modelBuilder.Entity<GamePlatform>()
 				.HasKey(gp => new { gp.GameId, gp.PlatformId });
