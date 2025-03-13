@@ -10,6 +10,8 @@ namespace Data.Interfaces
 
 		IRepository<Genre>? GenreRepository { get; }
 
+		IRepository<Publisher>? PublisherRepository { get; }
+
 		Task SaveAsync();
 	}
 }

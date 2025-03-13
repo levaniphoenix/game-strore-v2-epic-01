@@ -17,5 +17,14 @@ namespace Business.Models
 
 		[StringLength(5000)]
 		public string? Description { get; set; }
+
+		[Required]
+		public double Price { get; set; }
+
+		[Required]
+		public int UnitsInStock { get; set; }
+
+		[Required]
+		public int Discount { get; set; }
 	}
 }

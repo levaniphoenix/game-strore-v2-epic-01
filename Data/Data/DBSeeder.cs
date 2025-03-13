@@ -69,9 +69,9 @@ namespace Data.Data
 
 		private static readonly Game[] games = new Game[]
 			{
-			 new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(), PublisherId = publishers[0].Id } ,
-			 new Game { Name = "Test Game 2", Key = "test_game_2", Description = "This is a test game 2", Id = Guid.NewGuid(), PublisherId = publishers[1].Id} ,
-			 new Game { Name = "Test Game 3", Key = "test_game_3", Description = "This is a test game 3", Id = Guid.NewGuid(), PublisherId = publishers[2].Id}
+			 new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = Guid.NewGuid(), PublisherId = publishers[0].Id , Price = 10, Discount = 1 , UnitsInStock = 10 } ,
+			 new Game { Name = "Test Game 2", Key = "test_game_2", Description = "This is a test game 2", Id = Guid.NewGuid(), PublisherId = publishers[1].Id, Price = 20, Discount = 2 , UnitsInStock = 20} ,
+			 new Game { Name = "Test Game 3", Key = "test_game_3", Description = "This is a test game 3", Id = Guid.NewGuid(), PublisherId = publishers[2].Id, Price = 30, Discount = 3 , UnitsInStock = 30}
 			};
 
 		private static readonly GamePlatform[] gamePlatforms = new GamePlatform[]

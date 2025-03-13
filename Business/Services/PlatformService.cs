@@ -82,7 +82,7 @@ namespace Business.Services
 
 			if (existingPlatform is not null)
 			{
-				logger.LogWarning("Validation failed: Platform type {PlatformType} already exists", model.Platform.Type);
+				logger.LogError("Validation failed: Platform type {PlatformType} already exists", model.Platform.Type);
 				throw new GameStoreValidationException(ErrorMessages.PlatformTypeAlreadyExists);
 			}
 
