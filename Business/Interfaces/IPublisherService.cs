@@ -3,5 +3,5 @@
 namespace Business.Interfaces;
 public interface IPublisherService : ICrud<PublisherModel>
 {
-	Task<IEnumerable<GameModel?>> GetGamesByPublisherIdAsync(Guid id);
+	Task<IEnumerable<GameModel?>> GetGamesByPublisherNameAsync(string name);
 }

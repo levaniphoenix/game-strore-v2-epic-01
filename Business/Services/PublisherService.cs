@@ -53,12 +53,12 @@ public class PublisherService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Pu
 		return mapper.Map<PublisherModel?>(publisher);
 	}
 
-	public async Task<IEnumerable<GameModel?>> GetGamesByPublisherIdAsync(Guid id)
+	public async Task<IEnumerable<GameModel?>> GetGamesByPublisherNameAsync(string name)
 	{
-		logger.LogInformation("Fetching games for publisher ID: {PublisherId}", id);
+		logger.LogInformation("Fetching games for publisher : {PublisherCompanyName}", name);
 		
-		var games = await unitOfWork.GameRepository!.GetAllAsync(g => g.PublisherId == id);
-		logger.LogInformation("Fetched {Count} games for publisher ID: {PublisherId}", games.Count(), id);
+		var games = await unitOfWork.GameRepository!.GetAllAsync(g => g.Publisher.CompanyName.Equals(name));
+		logger.LogInformation("Fetched {Count} games for publisher : {PublisherCompanyName}", games.Count(), name);
 		
 		return mapper.Map<IEnumerable<GameModel?>>(games);
 	}
