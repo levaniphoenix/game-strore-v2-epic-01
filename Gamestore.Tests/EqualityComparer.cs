@@ -63,4 +63,24 @@ namespace Gamestore.Tests
 			return obj.GetHashCode();
 		}
 	}
+
+	//publisher comparer
+	internal class PublisherEqualityComparer : IEqualityComparer<Publisher>
+	{
+		public bool Equals(Publisher? x, Publisher? y)
+		{
+			if (x == null && y == null)
+				return true;
+			if (x == null || y == null)
+				return false;
+
+			return x.Id == y.Id
+				&& x.CompanyName.Equals(y.CompanyName);
+		}
+
+		public int GetHashCode([DisallowNull] Publisher obj)
+		{
+			return obj.GetHashCode();
+		}
+	}
 }

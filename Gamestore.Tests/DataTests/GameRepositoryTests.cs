@@ -84,7 +84,8 @@ namespace Gamestore.Tests.DataTests
 				Id = Guid.NewGuid(),
 				Name = "Test Game4",
 				Key = "test_game_4",
-				Description = "This is a test game"
+				Description = "This is a test game",
+				PublisherId = DBSeeder.Publishers[0].Id,
 			};
 
 			//act
@@ -159,11 +160,19 @@ namespace Gamestore.Tests.DataTests
 									orderby p.Id
 									select p;
 
+			var expectedPublishers = from g in DBSeeder.Games
+									 join p in DBSeeder.Publishers on g.PublisherId equals p.Id
+									 orderby p.Id
+									 select p;
+
 			//act
-			var result = await unitOfWork.GameRepository.GetAllAsync(includeProperties: "Platforms,Genres");
+			var result = await unitOfWork.GameRepository.GetAllAsync(includeProperties: "Platforms,Genres,Publisher");
 			Assert.Multiple(() =>
 			{
 				//assert
+				Assert.That(result.Select(i => i.Publisher).OrderBy(i => i.Id),
+					Is.EqualTo(expectedPublishers).Using(new PublisherEqualityComparer()), message: "GetAllAsync does not return included entities");
+
 				Assert.That(result.SelectMany(i => i.Platforms).OrderBy(i => i.Id),
 					Is.EqualTo(expectedPlatforms).Using(new PlatformEqualityComparer()), message: "GetAllAsync does not return inclided entities");
 

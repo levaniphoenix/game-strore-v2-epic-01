@@ -129,7 +129,7 @@ namespace Gamestore.Tests.DataTests
 			//act
 			await unitOfWork.PlatformRepository.AddAsync(platform);
 			//assert
-			Assert.ThrowsAsync<DbUpdateException>(() => unitOfWork.SaveAsync());
+			Assert.ThrowsAsync<DbUpdateException>(unitOfWork.SaveAsync);
 		}
 
 		[Test]
@@ -143,7 +143,7 @@ namespace Gamestore.Tests.DataTests
 			//act
 			unitOfWork.PlatformRepository.Update(platform);
 			//assert
-			Assert.ThrowsAsync<DbUpdateException>(() => unitOfWork.SaveAsync());
+			Assert.ThrowsAsync<DbUpdateException>(unitOfWork.SaveAsync);
 			platform.Type = originalType;
 		}
 	}
