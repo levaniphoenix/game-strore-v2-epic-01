@@ -9,6 +9,7 @@ namespace Data.Data
 		private IRepository<Game>? gameRepository;
 		private IRepository<Platform>? platformRepository;
 		private IRepository<Genre>? genreRepository;
+		private IRepository<Publisher>? publisherRepository;
 
 		public IRepository<Game> GameRepository
 		{
@@ -16,6 +17,14 @@ namespace Data.Data
 			{
 				gameRepository ??= new GameRepository(context);
 				return gameRepository;
+			}
+		}
+		public IRepository<Publisher> PublisherRepository
+		{
+			get
+			{
+				publisherRepository ??= new PublisherRepository(context);
+				return publisherRepository;
 			}
 		}
 		public IRepository<Platform> PlatformRepository
