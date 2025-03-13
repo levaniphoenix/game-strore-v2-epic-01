@@ -26,7 +26,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GenreRepositoryGetAllReturnsAllValues()
+		public async Task GetAllReturnsAllValues()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -39,7 +39,7 @@ namespace Gamestore.Tests.DataTests
 
 		[TestCase(0)]
 		[TestCase(1)]
-		public async Task GenreRepositoryGetByIDReturnsSingleValue(int i)
+		public async Task GetByIDReturnsSingleValue(int i)
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -51,7 +51,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GenreRepositoryGetAllByNameReturnsSingleValue()
+		public async Task GetAllByNameReturnsSingleValue()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -64,7 +64,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GenreRepositoryAddAsyncAddsValueToDatabase()
+		public async Task AddAsyncAddsValueToDatabase()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -78,7 +78,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GenreRepositoryDeleteRemovesSingleValue()
+		public async Task DeleteRemovesSingleValue()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -92,7 +92,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GenreRepositoryDeleteByIdAsyncRemovesSingleValue()
+		public async Task DeleteByIdAsyncRemovesSingleValue()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -106,7 +106,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GenreRepositoryUpdateUpdatesValueInDatabase()
+		public async Task UpdateUpdatesValueInDatabase()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -129,7 +129,7 @@ namespace Gamestore.Tests.DataTests
 			//act
 			await unitOfWork.GenreRepository.AddAsync(genre);
 			//assert
-			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			Assert.ThrowsAsync<DbUpdateException>(unitOfWork.SaveAsync);
 		}
 
 		[Test]
@@ -143,7 +143,7 @@ namespace Gamestore.Tests.DataTests
 			//act
 			unitOfWork.GenreRepository.Update(genre);
 			//assert
-			Assert.ThrowsAsync<DbUpdateException>(async () => await unitOfWork.SaveAsync());
+			Assert.ThrowsAsync<DbUpdateException>(unitOfWork.SaveAsync);
 			genre.Name = originalName;
 		}
 	}

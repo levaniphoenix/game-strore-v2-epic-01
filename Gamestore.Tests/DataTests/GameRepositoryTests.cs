@@ -28,7 +28,7 @@ namespace Gamestore.Tests.DataTests
 		[TestCase(0)]
 		[TestCase(1)]
 		[TestCase(2)]
-		public async Task GameRepositoryGetByIDReturnsSingleValue(int i)
+		public async Task GetByIDReturnsSingleValue(int i)
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -45,7 +45,7 @@ namespace Gamestore.Tests.DataTests
 		[TestCase(0)]
 		[TestCase(1)]
 		[TestCase(2)]
-		public async Task GameRepositoryGetByKeyReturnsSingleValue(int i)
+		public async Task GetByKeyReturnsSingleValue(int i)
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -61,7 +61,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GameRepositoryGetAllReturnsAllValues()
+		public async Task GetAllReturnsAllValues()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -74,7 +74,7 @@ namespace Gamestore.Tests.DataTests
 
 
 		[Test]
-		public async Task GameRepositoryAddAsyncAddsValueToDatabase()
+		public async Task AddAsyncAddsValueToDatabase()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -99,7 +99,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GameRepositoryUpdateAsyncUpdatesValueInDatabase()
+		public async Task UpdateAsyncUpdatesValueInDatabase()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -114,7 +114,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GameRepositoryDeleteAsyncRemovesValueFromDatabase()
+		public async Task DeleteAsyncRemovesValueFromDatabase()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -128,7 +128,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GameRepositoryDeleteByIdAsyncRemovesValueFromDatabase()
+		public async Task DeleteByIdAsyncRemovesValueFromDatabase()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -142,7 +142,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task GameRepositoryGetAllWithIncludeReturnsAllValuesWithIncludedProperties()
+		public async Task GetAllWithIncludeReturnsAllValuesWithIncludedProperties()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);

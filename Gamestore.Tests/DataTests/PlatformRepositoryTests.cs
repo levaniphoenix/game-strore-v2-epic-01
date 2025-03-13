@@ -27,7 +27,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task PlatformRepositoryGetAllReturnsAllValues()
+		public async Task GetAllReturnsAllValues()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -39,7 +39,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task PlatformRepositoryGetByIDReturnsSingleValue()
+		public async Task GetByIDReturnsSingleValue()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -51,7 +51,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task PlatformRepositoryGetByTypeReturnsSingleValue()
+		public async Task GetByTypeReturnsSingleValue()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -64,7 +64,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task PlatformRepositoryAddAsyncAddsSingleValue()
+		public async Task AddAsyncAddsSingleValue()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -78,7 +78,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task PlatformRepositoryDeleteAsyncRemovesSingleValue()
+		public async Task DeleteAsyncRemovesSingleValue()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -92,7 +92,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task PlatformRepositoryUpdateAsyncUpdatesValueInDatabase()
+		public async Task UpdateAsyncUpdatesValueInDatabase()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
@@ -107,7 +107,7 @@ namespace Gamestore.Tests.DataTests
 		}
 
 		[Test]
-		public async Task PlatformRepositoryDeleteByIdRemovesValueFromDataBase()
+		public async Task DeleteByIdRemovesValueFromDataBase()
 		{
 			// Arrange
 			var unitOfWork = new UnitOfWork(context);
