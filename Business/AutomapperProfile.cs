@@ -15,7 +15,7 @@ namespace Business
 				.ForMember(to => to.Description, from => from.MapFrom(x => x.Game.Description))
 				.ForMember(to => to.Price, from => from.MapFrom(x => x.Game.Price))
 				.ForMember(to => to.Discount, from => from.MapFrom(x => x.Game.Discount))
-				.ForMember(to => to.UnitsInStock, from => from.MapFrom(x => x.Game.UnitsInStock))
+				.ForMember(to => to.UnitInStock, from => from.MapFrom(x => x.Game.UnitInStock))
 				.ForMember(to => to.PublisherId, from => from.MapFrom(x => x.PublisherId))
 				.ReverseMap();
 

@@ -40,6 +40,12 @@ public class GamesController(IGameService gameService) : ControllerBase
 		return Ok(await gameService.GetPlatformsByGamekey(key));
 	}
 
+	[HttpGet("{key}/publisher")]
+	public async Task<ActionResult<PublisherModel>> GetPublisherByGamekey(string key)
+	{
+		return Ok(await gameService.GetPublisherByGamekey(key));
+	}
+
 	[HttpGet("find/{id}")]
 	public async Task<ActionResult<GameDetails?>> GetById(Guid id)
 	{
@@ -96,10 +102,10 @@ public class GamesController(IGameService gameService) : ControllerBase
 	}
 
 	// DELETE: games/1
-	[HttpDelete("{id}")]
-	public async Task<ActionResult> Delete(Guid id)
+	[HttpDelete("{key}")]
+	public async Task<ActionResult> Delete(string key)
 	{
-		await gameService.DeleteAsync(id);
+		await gameService.DeleteByKeyAsync(key);
 		return Ok();
 	}
 }

@@ -61,7 +61,7 @@ namespace Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
 
                     b.HasData(
                         new
@@ -111,7 +111,7 @@ namespace Data.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.ToTable("GameGenres");
+                    b.ToTable("GameGenres", (string)null);
 
                     b.HasData(
                         new
@@ -148,7 +148,7 @@ namespace Data.Migrations
 
                     b.HasIndex("PlatformId");
 
-                    b.ToTable("GamePlatforms");
+                    b.ToTable("GamePlatforms", (string)null);
 
                     b.HasData(
                         new
@@ -193,7 +193,7 @@ namespace Data.Migrations
 
                     b.HasIndex("ParentGenreId");
 
-                    b.ToTable("Genres");
+                    b.ToTable("Genres", (string)null);
 
                     b.HasData(
                         new
@@ -298,7 +298,7 @@ namespace Data.Migrations
                     b.HasIndex("Type")
                         .IsUnique();
 
-                    b.ToTable("Platforms");
+                    b.ToTable("Platforms", (string)null);
 
                     b.HasData(
                         new
@@ -344,7 +344,7 @@ namespace Data.Migrations
                     b.HasIndex("CompanyName")
                         .IsUnique();
 
-                    b.ToTable("Publishers");
+                    b.ToTable("Publishers", (string)null);
 
                     b.HasData(
                         new

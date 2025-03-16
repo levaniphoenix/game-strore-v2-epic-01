@@ -1,20 +1,19 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Business.Models
 {
-	[DataContract]
 	public class GameModel
 	{
-		[DataMember(Name = "game")]
+		[JsonPropertyName("game")]
 		public GameDetails Game { get; set; } = new GameDetails();
 
-		[DataMember(Name = "genres")]
+		[JsonPropertyName("genres")]
 		public ICollection<Guid>? GenreIds { get; set; } = [];
 
-		[DataMember(Name = "platforms")]
+		[JsonPropertyName("platforms")]
 		public ICollection<Guid>? PlatformIds { get; set; } = [];
 
-		[DataMember(Name = "publisher")]
-		public Guid PublisherId { get; set; }
-}
+		[JsonPropertyName("publisher")]
+		public Guid PublisherId { get; set; } = Guid.Empty;
+	}
 }

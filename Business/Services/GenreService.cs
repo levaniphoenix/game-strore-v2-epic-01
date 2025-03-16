@@ -78,7 +78,7 @@ namespace Business.Services
 		{
 			logger.LogInformation("Validating genre: {GenreName}", model.Genre.Name);
 
-			var existingGenre = (await unitOfWork.GenreRepository!.GetAllAsync(g => g.Name == model.Genre.Name)).SingleOrDefault();
+			var existingGenre = (await unitOfWork.GenreRepository!.GetAllAsync(g => g.Name == model.Genre.Name && g.Id != model.Genre.Id)).SingleOrDefault();
 
 			if (existingGenre is not null)
 			{

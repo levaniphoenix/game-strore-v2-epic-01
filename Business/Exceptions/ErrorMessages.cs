@@ -7,6 +7,7 @@
 		public const string PlatformTypeAlreadyExists = "Platform Type is already taken";
 		public const string PublisherNameAlreadyExists = "Publisher Name is already taken";
 		public const string PlatformDoesNotExist = "Platform with id:{0} does not exist";
+		public const string PublisherDoesNotExist = "Publisher with id:{0} does not exist";
 		public const string GenreNameAlreadyExists = "Genre Name is already taken";
 		public const string GenreDoesNotExist = "Genre with id:{0} does not exist";
 		public const string GameNotFound = "Game not found";

@@ -250,14 +250,14 @@ public class GamesControllerTests
 	public async Task DeleteShouldReturnOk()
 	{
 		var mockGameService = new Mock<IGameService>();
-		mockGameService.Setup(s => s.DeleteAsync(It.IsAny<object>()));
+		mockGameService.Setup(s => s.DeleteByKeyAsync(It.IsAny<string>()));
 		var gamesController = new GamesController(mockGameService.Object);
 
-		var id = Guid.Parse("00000000-0000-0000-0000-000000000001");
+		var game = DBSeeder.Games[0];
 
-		var result = await gamesController.Delete(id);
+		var result = await gamesController.Delete(game.Key);
 
-		mockGameService.Verify(x => x.DeleteAsync(It.Is<Guid>(g => g == id)), Times.Once);
+		mockGameService.Verify(x => x.DeleteByKeyAsync(It.Is<string>(g => g.Equals(game.Key))), Times.Once);
 		result.Should().BeOfType<OkResult>();
 	}
 }

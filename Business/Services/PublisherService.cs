@@ -27,7 +27,7 @@ public class PublisherService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Pu
 	{
 		logger.LogInformation("Deleting publisher with ID: {PublisherId}", modelId);
 
-		await unitOfWork.PlatformRepository!.DeleteByIdAsync(modelId);
+		await unitOfWork.PublisherRepository!.DeleteByIdAsync(modelId);
 		await unitOfWork.SaveAsync();
 
 		logger.LogInformation("Publisher with ID {PublisherId} deleted successfully", modelId);
@@ -53,6 +53,15 @@ public class PublisherService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Pu
 		return mapper.Map<PublisherModel?>(publisher);
 	}
 
+	public async Task<PublisherModel?> GetByNameAsync(string name)
+	{
+		logger.LogInformation("Fetching publisher by Name: {PublisherCompanyName}", name);
+		
+		var publisher = (await unitOfWork.PublisherRepository!.GetAllAsync(p => p.CompanyName == name)).SingleOrDefault();
+		logger.LogInformation("Fetched publisher by Name: {PublisherCompanyName}, Exists: {Exists}", name, publisher is not null);
+		
+		return mapper.Map<PublisherModel?>(publisher);
+	}
 	public async Task<IEnumerable<GameModel?>> GetGamesByPublisherNameAsync(string name)
 	{
 		logger.LogInformation("Fetching games for publisher : {PublisherCompanyName}", name);
@@ -79,7 +88,7 @@ public class PublisherService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Pu
 	{
 		logger.LogInformation("Validating publisher: {PublisherCompanyName}", model.Publisher.CompanyName);
 
-		var publisher = await unitOfWork.PublisherRepository!.GetAllAsync(p => p.CompanyName == model.Publisher.CompanyName);
+		var publisher = (await unitOfWork.PublisherRepository!.GetAllAsync(p => p.CompanyName == model.Publisher.CompanyName && p.Id != model.Publisher.Id)).SingleOrDefault();
 		if (publisher is not null)
 		{
 			logger.LogError("Publisher with name {PublisherCompanyName} already exists", model.Publisher.CompanyName);

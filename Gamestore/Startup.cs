@@ -4,6 +4,7 @@ using Business.Interfaces;
 using Business.Services;
 using Data.Data;
 using Data.Interfaces;
+using Gamestore.CustomDeserializer;
 using Gamestore.ExeptionHandlers;
 using Gamestore.Filters;
 using Gamestore.Middleware;
@@ -17,7 +18,11 @@ public class Startup(IConfiguration configuration)
 	public void ConfigureServices(IServiceCollection services)
 	{
 		services.AddSerilog();
-		services.AddControllers();
+		services.AddControllers()
+			.AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.Converters.Add(new NullableGuidConverter());
+			});
 
 		var connectionString = configuration.GetConnectionString("DefaultConnection");
 		services.AddDbContext<GamestoreDBContext>(options =>
@@ -45,6 +50,18 @@ public class Startup(IConfiguration configuration)
 
 		services.AddEndpointsApiExplorer();
 		services.AddSwaggerGen();
+
+		services.AddCors(options =>
+		{
+			options.AddPolicy(
+				"AllowLocalhost",
+				policy =>
+				{
+					policy.WithOrigins("http://127.0.0.1:8080") // Allow only this origin
+						  .AllowAnyMethod()
+						  .AllowAnyHeader();
+				});
+		});
 	}
 
 	public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -57,7 +74,7 @@ public class Startup(IConfiguration configuration)
 
 		app.UseMiddleware<RequestLoggingMiddleware>();
 		app.UseExceptionHandler(_ => { });
-		app.UseHttpsRedirection();
+		app.UseCors("AllowLocalhost");
 		app.UseRouting();
 		app.UseAuthorization();
 		app.UseEndpoints(endpoints =>

@@ -5,6 +5,7 @@ using static Business.Models.PublisherModel;
 
 namespace Gamestore.Controllers;
 
+// todo add publisher service and controller unit tests
 [Route("[controller]")]
 [ApiController]
 public class PublishersController(IPublisherService publisherService) : ControllerBase
@@ -15,10 +16,10 @@ public class PublishersController(IPublisherService publisherService) : Controll
 		return Ok((await publisherService.GetAllAsync()).Select(p => p.Publisher));
 	}
 
-	[HttpGet("{id}")]
-	public async Task<ActionResult<PublisherDetails?>> Get(Guid id)
+	[HttpGet("{companyName}")]
+	public async Task<ActionResult<PublisherDetails?>> Get(string companyName)
 	{
-		var publisher = await publisherService.GetByIdAsync(id);
+		var publisher = await publisherService.GetByNameAsync(companyName);
 		if (publisher is null)
 		{
 			return NotFound("publisher not found");
@@ -57,7 +58,7 @@ public class PublishersController(IPublisherService publisherService) : Controll
 		return Ok();
 	}
 
-	[HttpDelete]
+	[HttpDelete("{id}")]
 	public async Task<ActionResult> Delete(Guid id)
 	{
 		await publisherService.DeleteAsync(id);

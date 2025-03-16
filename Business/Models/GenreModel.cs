@@ -12,7 +12,7 @@ namespace Business.Models
 		[DataContract]
 		public class GenreDetails
 		{
-			public Guid Id { get; set; }
+			public Guid? Id { get; set; }
 
 			[Required]
 			[StringLength(50)]

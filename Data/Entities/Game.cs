@@ -24,7 +24,7 @@ namespace Data.Entities
 		public double Price { get; set; }
 
 		[Required]
-		public int UnitsInStock { get; set; }
+		public int UnitInStock { get; set; }
 
 		[Required]
 		public int Discount { get; set; }

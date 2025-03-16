@@ -78,7 +78,7 @@ namespace Business.Services
 		{
 			logger.LogInformation("Validating platform: {PlatformType}", model.Platform.Type);
 
-			var existingPlatform = (await unitOfWork.PlatformRepository!.GetAllAsync(g => g.Type == model.Platform.Type)).SingleOrDefault();
+			var existingPlatform = (await unitOfWork.PlatformRepository!.GetAllAsync(g => g.Type == model.Platform.Type && g.Id != model.Platform.Id)).SingleOrDefault();
 
 			if (existingPlatform is not null)
 			{

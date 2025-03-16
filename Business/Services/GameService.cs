@@ -5,6 +5,7 @@ using Business.Models;
 using Data.Entities;
 using Data.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Services;
 
@@ -28,7 +29,10 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 
 			var game = mapper.Map<Game>(model);
 
-			game.Key ??= GenerateKey(model.Game.Name);
+			if (game.Key.IsNullOrEmpty())
+			{
+				game.Key = GenerateKey(model.Game.Name);
+			}
 
 			await PopulateNavigationProperties(model, game);
 
@@ -46,6 +50,24 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 		await unitOfWork.GameRepository!.DeleteByIdAsync(modelId);
 		await unitOfWork.SaveAsync();
 		logger.LogInformation("Game with ID {GameId} deleted successfully", modelId);
+	}
+
+	public async Task DeleteByKeyAsync(string key)
+	{
+		ArgumentException.ThrowIfNullOrEmpty(key);
+		logger.LogInformation("Deleting game with key: {GameKey}", key);
+
+		var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
+
+		if (game is null)
+		{
+			logger.LogWarning("Game with key {GameKey} not found", key);
+			return;
+		}
+
+		await unitOfWork.GameRepository.DeleteByIdAsync(game.Id);
+		await unitOfWork.SaveAsync();
+		logger.LogInformation("Game with key {GameKey} deleted successfully", key);
 	}
 
 	public async Task<IEnumerable<GameModel>> GetAllAsync()
@@ -81,6 +103,13 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 		}
 
 		return getGenres();
+	}
+
+	public async Task<PublisherModel> GetPublisherByGamekey(string key)
+	{
+		logger.LogInformation("Fetching publisher by key: {GameKey}", key);
+		var publisher = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key, includeProperties: "Publisher")).Select(g => g.Publisher).SingleOrDefault();
+		return mapper.Map<PublisherModel>(publisher);
 	}
 
 	public Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key)
@@ -136,7 +165,11 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 			await ValidateGame(model);
 
 			var game = mapper.Map<Game>(model);
-			game.Key ??= GenerateKey(model.Game.Name);
+
+			if (game.Key.IsNullOrEmpty())
+			{
+				game.Key = GenerateKey(model.Game.Name);
+			}
 
 			await PopulateNavigationProperties(model, game);
 
@@ -163,7 +196,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 	public async Task ValidateGame(GameModel model)
 	{
 		logger.LogInformation("Validating game: {GameName}", model.Game.Name);
-		var existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == model.Game.Name)).SingleOrDefault();
+		var existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == model.Game.Name && g.Id != model.Game.Id)).SingleOrDefault();
 
 		if (existingGame is not null)
 		{
@@ -173,16 +206,20 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 
 		var key = model.Game.Key;
 
-		key ??= GenerateKey(model.Game.Name);
+		if (key.IsNullOrEmpty())
+		{
+			key = GenerateKey(model.Game.Name);
+		}
 
-		existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
+		logger.LogInformation("Validating game key: {GameKey}", key);
+		existingGame = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key && g.Id != model.Game.Id)).SingleOrDefault();
 
 		if (existingGame is not null)
 		{
 			logger.LogWarning("Validation failed: Game key {GameKey} already exists", key);
 			throw new GameStoreValidationException(ErrorMessages.GameKeyAlreadyExists);
 		}
-
+		
 		logger.LogInformation("Validation successful for game: {GameName}", model.Game.Name);
 	}
 
@@ -219,5 +256,17 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 
 			game.Genres = genres;
 		}
+
+		if(game.PublisherId != Guid.Empty)
+		{
+			var publisher = await unitOfWork.PublisherRepository!.GetByIDAsync(model.PublisherId);
+			if (publisher is null)
+			{
+				logger.LogWarning("Validation failed: Publisher ID {PublisherID} does not exist", model.PublisherId);
+				throw new GameStoreValidationException(string.Format(ErrorMessages.PublisherDoesNotExist, model.PublisherId));
+			}
+			game.Publisher = publisher;
+		}
+		
 	}
 }

@@ -14,6 +14,10 @@ namespace Business.Interfaces
 
 		Task<IEnumerable<PlatformModel>> GetPlatformsByGamekey(string key);
 
+		Task<PublisherModel> GetPublisherByGamekey(string key);
+
 		Task<int> GetTotalGamesCountAsync();
+
+		Task DeleteByKeyAsync(string key);
 	}
 }

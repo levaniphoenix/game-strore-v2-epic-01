@@ -285,6 +285,23 @@ namespace Gamestore.Tests.BusinessTests
 		}
 
 		[Test]
+		public async Task GameServiceUpdatePriceAsyncUpdatesGame()
+		{
+			var dbGame = DBSeeder.Games[0];
+			var game = new GameModel() { Game = new GameDetails { Id = dbGame.Id, Name = dbGame.Name, Description = "Test Game desc", Price = dbGame.Price + 1 } };
+			var mockUnitOfWork = new Mock<IUnitOfWork>();
+			mockUnitOfWork.Setup(m => m.GameRepository!.Update(It.IsAny<Game>()));
+			UnitTestHelper.SetUpMockGameRepository(mockUnitOfWork, DBSeeder.Games);
+			UnitTestHelper.SetUpMockPlatformRepository(mockUnitOfWork, DBSeeder.Platforms);
+			UnitTestHelper.SetUpMockGenreRepository(mockUnitOfWork, DBSeeder.Genres);
+			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger);
+			await gameService.UpdateAsync(game);
+			mockUnitOfWork.Verify(x => x.GameRepository!.Update(It.Is<Game>(x =>
+				x.Name == game.Game.Name && x.Description == game.Game.Description)), Times.Once);
+			mockUnitOfWork.Verify(x => x.SaveAsync(), Times.Once);
+		}
+
+		[Test]
 		public async Task GameServiceUpdateAsyncThrowsArgumentNullException()
 		{
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
