@@ -16,7 +16,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 	}
 
 	[HttpGet("{id}")]
-	public async Task<ActionResult<GenreModel?>> Get(Guid id)
+	public async Task<ActionResult<GenreDetails?>> Get(Guid id)
 	{
 		var genre = await genreService.GetByIdAsync(id);
 
@@ -25,7 +25,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 			return NotFound("genre was not found");
 		}
 
-		return Ok(genre);
+		return Ok(genre.Genre);
 	}
 
 	[HttpGet("{id}/games")]

@@ -2,6 +2,9 @@
 using Business.Interfaces;
 using Business.Models;
 using Microsoft.AspNetCore.Mvc;
+using static Business.Models.GenreModel;
+using static Business.Models.PlatformModel;
+using static Business.Models.PublisherModel;
 
 namespace Gamestore.Controllers;
 
@@ -29,21 +32,24 @@ public class GamesController(IGameService gameService) : ControllerBase
 	}
 
 	[HttpGet("{key}/genres")]
-	public async Task<ActionResult<IEnumerable<GenreModel>>> GetGenresByGamekey(string key)
+	public async Task<ActionResult<IEnumerable<GenreDetails>>> GetGenresByGamekey(string key)
 	{
-		return Ok(await gameService.GetGenresByGamekey(key));
+		var genres = (await gameService.GetGenresByGamekey(key)).Select(x => x.Genre);
+		return Ok(genres);
 	}
 
 	[HttpGet("{key}/platforms")]
-	public async Task<ActionResult<IEnumerable<PlatformModel>>> GetPlatformsByGamekey(string key)
+	public async Task<ActionResult<IEnumerable<PlatformDetails>>> GetPlatformsByGamekey(string key)
 	{
-		return Ok(await gameService.GetPlatformsByGamekey(key));
+		var platforms = (await gameService.GetPlatformsByGamekey(key)).Select(x => x.Platform);
+		return Ok(platforms);
 	}
 
 	[HttpGet("{key}/publisher")]
-	public async Task<ActionResult<PublisherModel>> GetPublisherByGamekey(string key)
+	public async Task<ActionResult<PublisherDetails>> GetPublisherByGamekey(string key)
 	{
-		return Ok(await gameService.GetPublisherByGamekey(key));
+		var publisher = await gameService.GetPublisherByGamekey(key);
+		return Ok(publisher.Publisher);
 	}
 
 	[HttpGet("find/{id}")]
