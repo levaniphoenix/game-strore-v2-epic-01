@@ -52,7 +52,7 @@ public class GenresControllerTests
 		var result = await genresController.Get(id);
 
 		var okResult = result.Result as OkObjectResult;
-		var returnedGenre = (GenreModel?)okResult?.Value;
+		var returnedGenre = (GenreDetails?)okResult?.Value;
 
 		result.Result.Should().BeOfType<OkObjectResult>();
 		returnedGenre.Should().NotBeNull();

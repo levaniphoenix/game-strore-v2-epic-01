@@ -6,6 +6,8 @@ using FluentAssertions;
 using Gamestore.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using static Business.Models.GenreModel;
+using static Business.Models.PlatformModel;
 
 namespace Gamestore.Tests.ApiTests;
 [TestFixture]
@@ -91,7 +93,7 @@ public class GamesControllerTests
 		var result = await gamesController.GetGenresByGamekey("test_game");
 
 		var okResult = result.Result as OkObjectResult;
-		var returnedGenres = (IEnumerable<GenreModel>) okResult?.Value;
+		var returnedGenres = (IEnumerable<GenreDetails>) okResult?.Value;
 
 		okResult.Should().NotBeNull();
 		returnedGenres.Should().NotBeNull();
@@ -119,7 +121,7 @@ public class GamesControllerTests
 		var result = await gamesController.GetGenresByGamekey("test_game_Non_existent_key");
 
 		var okResult = result.Result as OkObjectResult;
-		var returnedGenres = (IEnumerable<GenreModel>)okResult?.Value;
+		var returnedGenres = (IEnumerable<GenreDetails>)okResult?.Value;
 
 		okResult.Should().NotBeNull();
 		returnedGenres.Should().NotBeNull();
@@ -148,7 +150,7 @@ public class GamesControllerTests
 		var result = await gamesController.GetPlatformsByGamekey("test_game");
 
 		var okResult = result.Result as OkObjectResult;
-		var returnedGenres = (IEnumerable<PlatformModel>)okResult?.Value;
+		var returnedGenres = (IEnumerable<PlatformDetails>)okResult?.Value;
 
 		okResult.Should().NotBeNull();
 		returnedGenres.Should().NotBeNull();
@@ -177,7 +179,7 @@ public class GamesControllerTests
 		var result = await gamesController.GetPlatformsByGamekey("test_game_Non_existent_key");
 
 		var okResult = result.Result as OkObjectResult;
-		var returnedGenres = (IEnumerable<PlatformModel>)okResult?.Value;
+		var returnedGenres = (IEnumerable<PlatformDetails>)okResult?.Value;
 
 		okResult.Should().NotBeNull();
 		returnedGenres.Should().NotBeNull();

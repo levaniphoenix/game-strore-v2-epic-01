@@ -34,7 +34,7 @@ public class GamesController(IGameService gameService) : ControllerBase
 	[HttpGet("{key}/genres")]
 	public async Task<ActionResult<IEnumerable<GenreDetails>>> GetGenresByGamekey(string key)
 	{
-		var genres = (await gameService.GetGenresByGamekey(key)).Select(x => x.Genre);
+		var genres = (await gameService.GetGenresByGamekey(key)).Select(x => x.Genre).ToList();
 		return Ok(genres);
 	}
 
