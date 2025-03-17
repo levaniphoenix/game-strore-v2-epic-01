@@ -54,11 +54,11 @@ namespace Gamestore.Tests
 
 					if (orderBy != null)
 					{
-						return orderBy(query).ToList();
+						return [.. orderBy(query)];
 					}
 					else
 					{
-						return query.ToList();
+						return [.. query];
 					}
 
 				});
@@ -86,11 +86,11 @@ namespace Gamestore.Tests
 
 					if (orderBy != null)
 					{
-						return orderBy(query).ToList();
+						return [.. orderBy(query)];
 					}
 					else
 					{
-						return query.ToList();
+						return [.. query];
 					}
 
 				});
@@ -118,13 +118,41 @@ namespace Gamestore.Tests
 
 					if (orderBy != null)
 					{
-						return orderBy(query).ToList();
+						return [.. orderBy(query)];
 					}
 					else
 					{
-						return query.ToList();
+						return [.. query];
 					}
 
+				});
+		}
+
+		public static void SetUpMockPublisherRepository(Mock<IUnitOfWork> mock, Publisher[] data)
+		{
+			mock.Setup(m => m.PublisherRepository!.GetAllAsync(It.IsAny<Expression<Func<Publisher, bool>>?>(), It.IsAny<Func<IQueryable<Publisher>, IOrderedQueryable<Publisher>>?>(), It.IsAny<string>()))
+				.ReturnsAsync((Expression<Func<Publisher, bool>>? filter,
+					   Func<IQueryable<Publisher>, IOrderedQueryable<Publisher>>? orderBy,
+					   string includeProperties) =>
+				{
+					IQueryable<Publisher> query = data.AsQueryable();
+					if (filter != null)
+					{
+						query = query.Where(filter);
+					}
+					foreach (var includeProperty in includeProperties.Split
+						(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+					{
+						query = query.Include(includeProperty);
+					}
+					if (orderBy != null)
+					{
+						return [.. orderBy(query)];
+					}
+					else
+					{
+						return [.. query];
+					}
 				});
 		}
 	}

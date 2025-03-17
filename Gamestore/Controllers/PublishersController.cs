@@ -5,7 +5,6 @@ using static Business.Models.PublisherModel;
 
 namespace Gamestore.Controllers;
 
-// todo add publisher service and controller unit tests
 [Route("[controller]")]
 [ApiController]
 public class PublishersController(IPublisherService publisherService) : ControllerBase
