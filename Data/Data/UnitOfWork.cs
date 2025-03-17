@@ -10,6 +10,8 @@ namespace Data.Data
 		private IRepository<Platform>? platformRepository;
 		private IRepository<Genre>? genreRepository;
 		private IRepository<Publisher>? publisherRepository;
+		private IRepository<Order>? orderRepository;
+		private IRepository<OrderGame>? orderGameRepository;
 
 		public IRepository<Game> GameRepository
 		{
@@ -43,6 +45,25 @@ namespace Data.Data
 				return genreRepository;
 			}
 		}
+
+		public IRepository<Order>? OrderRepository
+		{
+			get
+			{
+				orderRepository ??= new OrderRepository(context);
+				return orderRepository;
+			}
+		}
+
+		public IRepository<OrderGame>? OrderDetailsRepository
+		{
+			get
+			{
+				orderGameRepository ??= new OrderGameRepository(context);
+				return orderGameRepository;
+			}
+		}
+
 		public async Task SaveAsync()
 		{
 			await context.SaveChangesAsync();

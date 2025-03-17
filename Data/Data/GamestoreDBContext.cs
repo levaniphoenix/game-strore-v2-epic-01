@@ -9,8 +9,11 @@ namespace Data.Data
 		public DbSet<Genre> Genres { get; set; } = default!;
 		public DbSet<Platform> Platforms { get; set; } = default!;
 		public DbSet<Publisher> Publishers { get; set; } = default!;
+		public DbSet<Order> Orders { get; set; } = default!;
+
 		public DbSet<GamePlatform> GamePlatforms { get; set; } = default!;
 		public DbSet<GameGenre> GameGenres { get; set; } = default!;
+		public DbSet<OrderGame> OrderDetails { get; set; } = default!;
 
 		public GamestoreDBContext(DbContextOptions<GamestoreDBContext> options) : base(options)
 		{
@@ -20,6 +23,7 @@ namespace Data.Data
 		{
 			modelBuilder.Entity<Game>().HasIndex(g => g.Key).IsUnique();
 			modelBuilder.Entity<Game>().HasIndex(g => g.Name).IsUnique(true);
+			
 			modelBuilder.Entity<Game>()
 				.HasMany(e => e.Platforms)
 				.WithMany(e => e.Games)
@@ -48,6 +52,16 @@ namespace Data.Data
 						.HasForeignKey(e => e.GameId)
 				);
 
+			modelBuilder.Entity<OrderGame>()
+				.HasOne(og => og.Order)
+				.WithMany(o => o.OrderDetails)
+				.HasForeignKey(og => og.OrderId);
+
+			modelBuilder.Entity<OrderGame>()
+				.HasOne(og => og.Product)
+				.WithMany(g => g.OrderGames)
+				.HasForeignKey(og => og.ProductId);
+
 			modelBuilder.Entity<Genre>()
 				.HasOne(e => e.Parent)
 				.WithMany(e => e.Children)
@@ -64,6 +78,9 @@ namespace Data.Data
 
 			modelBuilder.Entity<GameGenre>()
 				.HasKey(gg => new { gg.GameId, gg.GenreId });
+
+			modelBuilder.Entity<OrderGame>()
+				.HasKey(og => new { og.OrderId, og.ProductId });
 
 			DBSeeder.Seed(modelBuilder);
 		}

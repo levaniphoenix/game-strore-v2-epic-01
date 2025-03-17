@@ -18,6 +18,10 @@ namespace Data.Data
 
 		public static GameGenre[] GameGenres => gameGenres;
 
+		public static Order[] Orders => orders;
+
+		public static OrderGame[] OrderDetails => orderGames;
+
 		public static void Seed(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Publisher>().HasData(publishers);
@@ -27,6 +31,8 @@ namespace Data.Data
 			modelBuilder.Entity<Game>().HasData(games);
 			modelBuilder.Entity<GamePlatform>().HasData(gamePlatforms);
 			modelBuilder.Entity<GameGenre>().HasData(gameGenres);
+			modelBuilder.Entity<Order>().HasData(orders);
+			modelBuilder.Entity<OrderGame>().HasData(orderGames);
 		}
 
 		private static readonly Publisher[] publishers = new Publisher[]
@@ -89,5 +95,15 @@ namespace Data.Data
 			new GameGenre { GameId = games[1].Id, GenreId = genres[1].Id},
 			new GameGenre { GameId = games[2].Id, GenreId = genres[2].Id},
 			};
+
+		private static readonly Order[] orders = new Order[]
+			{
+				new Order { CustomerId = Guid.Parse("00000000-0000-0000-0000-000000000000"), Id = new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"), Date = DateTime.Now, Status = OrderStatus.Open },
+			};
+
+		private static readonly OrderGame[] orderGames = new OrderGame[]
+		{
+			new OrderGame { OrderId = orders[0].Id, ProductId = games[0].Id, Discount = 0, Price = 60, Quantity = 1 },
+		};
 	}
 }

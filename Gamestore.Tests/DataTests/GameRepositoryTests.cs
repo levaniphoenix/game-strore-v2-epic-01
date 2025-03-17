@@ -166,7 +166,7 @@ namespace Gamestore.Tests.DataTests
 									 select p;
 
 			//act
-			var result = await unitOfWork.GameRepository.GetAllAsync(includeProperties: "Platforms,Genres,Publisher");
+			var result = await unitOfWork.GameRepository.GetAllAsync(includeProperties: "Platforms,Genres,Publisher,OrderGames");
 			Assert.Multiple(() =>
 			{
 				//assert

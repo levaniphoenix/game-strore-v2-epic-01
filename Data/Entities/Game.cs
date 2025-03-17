@@ -36,6 +36,8 @@ namespace Data.Entities
 
 		public ICollection<Genre> Genres { get; set; } = [];
 
+		public ICollection<OrderGame> OrderGames { get; set; } = [];
+
 		public virtual Publisher Publisher { get; set; } = default!;
 	}
 }

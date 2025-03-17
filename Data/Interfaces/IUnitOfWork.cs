@@ -12,6 +12,10 @@ namespace Data.Interfaces
 
 		IRepository<Publisher>? PublisherRepository { get; }
 
+		IRepository<Order>? OrderRepository { get; }
+
+		IRepository<OrderGame>? OrderDetailsRepository { get; }
+
 		Task SaveAsync();
 	}
 }
