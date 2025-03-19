@@ -36,6 +36,10 @@ namespace Business
 				.ForMember(to => to.HomePage, from => from.MapFrom(x => x.Publisher.HomePage))
 				.ForMember(to => to.Description, from => from.MapFrom(x => x.Publisher.Description))
 				.ReverseMap();
+
+			CreateMap<OrderModel, Order>().ReverseMap();
+
+			CreateMap<OrderDetailsModel, OrderGame>().ReverseMap();
 		}
 	}
 }

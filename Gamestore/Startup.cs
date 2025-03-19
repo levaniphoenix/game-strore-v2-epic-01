@@ -9,6 +9,7 @@ using Gamestore.ExeptionHandlers;
 using Gamestore.Filters;
 using Gamestore.Middleware;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
 using Serilog;
 
 namespace Gamestore;
@@ -17,6 +18,7 @@ public class Startup(IConfiguration configuration)
 {
 	public void ConfigureServices(IServiceCollection services)
 	{
+		QuestPDF.Settings.License = LicenseType.Community;
 		services.AddSerilog();
 		services.AddControllers()
 			.AddJsonOptions(options =>
@@ -42,6 +44,7 @@ public class Startup(IConfiguration configuration)
 		services.AddScoped<IPlatformService, PlatformService>();
 		services.AddScoped<IGenreService, GenreService>();
 		services.AddScoped<IPublisherService, PublisherService>();
+		services.AddScoped<IOrderService, OrderService>();
 
 		services.AddControllers(options =>
 		{

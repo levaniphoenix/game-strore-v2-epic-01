@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Services;
 
-public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameService> logger) : IGameService
+public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameService> logger, IOrderService orderService) : IGameService
 {
 	public async Task<int> GetTotalGamesCountAsync()
 	{
@@ -268,5 +268,10 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 			game.Publisher = publisher;
 		}
 		
+	}
+
+	public async Task AddToCartAsync(string key)
+	{
+		await orderService.AddToCartAsync(key);
 	}
 }

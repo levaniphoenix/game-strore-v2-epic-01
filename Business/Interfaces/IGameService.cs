@@ -19,5 +19,7 @@ namespace Business.Interfaces
 		Task<int> GetTotalGamesCountAsync();
 
 		Task DeleteByKeyAsync(string key);
+
+		Task AddToCartAsync(string key);
 	}
 }

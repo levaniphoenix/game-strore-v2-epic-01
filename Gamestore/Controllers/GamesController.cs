@@ -114,4 +114,11 @@ public class GamesController(IGameService gameService) : ControllerBase
 		await gameService.DeleteByKeyAsync(key);
 		return Ok();
 	}
+
+	[HttpPost("{key}/buy")]
+	public async Task<ActionResult> AddGameToCart(string key)
+	{
+		await gameService.AddToCartAsync(key);
+		return Ok();
+	}
 }
