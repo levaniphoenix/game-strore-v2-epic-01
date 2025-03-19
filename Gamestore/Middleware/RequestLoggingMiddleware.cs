@@ -24,8 +24,16 @@ public class RequestLoggingMiddleware(RequestDelegate next)
 		var statusCode = context.Response.StatusCode;
 		var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
 
+		string responseBody = string.Empty;
+		var contentType = context.Response.ContentType ?? string.Empty;
+
+		// Only read and log the response body if it's NOT a PDF
+		responseBody = contentType.Contains("application/pdf", StringComparison.OrdinalIgnoreCase)
+			? "[PDF Content Omitted]" :
+			await FormatResponse(context.Response);
+
 		Log.Information(
-			"[Request] IP: {IPAddress}, Method: {Method}, URL: {Url}, RequestBody: {RequestBody}, [Response] StatusCode: {StatusCode}, TimeElapsed: {ElapsedTime}ms, ResponseBody: {ResponseBody}", ipAddress, context.Request.Method, context.Request.Path, request, statusCode, elapsedTime, response);
+			"[Request] IP: {IPAddress}, Method: {Method}, URL: {Url}, RequestBody: {RequestBody}, [Response] StatusCode: {StatusCode}, TimeElapsed: {ElapsedTime}ms, ResponseBody: {ResponseBody}", ipAddress, context.Request.Method, context.Request.Path, request, statusCode, elapsedTime, responseBody);
 
 		await responseBodyStream.CopyToAsync(originalResponseBodyStream);
 	}
