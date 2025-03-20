@@ -9,6 +9,9 @@ using Gamestore.ExeptionHandlers;
 using Gamestore.Filters;
 using Gamestore.Middleware;
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Extensions.Http;
+using Polly.Retry;
 using QuestPDF.Infrastructure;
 using Serilog;
 
@@ -18,6 +21,14 @@ public class Startup(IConfiguration configuration)
 {
 	public void ConfigureServices(IServiceCollection services)
 	{
+		services.AddHttpClient("PaymentClient", client =>
+		{
+			var baseUrl = configuration["PaymentApiBaseUrl"];
+			client.BaseAddress = new Uri(baseUrl!);
+			client.DefaultRequestHeaders.Add("Accept", "application/json");
+		})
+		.AddPolicyHandler(GetRetryPolicy());
+
 		QuestPDF.Settings.License = LicenseType.Community;
 		services.AddSerilog();
 		services.AddControllers()
@@ -84,5 +95,12 @@ public class Startup(IConfiguration configuration)
 		{
 			endpoints.MapControllers();
 		});
+	}
+
+	private static AsyncRetryPolicy<HttpResponseMessage> GetRetryPolicy()
+	{
+		return HttpPolicyExtensions
+			.HandleTransientHttpError()
+			.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))); // Exponential backoff
 	}
 }

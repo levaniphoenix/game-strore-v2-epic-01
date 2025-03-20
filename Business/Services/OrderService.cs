@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
+using AutoMapper;
 using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
@@ -11,7 +13,7 @@ using QuestPDF.Helpers;
 
 namespace Business.Services;
 
-public class OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<OrderService> logger) : IOrderService
+public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientFactory, IMapper mapper, ILogger<OrderService> logger) : IOrderService
 {
 	public Task AddAsync(OrderModel model)
 	{
@@ -161,7 +163,7 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<OrderS
 		return Task.FromResult(new PaymentMethodsModel());
 	}
 
-	public async Task<IActionResult> ProcessPaymentAsync(string method, dynamic model = null)
+	public async Task<IActionResult> ProcessPaymentAsync(string method, JsonElement model)
 	{
 		logger.LogInformation("Processing payment with method {Method}", method);
 
@@ -173,10 +175,28 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<OrderS
 			throw new GameStoreValidationException("No open cart found for payment");
 		}
 
-		double sum = cartOrder.OrderDetails.Sum(od => (od.Price - od.Discount) * od.Quantity);
+		double sum = cartOrder.OrderDetails.Sum(od => (od.Price - (od.Price * od.Discount/100)) * od.Quantity);
 
 		// check if unitsinStock is higher than quantity
+		foreach (var item in cartOrder.OrderDetails)
+		{
+			var game = await unitOfWork.GameRepository.GetByIDAsync(item.ProductId);
 
+			if(game.UnitInStock < item.Quantity)
+			{
+				var errorResponse = new
+				{
+					error = "Insufficient stock",
+					gameId = game.Id,
+					requestedQuantity = item.Quantity,
+					availableStock = game.UnitInStock
+				};
+
+				return new BadRequestObjectResult(errorResponse);
+			}
+		}
+		
+		HttpResponseMessage? apiResponse;
 		switch (method)
 		{
 			case "Bank":
@@ -185,10 +205,39 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<OrderS
 				await unitOfWork.SaveAsync();
 				return GenerateInvoice(Guid.Parse("00000000-0000-0000-0000-000000000000"), cartOrder.Id, sum);
 
+			case "Visa":
+				apiResponse = await ProcessVisaPaymentAsync(model,sum);
+				break;
+
+			case "IBox terminal":
+				var terminalRequest = new { transactionAmount = sum, accountNumber = "3fa85f64-5717-4562-b3fc-2c963f66afa6" };
+				apiResponse = await ProcessIBoxPaymentAsync(terminalRequest);
+				break;
+
 			default:
 				logger.LogWarning("Unknown payment method {Method}", method);
 				throw new GameStoreValidationException("Unknown payment method");
 		}
+
+		if (!apiResponse.IsSuccessStatusCode)
+		{
+			logger.LogError("Payment failed with status code {StatusCode}", apiResponse.StatusCode);
+		}
+		else
+		{
+			cartOrder.Status = OrderStatus.Paid;
+			unitOfWork.OrderRepository.Update(cartOrder);
+			await unitOfWork.SaveAsync();
+		}
+
+		var content = await apiResponse.Content.ReadAsStringAsync();
+
+		return new ContentResult
+		{
+			StatusCode = (int)apiResponse.StatusCode,
+			Content = content,
+			ContentType = "application/json"
+		};
 	}
 
 	private FileContentResult GenerateInvoice(Guid userId, Guid orderId, double sum)
@@ -232,5 +281,66 @@ public class OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<OrderS
 		});
 
 		return pdf.GeneratePdf();
+	}
+
+	public async Task<HttpResponseMessage> ProcessVisaPaymentAsync(JsonElement visaPayload, double sum)
+	{
+		object? visaRequest;
+		try
+		{
+			string holder = visaPayload.GetProperty("holder").GetString();
+			string cardNumber = visaPayload.GetProperty("cardNumber").GetString();
+			int monthExpire = visaPayload.GetProperty("monthExpire").GetInt32();
+			int yearExpire = visaPayload.GetProperty("yearExpire").GetInt32();
+			int cvv2 = visaPayload.GetProperty("cvv2").GetInt32();
+
+			// validation is done on payment gateway
+
+			visaRequest = new 
+			{
+				transactionAmount = sum,
+				cardHolderName = holder,
+				cardNumber = cardNumber,
+				expirationMonth = monthExpire,
+				expirationYear = yearExpire,
+				cvv = cvv2
+			};
+		}
+		catch (Exception e) when (e is not GameStoreValidationException)
+		{
+			logger.LogError(e, "Visa payment failed");
+			throw new GameStoreValidationException("Invalid Visa model format.");
+		}
+
+		var client = httpClientFactory.CreateClient("PaymentClient");
+		var response = await client.PostAsJsonAsync("api/payments/visa", visaRequest);
+
+		if (response.IsSuccessStatusCode)
+		{
+			logger.LogInformation("Visa payment processed successfully.");
+		}
+		else
+		{
+			logger.LogError("Visa payment failed with status code: {StatusCode}", response.StatusCode);
+		}
+
+		return response;
+	}
+
+	public async Task<HttpResponseMessage> ProcessIBoxPaymentAsync(object iboxPayload)
+	{
+		var client = httpClientFactory.CreateClient("PaymentClient");
+		var response = await client.PostAsJsonAsync("api/payments/ibox", iboxPayload);
+
+		if (response.IsSuccessStatusCode)
+		{
+			logger.LogInformation("IBox payment processed successfully.");
+		}
+		else
+		{
+			logger.LogError("IBox payment failed with status code: {StatusCode}", response.StatusCode);
+		}
+
+		return response;
 	}
 }

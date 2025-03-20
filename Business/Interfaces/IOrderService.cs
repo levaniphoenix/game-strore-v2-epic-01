@@ -1,4 +1,5 @@
-﻿using Business.Models;
+﻿using System.Text.Json;
+using Business.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Business.Interfaces;
@@ -17,5 +18,5 @@ public interface IOrderService : ICrud<OrderModel>
 
 	Task<PaymentMethodsModel> GetPaymentMethodsAsync();
 
-	Task<IActionResult> ProcessPaymentAsync(string method, dynamic model = null);
+	Task<IActionResult> ProcessPaymentAsync(string method, JsonElement model);
 }
