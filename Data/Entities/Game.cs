@@ -39,5 +39,7 @@ namespace Data.Entities
 		public ICollection<OrderGame> OrderGames { get; set; } = [];
 
 		public virtual Publisher Publisher { get; set; } = default!;
+
+		public ICollection<Comment> Comments { get; set; } = [];
 	}
 }

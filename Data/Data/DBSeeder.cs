@@ -22,6 +22,12 @@ namespace Data.Data
 
 		public static OrderGame[] OrderDetails => orderGames;
 
+		public static Comment[] Comments => comments;
+
+		public static Comment[] Replies => replies;
+
+		public static Comment[] Tier3Replies => tier3replies;
+
 		public static void Seed(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Publisher>().HasData(publishers);
@@ -33,6 +39,9 @@ namespace Data.Data
 			modelBuilder.Entity<GameGenre>().HasData(gameGenres);
 			modelBuilder.Entity<Order>().HasData(orders);
 			modelBuilder.Entity<OrderGame>().HasData(orderGames);
+			modelBuilder.Entity<Comment>().HasData(comments);
+			modelBuilder.Entity<Comment>().HasData(replies);
+			modelBuilder.Entity<Comment>().HasData(tier3replies);
 		}
 
 		private static readonly Publisher[] publishers = new Publisher[]
@@ -104,6 +113,23 @@ namespace Data.Data
 		private static readonly OrderGame[] orderGames = new OrderGame[]
 		{
 			new OrderGame { OrderId = orders[0].Id, ProductId = games[0].Id, Discount = 0, Price = 60, Quantity = 1 },
+		};
+
+		private static readonly Comment[] comments = new Comment[]
+		{
+			new Comment { GameId = games[0].Id, Id = new Guid("bce96b76-0624-4248-9b34-d30655495c2d"), Body = "This is a test comment", Name = "Paul" },
+			new Comment { GameId = games[0].Id, Id = new Guid("525d6ae7-9e7f-4514-930f-c62428c41948"), Body = "This is a test comment 2", Name = "John"},
+		};
+
+		private static readonly Comment[] replies = new Comment[]
+		{
+			new Comment { GameId = games[0].Id, Id = new Guid("96d2c845-1144-4a6b-a8cb-abced83a8b2c"), Body = "This is a test reply to test comment", Name = "Paul", ParentId = comments[0].Id },
+			new Comment { GameId = games[0].Id, Id = new Guid("66d313b8-da86-4444-aae6-98f3737624eb"), Body = "This is a test reply to comment 2", Name = "John", ParentId = comments[1].Id },
+		};
+
+		private static readonly Comment[] tier3replies = new Comment[]
+		{
+			new Comment { GameId = games[0].Id, Id = new Guid("0db6fa93-f8a1-43f5-a57c-4405bce7aa63"), Body = "This is a tier 3 reply to test comment", Name = "Paul", ParentId = replies[0].Id },
 		};
 	}
 }

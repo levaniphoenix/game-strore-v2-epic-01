@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Models;
 using Data.Entities;
+using static Business.Models.CommentModel;
 
 namespace Business
 {
@@ -40,6 +41,34 @@ namespace Business
 			CreateMap<OrderModel, Order>().ReverseMap();
 
 			CreateMap<OrderDetailsModel, OrderGame>().ReverseMap();
+
+			CreateMap<CommentDetails, Comment>()
+				.ForMember(to => to.Id, from => from.MapFrom(x => x.Id))
+				.ForMember(to => to.Name, from => from.MapFrom(x => x.Name))
+				.ForMember(to => to.Body, from => from.MapFrom(x => x.Body))
+				.ForMember(to => to.Replies, from => from.MapFrom(x => x.ChildComments));
+
+			CreateMap<Comment, CommentDetails>()
+				.ForMember(to => to.Id, from => from.MapFrom(x => x.Id))
+				.ForMember(to => to.Name, from => from.MapFrom(x => x.Name))
+				.ForMember(to => to.Body, from => from.MapFrom(x => x.DisplayContent))
+				.ForMember(to => to.ChildComments, from => from.MapFrom(x => x.Replies));
+
+			CreateMap<CommentModel, Comment>()
+				.ForMember(to => to.Id, from => from.MapFrom(x => x.Comment.Id))
+				.ForMember(to => to.GameId, from => from.MapFrom(x => x.GameId))
+				.ForMember(to => to.Name, from => from.MapFrom(x => x.Comment.Name))
+				.ForMember(to => to.Body, from => from.MapFrom(x => x.Comment.Body))
+				.ForMember(to => to.Replies, from => from.MapFrom(x => x.Comment.ChildComments))
+				.ForMember(to => to.ParentId, from => from.MapFrom(x => x.ParentId));
+
+			CreateMap<Comment, CommentModel>()
+				.ForMember(to => to.GameId, from => from.MapFrom(x => x.GameId))
+				.ForPath(to => to.Comment.Id, from => from.MapFrom(x => x.Id))
+				.ForPath(to => to.Comment.Name, from => from.MapFrom(x => x.Name))
+				.ForPath(to => to.Comment.Body, from => from.MapFrom(x => x.DisplayContent))
+				.ForPath(to => to.Comment.ChildComments, from => from.MapFrom(x => x.Replies))
+				.ForMember(to => to.ParentId, from => from.MapFrom(x => x.ParentId));
 		}
 	}
 }

@@ -2,6 +2,7 @@
 using Business.Interfaces;
 using Business.Models;
 using Microsoft.AspNetCore.Mvc;
+using static Business.Models.CommentModel;
 using static Business.Models.GenreModel;
 using static Business.Models.PlatformModel;
 using static Business.Models.PublisherModel;
@@ -10,7 +11,7 @@ namespace Gamestore.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class GamesController(IGameService gameService) : ControllerBase
+public class GamesController(IGameService gameService, ICommentService commentService) : ControllerBase
 {
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<GameDetails>>> Get()
@@ -50,6 +51,13 @@ public class GamesController(IGameService gameService) : ControllerBase
 	{
 		var publisher = await gameService.GetPublisherByGamekey(key);
 		return Ok(publisher.Publisher);
+	}
+
+	[HttpGet("{key}/comments")]
+	public async Task<ActionResult<IEnumerable<CommentDetails>>?> GetCommentsByGameKeyAsync(string key)
+	{
+		var comments = (await commentService.GetCommentsByGameKeyAsync(key)).Select(x => x.Comment);
+		return Ok(comments);
 	}
 
 	[HttpGet("find/{id}")]
@@ -119,6 +127,60 @@ public class GamesController(IGameService gameService) : ControllerBase
 	public async Task<ActionResult> AddGameToCart(string key)
 	{
 		await gameService.AddToCartAsync(key);
+		return Ok();
+	}
+
+	[HttpPost("{key}/comments")]
+	public async Task<ActionResult> AddComment(string key, [FromBody] CommentModel comment)
+	{
+		if (!ModelState.IsValid)
+		{
+			return BadRequest(ModelState);
+		}
+
+		var game = await gameService.GetByKeyAsync(key);
+
+		if (game is null)
+		{
+			return NotFound("could not find the game with the specified key");
+		}
+
+		comment.GameId = game.Game.Id;
+
+		switch (comment.Action)
+		{
+			case "Quote":
+				await commentService.QuoteCommentAsync(comment.ParentId, comment.Comment.Name, comment.Comment.Body);
+				break;
+			case "Reply":
+				await commentService.ReplyToCommentAsync(comment.ParentId, comment.Comment.Name, comment.Comment.Body);
+				break;
+			default:
+				await commentService.AddAsync(comment);
+				break;
+		}
+
+		return Ok();
+	}
+
+	[HttpDelete("{key}/comments/{id}")]
+	public async Task<ActionResult> DeleteComment(string key, Guid id)
+	{
+		var game = await gameService.GetByKeyAsync(key);
+
+		if (game is null)
+		{
+			return NotFound("could not find the game with the specified key");
+		}
+
+		var comment = await commentService.GetByIdAsync(id);
+
+		if (comment is null)
+		{
+			return NotFound("could not find the comment with the specified id");
+		}
+
+		await commentService.DeleteAsync(id);
 		return Ok();
 	}
 }

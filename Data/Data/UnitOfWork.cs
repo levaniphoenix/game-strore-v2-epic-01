@@ -12,6 +12,16 @@ namespace Data.Data
 		private IRepository<Publisher>? publisherRepository;
 		private IRepository<Order>? orderRepository;
 		private IRepository<OrderGame>? orderGameRepository;
+		private IRepository<Comment>? commentRepository;
+
+		public IRepository<Comment> CommentRepository
+		{
+			get
+			{
+				commentRepository ??= new CommentRepository(context);
+				return commentRepository;
+			}
+		}
 
 		public IRepository<Game> GameRepository
 		{

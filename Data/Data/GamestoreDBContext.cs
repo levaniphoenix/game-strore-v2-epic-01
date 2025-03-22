@@ -10,6 +10,7 @@ namespace Data.Data
 		public DbSet<Platform> Platforms { get; set; } = default!;
 		public DbSet<Publisher> Publishers { get; set; } = default!;
 		public DbSet<Order> Orders { get; set; } = default!;
+		public DbSet<Comment> Comments { get; set; } = default!;
 
 		public DbSet<GamePlatform> GamePlatforms { get; set; } = default!;
 		public DbSet<GameGenre> GameGenres { get; set; } = default!;
@@ -52,6 +53,11 @@ namespace Data.Data
 						.HasForeignKey(e => e.GameId)
 				);
 
+			modelBuilder.Entity<Game>()
+				.HasMany(g => g.Comments)
+				.WithOne(c => c.Game)
+				.HasForeignKey(c => c.GameId);
+
 			modelBuilder.Entity<OrderGame>()
 				.HasOne(og => og.Order)
 				.WithMany(o => o.OrderDetails)
@@ -81,6 +87,11 @@ namespace Data.Data
 
 			modelBuilder.Entity<OrderGame>()
 				.HasKey(og => new { og.OrderId, og.ProductId });
+
+			modelBuilder.Entity<Comment>()
+				.HasMany(c => c.Replies)
+				.WithOne(c => c.Parent)
+				.HasForeignKey(c => c.ParentId);
 
 			DBSeeder.Seed(modelBuilder);
 		}

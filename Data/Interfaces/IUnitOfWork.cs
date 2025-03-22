@@ -16,6 +16,8 @@ namespace Data.Interfaces
 
 		IRepository<OrderGame>? OrderDetailsRepository { get; }
 
+		IRepository<Comment>? CommentRepository { get; }
+
 		Task SaveAsync();
 	}
 }

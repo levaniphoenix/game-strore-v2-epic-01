@@ -56,6 +56,7 @@ public class Startup(IConfiguration configuration)
 		services.AddScoped<IGenreService, GenreService>();
 		services.AddScoped<IPublisherService, PublisherService>();
 		services.AddScoped<IOrderService, OrderService>();
+		services.AddScoped<ICommentService, CommentService>();
 
 		services.AddControllers(options =>
 		{
