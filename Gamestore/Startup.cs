@@ -57,6 +57,7 @@ public class Startup(IConfiguration configuration)
 		services.AddScoped<IPublisherService, PublisherService>();
 		services.AddScoped<IOrderService, OrderService>();
 		services.AddScoped<ICommentService, CommentService>();
+		services.AddSingleton<IBannedUsersService, BannedUsersService>();
 
 		services.AddControllers(options =>
 		{

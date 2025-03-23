@@ -7,10 +7,18 @@ using Data.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Business.Services;
-public class CommentService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CommentService> logger) : ICommentService
+public class CommentService(IBannedUsersService bannedUsersService,IUnitOfWork unitOfWork, IMapper mapper, ILogger<CommentService> logger) : ICommentService
 {
 	public async Task AddAsync(CommentModel model)
 	{
+		logger.LogInformation("checking if user:{Username} is banned", model.Comment.Name);
+
+		if (bannedUsersService.IsUserBanned(model.Comment.Name))
+		{
+			logger.LogWarning("User {Username} is banned", model.Comment.Name);
+			throw new GameStoreValidationException("User is banned");
+		}
+
 		logger.LogInformation("Adding a new comment");
 		var comment = mapper.Map<Comment>(model);
 		await unitOfWork.CommentRepository.AddAsync(comment);
@@ -67,6 +75,14 @@ public class CommentService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Comm
 
 	public async Task QuoteCommentAsync(Guid? parentCommentId, string name, string quoteBody)
 	{
+		logger.LogInformation("checking if user:{Username} is banned", name);
+
+		if (bannedUsersService.IsUserBanned(name))
+		{
+			logger.LogWarning("User {Username} is banned", name);
+			throw new GameStoreValidationException("User is banned");
+		}
+
 		logger.LogInformation("Quoting comment with ID: {CommentId}", parentCommentId);
 
 		if (parentCommentId == null)
@@ -99,6 +115,14 @@ public class CommentService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Comm
 
 	public async Task ReplyToCommentAsync(Guid? parentCommentId, string name, string replyBody)
 	{
+		logger.LogInformation("checking if user:{Username} is banned", name);
+
+		if (bannedUsersService.IsUserBanned(name))
+		{
+			logger.LogWarning("User {Username} is banned", name);
+			throw new GameStoreValidationException("User is banned");
+		}
+
 		logger.LogInformation("Replying to comment with ID: {CommentId}", parentCommentId);
 
 		if (parentCommentId == null)
@@ -136,5 +160,27 @@ public class CommentService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<Comm
 		unitOfWork.CommentRepository.Update(comment);
 		await unitOfWork.SaveAsync();
 		logger.LogInformation("Comment with ID {CommentId} updated successfully", comment.Id);
+	}
+
+	public async Task BanUserAsync(BanRequestModel banRequest)
+	{
+		logger.LogInformation("Banning user with Name: {UserName}", banRequest.UserName);
+		var comments = await unitOfWork.CommentRepository.GetAllAsync(c => c.Name == banRequest.UserName);
+		
+		if (comments == null)
+		{
+			logger.LogWarning("No comments found for user with name {UserName}", banRequest.UserName);
+			throw new GameStoreValidationException("No comments found for user");
+		}
+
+		bannedUsersService.BanUser(banRequest);
+
+		foreach (var comment in comments)
+		{
+			comment.IsDeleted = true;
+			unitOfWork.CommentRepository.Update(comment);
+		}
+		await unitOfWork.SaveAsync();
+		logger.LogInformation("User with name {UserName} banned successfully", banRequest.UserName);
 	}
 }

@@ -9,4 +9,6 @@ public interface ICommentService : ICrud<CommentModel>
 	Task ReplyToCommentAsync(Guid? parentCommentId, string name, string replyBody);
 
 	Task QuoteCommentAsync(Guid? parentCommentId, string name, string quoteBody);
+
+	Task BanUserAsync(BanRequestModel banRequest);
 }
