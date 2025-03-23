@@ -40,7 +40,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 		var genres = await genreService.GetGenresByParentId(id);
 		if (!genres.Any())
 		{
-			return NotFound("genres not found");
+			return Ok();
 		}
 
 		return Ok(genres.Select(g => g.Genre));
