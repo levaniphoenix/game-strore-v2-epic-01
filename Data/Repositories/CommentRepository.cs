@@ -13,12 +13,12 @@ public class CommentRepository(GamestoreDBContext context) : GenericRepository<C
 			.FirstOrDefaultAsync(c => c.Id == (Guid)id);
 	}
 
-	public override void Update(Comment comment)
+	public override void Update(Comment entityToUpdate)
 	{
 		// Get the original comment from the database (to track changes)
 		var originalComment = Context.Comments
 			.AsNoTracking() // Ensure we don't track the entity while comparing
-			.FirstOrDefault(c => c.Id == comment.Id);
+			.FirstOrDefault(c => c.Id == entityToUpdate.Id);
 
 		if (originalComment == null)
 		{
@@ -26,7 +26,7 @@ public class CommentRepository(GamestoreDBContext context) : GenericRepository<C
 		}
 
 		// Check if the Body has changed
-		if (originalComment.Body != comment.Body)
+		if (originalComment.Body != entityToUpdate.Body)
 		{
 			// Find all quotes referencing the original body
 			var quotes = Context.Comments
@@ -37,7 +37,7 @@ public class CommentRepository(GamestoreDBContext context) : GenericRepository<C
 			{
 				// Replace the old quoted part with the new body
 				var oldQuotedPart = $"[{originalComment.Body}]";
-				var newQuotedPart = $"[{comment.Body}]";
+				var newQuotedPart = $"[{entityToUpdate.Body}]";
 
 				if (quote.Body.Contains(oldQuotedPart))
 				{
@@ -47,7 +47,7 @@ public class CommentRepository(GamestoreDBContext context) : GenericRepository<C
 		}
 
 		// Update the comment
-		Context.Comments.Update(comment);
+		Context.Comments.Update(entityToUpdate);
 	}
 
 	public override void Delete(Comment entityToDelete)
