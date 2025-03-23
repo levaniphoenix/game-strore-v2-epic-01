@@ -15,6 +15,8 @@ public class GamesControllerTests
 {
 	private readonly IMapper mapper = UnitTestHelper.CreateMapperProfile();
 
+	private readonly Mock<ICommentService> mockCommentService = new Mock<ICommentService>();
+
 	[Test]
 	public async Task GetShouldReturnAllGames()
 	{
@@ -22,7 +24,7 @@ public class GamesControllerTests
 		mockGameService
 			.Setup(s => s.GetAllAsync())
 			.ReturnsAsync(mapper.Map<IEnumerable<GameModel>>(DBSeeder.Games));
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.Get();
 
@@ -43,7 +45,7 @@ public class GamesControllerTests
 			.ReturnsAsync((string key) => {
 				return mapper.Map<GameModel?>(DBSeeder.Games.SingleOrDefault(g => g.Key == key));
 			});
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.Get("test_game");
 
@@ -63,7 +65,7 @@ public class GamesControllerTests
 			.ReturnsAsync((string key) => {
 				return mapper.Map<GameModel?>(DBSeeder.Games.SingleOrDefault(g => g.Key == key));
 			});
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.Get("test_game_NOT_FOUND");
 
@@ -88,7 +90,7 @@ public class GamesControllerTests
 
 				return mapper.Map<IEnumerable<GenreModel>>(genres);
 			});
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.GetGenresByGamekey("test_game");
 
@@ -116,7 +118,7 @@ public class GamesControllerTests
 
 				return mapper.Map<IEnumerable<GenreModel>>(genres);
 			});
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.GetGenresByGamekey("test_game_Non_existent_key");
 
@@ -145,7 +147,7 @@ public class GamesControllerTests
 				return mapper.Map<IEnumerable<PlatformModel>>(platforms);
 			});
 
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.GetPlatformsByGamekey("test_game");
 
@@ -174,7 +176,7 @@ public class GamesControllerTests
 				return mapper.Map<IEnumerable<PlatformModel>>(platforms);
 			});
 
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.GetPlatformsByGamekey("test_game_Non_existent_key");
 
@@ -192,7 +194,7 @@ public class GamesControllerTests
 		var mockGameService = new Mock<IGameService>();
 		mockGameService.Setup(s => s.GetByIdAsync(It.IsAny<object>()))
 			.ReturnsAsync((object id) => { return mapper.Map<GameModel?>(DBSeeder.Games.SingleOrDefault(g => g.Id ==(Guid) id)); });
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.GetById(DBSeeder.Games[0].Id);
 
@@ -209,7 +211,7 @@ public class GamesControllerTests
 		var mockGameService = new Mock<IGameService>();
 		mockGameService.Setup(s => s.GetByIdAsync(It.IsAny<object>()))
 			.ReturnsAsync((object id) => { return mapper.Map<GameModel?>(DBSeeder.Games.SingleOrDefault(g => g.Id == (Guid)id)); });
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var result = await gamesController.GetById(Guid.Parse("00000000-0000-0000-0000-000000000001"));
 
@@ -223,7 +225,7 @@ public class GamesControllerTests
 	{
 		var mockGameService = new Mock<IGameService>();
 		mockGameService.Setup(s => s.AddAsync(It.IsAny<GameModel>()));
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var game = new GameModel() { Game = new GameDetails() { Name = "a new game", Description = "game desc" } };
 
@@ -238,7 +240,7 @@ public class GamesControllerTests
 	{
 		var mockGameService = new Mock<IGameService>();
 		mockGameService.Setup(s => s.UpdateAsync(It.IsAny<GameModel>()));
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var game = new GameModel() { Game = new GameDetails() { Name = "a new game", Description = "game desc" } };
 
@@ -253,7 +255,7 @@ public class GamesControllerTests
 	{
 		var mockGameService = new Mock<IGameService>();
 		mockGameService.Setup(s => s.DeleteByKeyAsync(It.IsAny<string>()));
-		var gamesController = new GamesController(mockGameService.Object);
+		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
 		var game = DBSeeder.Games[0];
 
