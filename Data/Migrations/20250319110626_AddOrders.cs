@@ -55,7 +55,7 @@ namespace Data.Migrations
             migrationBuilder.InsertData(
                 table: "Orders",
                 columns: new[] { "Id", "CustomerId", "Date", "Status" },
-                values: new object[] { new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"), new Guid("00000000-0000-0000-0000-000000000000"), new DateTime(2025, 3, 19, 15, 6, 24, 811, DateTimeKind.Local).AddTicks(9574), 0 });
+                values: new object[] { new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"), Guid.Empty, new DateTime(2025, 3, 19, 15, 6, 24, 811, DateTimeKind.Local).AddTicks(9574), 0 });
 
             migrationBuilder.InsertData(
                 table: "OrderDetails",
