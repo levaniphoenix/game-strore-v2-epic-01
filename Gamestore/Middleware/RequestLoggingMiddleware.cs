@@ -19,7 +19,6 @@ public class RequestLoggingMiddleware(RequestDelegate next)
 		await next(context);
 
 		stopwatch.Stop();
-		var response = await FormatResponse(context.Response);
 		var elapsedTime = stopwatch.ElapsedMilliseconds;
 		var statusCode = context.Response.StatusCode;
 		var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
