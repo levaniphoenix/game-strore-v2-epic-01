@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Business.Interfaces;
 using Business.Models;
+using Data.Filters;
 using Microsoft.AspNetCore.Mvc;
 using static Business.Models.CommentModel;
 using static Business.Models.GenreModel;
@@ -14,9 +15,9 @@ namespace Gamestore.Controllers;
 public class GamesController(IGameService gameService, ICommentService commentService) : ControllerBase
 {
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<GameDetails>>> Get()
+	public async Task<ActionResult<PaginatedGamesModel>> Get([FromQuery] GameFilter filter)
 	{
-		var games = (await gameService.GetAllAsync()).Select(x => x.Game);
+		var games = await gameService.GetAllWithFilterAsync(filter);
 		return Ok(games);
 	}
 
@@ -182,5 +183,23 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 
 		await commentService.DeleteAsync(id);
 		return Ok();
+	}
+
+	[HttpGet("publish-date-options")]
+	public ActionResult<IEnumerable<string>> GetPublishDateOptions()
+	{
+		return Ok(new[] { "last week", "last month", "last year", "2 years", "3 years" });
+	}
+
+	[HttpGet("pagination-options")]
+	public ActionResult<IEnumerable<string>> GetPaginationOptions()
+	{
+		return Ok(new[] { "10", "20", "50", "100", "all" });
+	}
+
+	[HttpGet("sorting-options")]
+	public ActionResult<IEnumerable<string>> GetSortingOptions()
+	{
+		return Ok(new[] { "Most popular", "Most commented", "Price ASC", "Price DESC", "New" });
 	}
 }

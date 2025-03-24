@@ -3,6 +3,7 @@ using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
 using Data.Entities;
+using Data.Filters;
 using Data.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -77,6 +78,13 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 		return mapper.Map<IEnumerable<GameModel>>(games);
 	}
 
+	public async Task<PaginatedGamesModel> GetAllWithFilterAsync(GameFilter filter)
+	{
+		logger.LogInformation("Fetching all games with filter: {Filter}", filter);
+		var games = mapper.Map<IEnumerable<GameModel>>(await unitOfWork.GameRepository!.GetAllWithFilterAsync(filter));
+		return await MakePaginatedModelAsync(games, filter);
+	}
+
 	public Task<GameModel?> GetByKeyAsync(string key)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(key);
@@ -123,7 +131,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 			logger.LogInformation("Fetched {Count} platforms for game key: {GameKey}", platforms.Count(), key);
 			return mapper.Map<IEnumerable<PlatformModel>>(platforms);
 		}
-		
+
 		return getPlatforms();
 	}
 
@@ -188,7 +196,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 
 		var key = gameName.Split(" ").Select(s => string.Concat(s[0].ToString().ToUpperInvariant(), s.AsSpan(1)));
 		var generatedKey = string.Join("", key);
-		
+
 		logger.LogInformation("Generated key: {GameKey} for game name: {GameName}", generatedKey, gameName);
 		return generatedKey;
 	}
@@ -219,7 +227,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 			logger.LogWarning("Validation failed: Game key {GameKey} already exists", key);
 			throw new GameStoreValidationException(ErrorMessages.GameKeyAlreadyExists);
 		}
-		
+
 		logger.LogInformation("Validation successful for game: {GameName}", model.Game.Name);
 	}
 
@@ -257,7 +265,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 			game.Genres = genres;
 		}
 
-		if(game.PublisherId != Guid.Empty)
+		if (game.PublisherId != Guid.Empty)
 		{
 			var publisher = await unitOfWork.PublisherRepository!.GetByIDAsync(model.PublisherId);
 			if (publisher is null)
@@ -267,11 +275,36 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 			}
 			game.Publisher = publisher;
 		}
-		
+
 	}
 
 	public async Task AddToCartAsync(string key)
 	{
 		await orderService.AddToCartAsync(key);
+	}
+
+	private async Task<PaginatedGamesModel> MakePaginatedModelAsync(IEnumerable<GameModel> games, GameFilter filter)
+	{
+		var totalGames = await unitOfWork.GameRepository.GetTotalCountAsync();
+		var pageCount = int.MaxValue;
+
+		if (!string.IsNullOrEmpty(filter.PageCount) && !filter.PageCount.Equals("all"))
+		{
+			var parse = int.TryParse(filter.PageCount, out pageCount);
+
+			if (!parse)
+			{
+				throw new GameStoreValidationException("Invalid page count");
+			}
+		}
+
+		var totalPages = (int)Math.Ceiling((double)totalGames / pageCount);
+
+		return new PaginatedGamesModel
+		{
+			Games = games.Select(x => x.Game),
+			CurrentPage = filter.Page,
+			TotalPages = totalPages,
+		};
 	}
 }

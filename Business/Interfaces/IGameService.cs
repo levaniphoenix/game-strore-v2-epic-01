@@ -1,9 +1,12 @@
 ﻿using Business.Models;
+using Data.Filters;
 
 namespace Business.Interfaces
 {
 	public interface IGameService : ICrud<GameModel>
 	{
+		Task<PaginatedGamesModel> GetAllWithFilterAsync(GameFilter filter);
+
 		string GenerateKey(string gameName);
 
 		Task<GameModel?> GetByNameAsync(string gameName);

@@ -6,7 +6,7 @@ namespace Data.Data
 {
 	public class UnitOfWork(GamestoreDBContext context) : IUnitOfWork, IDisposable
 	{
-		private IRepository<Game>? gameRepository;
+		private IGameRepository? gameRepository;
 		private IRepository<Platform>? platformRepository;
 		private IRepository<Genre>? genreRepository;
 		private IRepository<Publisher>? publisherRepository;
@@ -23,7 +23,7 @@ namespace Data.Data
 			}
 		}
 
-		public IRepository<Game> GameRepository
+		public IGameRepository GameRepository
 		{
 			get
 			{

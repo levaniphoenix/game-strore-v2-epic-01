@@ -4,7 +4,7 @@ namespace Data.Interfaces
 {
 	public interface IUnitOfWork
 	{
-		IRepository<Game>? GameRepository { get; }
+		IGameRepository? GameRepository { get; }
 
 		IRepository<Platform>? PlatformRepository { get; }
 
