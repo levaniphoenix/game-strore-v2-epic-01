@@ -1,4 +1,5 @@
-﻿using Data.Data;
+﻿using System.Globalization;
+using Data.Data;
 using Data.Entities;
 using Data.Filters;
 using Data.Interfaces;
@@ -39,6 +40,26 @@ namespace Data.Repositories
 
 			// todo add publish date to game to handle filtering by publish date
 
+			if (!string.IsNullOrEmpty(filter.DatePublishing))
+			{
+				var now = DateTime.UtcNow;
+
+				query = filter.DatePublishing switch
+				{
+					"last week" => query.Where(g => g.PublishDate >= now.AddDays(-7)),
+					"last month" => query.Where(g => g.PublishDate >= now.AddMonths(-1)),
+					"last year" => query.Where(g => g.PublishDate >= now.AddYears(-1)),
+					"2 years" => query.Where(g => g.PublishDate >= now.AddYears(-2)),
+					"3 years" => query.Where(g => g.PublishDate >= now.AddYears(-3)),
+					_ => query // No filtering if the value doesn't match
+				};
+			}
+
+			if (!string.IsNullOrEmpty(filter.Name))
+			{
+				query = query.Where(g => g.Name.Contains(filter.Name));
+			}
+
 			if (!string.IsNullOrEmpty(filter.Sort))
 			{
 				query = filter.Sort switch
@@ -46,6 +67,8 @@ namespace Data.Repositories
 					"Price ASC" => query.OrderBy(g => g.Price),
 					"Price DESC" => query.OrderByDescending(g => g.Price),
 					"Most commented" => query.OrderByDescending(g => g.Comments.Count),
+					"Most popular" => query.OrderByDescending(g => g.Views),
+					"New" => query.OrderByDescending(g => g.PublishDate),
 					_ => query
 				};
 			}

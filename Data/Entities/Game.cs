@@ -32,6 +32,11 @@ namespace Data.Entities
 		[Required]
 		public Guid PublisherId { get; set; }
 
+		[Required]
+		public DateTime PublishDate { get; set; }
+
+		public int Views { get; set; }
+
 		public ICollection<Platform> Platforms { get; set; } = [];
 
 		public ICollection<Genre> Genres { get; set; } = [];

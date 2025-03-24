@@ -92,8 +92,22 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 
 		async Task<GameModel?> getGameByIdAsync()
 		{
-			var games = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
-			return mapper.Map<GameModel?>(games);
+			var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
+
+			if (game == null)
+			{
+				logger.LogWarning("Game with Key {Key} not found", key);
+				return null;
+			}
+
+			logger.LogInformation("Incrementing the View Count of Game: {GameName}", game.Name);
+			game.Views++;
+			unitOfWork.GameRepository.Update(game);
+			await unitOfWork.SaveAsync();
+			logger.LogInformation("View Count incremented successfully for Game: {GameName}, Views: {Views}", game.Name, game.Views);
+
+
+			return mapper.Map<GameModel?>(game);
 		}
 
 		return getGameByIdAsync();
@@ -143,6 +157,19 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 		async Task<GameModel?> getById()
 		{
 			var game = await unitOfWork.GameRepository!.GetByIDAsync(id);
+
+			if (game == null)
+			{
+				logger.LogWarning("Game with ID {GameId} not found", id);
+				return null;
+			}
+
+			logger.LogInformation("Incrementing the View Count of Game: {GameName}", game.Name);
+			game.Views++;
+			unitOfWork.GameRepository.Update(game);
+			await unitOfWork.SaveAsync();
+			logger.LogInformation("View Count incremented successfully for Game: {GameName}, Views: {Views}", game.Name, game.Views);
+
 			return mapper.Map<GameModel?>(game);
 		}
 

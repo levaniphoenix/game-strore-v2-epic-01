@@ -84,9 +84,9 @@ namespace Data.Data
 
 		private static readonly Game[] games = new Game[]
 			{
-			 new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"), PublisherId = publishers[0].Id , Price = 10, Discount = 1 , UnitInStock = 10 } ,
-			 new Game { Name = "Test Game 2", Key = "test_game_2", Description = "This is a test game 2", Id = new Guid("2d86363e-011c-43e0-95e2-17dcd5b77149"), PublisherId = publishers[1].Id, Price = 20, Discount = 2 , UnitInStock = 20} ,
-			 new Game { Name = "Test Game 3", Key = "test_game_3", Description = "This is a test game 3", Id = new Guid("90b78d48-009a-4bb3-9857-cedb9e6a6b21"), PublisherId = publishers[2].Id, Price = 30, Discount = 3 , UnitInStock = 30}
+			 new Game { Name = "Test Game", Key = "test_game", Description = "This is a test game", Id = new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"), PublisherId = publishers[0].Id , Price = 10, Discount = 1 , UnitInStock = 10 , PublishDate = DateTime.Now} ,
+			 new Game { Name = "Test Game 2", Key = "test_game_2", Description = "This is a test game 2", Id = new Guid("2d86363e-011c-43e0-95e2-17dcd5b77149"), PublisherId = publishers[1].Id, Price = 20, Discount = 2 , UnitInStock = 20, PublishDate = new DateTime(2025, 2, 23, 0, 0, 0, DateTimeKind.Utc)} ,
+			 new Game { Name = "Test Game 3", Key = "test_game_3", Description = "This is a test game 3", Id = new Guid("90b78d48-009a-4bb3-9857-cedb9e6a6b21"), PublisherId = publishers[2].Id, Price = 30, Discount = 3 , UnitInStock = 30, PublishDate = new DateTime(2024, 11, 2, 0, 0, 0, DateTimeKind.Utc) }
 			};
 
 		private static readonly GamePlatform[] gamePlatforms = new GamePlatform[]

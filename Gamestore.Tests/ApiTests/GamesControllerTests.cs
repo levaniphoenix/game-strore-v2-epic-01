@@ -2,6 +2,7 @@
 using Business.Interfaces;
 using Business.Models;
 using Data.Data;
+using Data.Filters;
 using FluentAssertions;
 using Gamestore.Controllers;
 using Microsoft.AspNetCore.Mvc;
@@ -22,18 +23,18 @@ public class GamesControllerTests
 	{
 		var mockGameService = new Mock<IGameService>();
 		mockGameService
-			.Setup(s => s.GetAllAsync())
-			.ReturnsAsync(mapper.Map<IEnumerable<GameModel>>(DBSeeder.Games));
+			.Setup(s => s.GetAllWithFilterAsync(It.IsAny<GameFilter>()))
+			.ReturnsAsync(new PaginatedGamesModel() { Games = mapper.Map<IEnumerable<GameModel>>(DBSeeder.Games).Select(x => x.Game)});
 		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
-		var result = await gamesController.Get();
+		var result = await gamesController.Get(new GameFilter());
 
 		var okResult = result.Result as OkObjectResult;
-		var returnedGames =(IEnumerable<GameDetails>) okResult?.Value;
+		var returnedGames =(PaginatedGamesModel) okResult?.Value;
 
 		okResult.Should().NotBeNull();
 		returnedGames.Should().NotBeNull();
-		returnedGames.Count().Should().Be(DBSeeder.Games.Length);
+		returnedGames.Games.Count().Should().Be(DBSeeder.Games.Length);
 	}
 
 	[Test]
