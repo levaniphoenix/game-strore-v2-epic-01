@@ -4,8 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Business.Interfaces;
 
-public interface IOrderService : ICrud<OrderModel>
+public interface IOrderService
 {
+	Task<IEnumerable<OrderModel>> GetAllAsync();
+
+	Task<OrderModel?> GetByIdAsync(object id);
+
+	Task DeleteAsync(object modelId);
+
 	Task AddToCartAsync(string key);
 
 	Task RemoveFromCartAsync(string key);

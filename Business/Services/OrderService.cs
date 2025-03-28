@@ -15,11 +15,6 @@ namespace Business.Services;
 
 public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientFactory, IMapper mapper, ILogger<OrderService> logger) : IOrderService
 {
-	public Task AddAsync(OrderModel model)
-	{
-		throw new NotImplementedException();
-	}
-
 	public async Task AddToCartAsync(string key)
 	{
 		logger.LogInformation("Adding to cart with key {Key}", key);
@@ -151,11 +146,6 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 			unitOfWork.OrderRepository.Update(cartOrder);
 		}
 		await unitOfWork.SaveAsync();
-	}
-
-	public Task UpdateAsync(OrderModel model)
-	{
-		throw new NotImplementedException();
 	}
 
 	public Task<PaymentMethodsModel> GetPaymentMethodsAsync()
