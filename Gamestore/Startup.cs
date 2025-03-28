@@ -88,9 +88,9 @@ public class Startup(IConfiguration configuration)
 			app.UseSwaggerUI();
 		}
 
+		app.UseCors("AllowLocalhost");
 		app.UseMiddleware<RequestLoggingMiddleware>();
 		app.UseExceptionHandler(_ => { });
-		app.UseCors("AllowLocalhost");
 		app.UseRouting();
 		app.UseAuthorization();
 		app.UseEndpoints(endpoints =>
