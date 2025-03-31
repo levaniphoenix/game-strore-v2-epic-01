@@ -9,10 +9,10 @@ public class Comment
 
 	[Required]
 	public string Body { get; set; }
-	
+
 	[Required]
 	public string Name { get; set; }
-	
+
 	[Required]
 	public bool IsDeleted { get; set; }
 
@@ -26,5 +26,21 @@ public class Comment
 	public Game Game { get; set; } = null!;
 
 	// Computed property for deleted content handling
-	public string DisplayContent => IsDeleted ? "A comment/quote was deleted" : Body;
+	public string DisplayContent 
+	{
+		get
+		{
+			if (IsDeleted)
+			{
+				return "A comment/quote was deleted";
+			}
+
+			if (Parent != null && Parent.IsDeleted)
+			{
+				return "[A comment/quote was deleted]" + Body;
+			}
+
+			return Body;
+		}
+	}
 }

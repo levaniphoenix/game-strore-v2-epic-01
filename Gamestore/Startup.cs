@@ -70,10 +70,10 @@ public class Startup(IConfiguration configuration)
 		services.AddCors(options =>
 		{
 			options.AddPolicy(
-				"AllowLocalhost",
+				"AllowAny",
 				policy =>
 				{
-					policy.WithOrigins("http://127.0.0.1:8080") // Allow only this origin
+					policy.AllowAnyOrigin()
 						  .AllowAnyMethod()
 						  .AllowAnyHeader();
 				});
@@ -88,7 +88,7 @@ public class Startup(IConfiguration configuration)
 			app.UseSwaggerUI();
 		}
 
-		app.UseCors("AllowLocalhost");
+		app.UseCors("AllowAny");
 		app.UseMiddleware<RequestLoggingMiddleware>();
 		app.UseExceptionHandler(_ => { });
 		app.UseRouting();

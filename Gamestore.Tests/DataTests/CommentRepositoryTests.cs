@@ -106,11 +106,11 @@ public class CommentRepositoryTests
 
 		// Assert the reply
 		updatedReply.Should().NotBeNull();
-		updatedReply.Body.Should().Be("[A comment/quote was deleted], This is a reply.");
+		updatedReply.DisplayContent.Should().Be("[A comment/quote was deleted], This is a reply.");
 
 		// Assert the quote
 		updatedQuote.Should().NotBeNull();
-		updatedQuote.Body.Should().Be("[A comment/quote was deleted], This is a quote.");
+		updatedQuote.DisplayContent.Should().Be("[A comment/quote was deleted], This is a quote.");
 	}
 
 	[Test]

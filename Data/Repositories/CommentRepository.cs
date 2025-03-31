@@ -61,7 +61,7 @@ public class CommentRepository(GamestoreDBContext context) : GenericRepository<C
 		// Modify the reply by replacing the author's name with "A comment/quote was deleted"
 		foreach (var reply in replies.Where(x => x.Body.StartsWith($"[{entityToDelete.Name}],", StringComparison.InvariantCulture)))
 		{
-			reply.Body = reply.Body.Replace($"[{entityToDelete.Name}]", "[A comment/quote was deleted]");
+			reply.Body = reply.Body.Replace($"[{entityToDelete.Name}]", "");
 		}
 
 		var quotes = Context.Comments
@@ -74,7 +74,7 @@ public class CommentRepository(GamestoreDBContext context) : GenericRepository<C
 			var quotedPart = $"[{entityToDelete.Body}]";
 			if (quote.Body.Contains(quotedPart))
 			{
-				quote.Body = quote.Body.Replace(quotedPart, "[A comment/quote was deleted]");
+				quote.Body = quote.Body.Replace(quotedPart, "");
 			}
 		}
 	}
