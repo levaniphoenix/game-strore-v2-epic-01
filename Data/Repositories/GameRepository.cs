@@ -69,24 +69,27 @@ namespace Data.Repositories
 					_ => query
 				};
 			}
+			
+			query = ApplyPagination(query, filter);
 
+			return await query.ToListAsync();
+		}
 
+		private static IQueryable<Game> ApplyPagination(IQueryable<Game> query, GameFilter filter)
+		{
 			int pageCount = 10;
 
 			if (!string.IsNullOrEmpty(filter.PageCount) && !filter.PageCount.Equals("all"))
 			{
 				var parse = int.TryParse(filter.PageCount, out pageCount);
-				
+
 				if (!parse)
 				{
 					pageCount = 10;
 				}
 			}
 
-			query = query.Skip((filter.Page - 1) * pageCount)
-				 .Take(pageCount);
-
-			return await query.ToListAsync();
+			return query.Skip((filter.Page - 1) * pageCount).Take(pageCount);
 		}
 	}
 }
