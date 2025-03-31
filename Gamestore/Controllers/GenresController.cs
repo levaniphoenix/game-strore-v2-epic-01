@@ -55,7 +55,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 		}
 
 		await genreService.AddAsync(genre);
-		return Ok();
+		return Created();
 	}
 
 	[HttpPut]
