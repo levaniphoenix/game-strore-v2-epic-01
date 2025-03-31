@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Data.Data;
+﻿using Data.Data;
 using Data.Entities;
 using Data.Filters;
 using Data.Interfaces;
@@ -37,8 +36,6 @@ namespace Data.Repositories
 			{
 				query = query.Where(g => g.Price >= filter.MinPrice.Value);
 			}
-
-			// todo add publish date to game to handle filtering by publish date
 
 			if (!string.IsNullOrEmpty(filter.DatePublishing))
 			{

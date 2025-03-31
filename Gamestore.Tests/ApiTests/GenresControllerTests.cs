@@ -167,7 +167,7 @@ public class GenresControllerTests
 		var result = await genresController.Post(genre);
 
 		mockGenreService.Verify(x => x.AddAsync(It.Is<GenreModel>(g => g.Genre.Name == genre.Genre.Name)), Times.Once);
-		result.Should().BeOfType<OkResult>();
+		result.Should().BeOfType<CreatedResult>();
 	}
 
 	[Test]
