@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Business.Models;
+using Common.Options;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Business.Interfaces;
@@ -22,7 +23,7 @@ public interface IOrderService
 
 	Task<IEnumerable<OrderDetailsModel>>? GetOrderDetailsByIdAsync(object id);
 
-	Task<PaymentMethodsModel> GetPaymentMethodsAsync();
+	Task<PaymentOptions> GetPaymentMethodsAsync();
 
 	Task<IActionResult> ProcessPaymentAsync(string method, JsonElement model);
 }

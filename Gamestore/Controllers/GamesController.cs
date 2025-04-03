@@ -1,7 +1,8 @@
 ﻿using System.Text;
 using Business.Interfaces;
 using Business.Models;
-using Data.Filters;
+using Common.Filters;
+using Common.Options;
 using Microsoft.AspNetCore.Mvc;
 using static Business.Models.CommentModel;
 using static Business.Models.GenreModel;
@@ -188,18 +189,18 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 	[HttpGet("publish-date-options")]
 	public ActionResult<IEnumerable<string>> GetPublishDateOptions()
 	{
-		return Ok(new[] { "last week", "last month", "last year", "2 years", "3 years" });
+		return Ok(PublishingDateOptions.Values);
 	}
 
 	[HttpGet("pagination-options")]
 	public ActionResult<IEnumerable<string>> GetPaginationOptions()
 	{
-		return Ok(new[] { "10", "20", "50", "100", "all" });
+		return Ok(PaginationPageCountOptions.Values);
 	}
 
 	[HttpGet("sorting-options")]
 	public ActionResult<IEnumerable<string>> GetSortingOptions()
 	{
-		return Ok(new[] { "Most popular", "Most commented", "Price ASC", "Price DESC", "New" });
+		return Ok(SortingOptions.Values);
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces;
 using Business.Models;
+using Common.Options;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.Controllers;
@@ -54,7 +55,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 	}
 
 	[HttpGet("payment-methods")]
-	public async Task<ActionResult<IEnumerable<PaymentMethodsModel>>> GetPaymentMethods()
+	public async Task<ActionResult<IEnumerable<PaymentOptions>>> GetPaymentMethods()
 	{
 		var paymentMethods = await orderService.GetPaymentMethodsAsync();
 		return Ok(paymentMethods);

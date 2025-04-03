@@ -1,5 +1,5 @@
 ﻿using Data.Entities;
-using Data.Filters;
+using Common.Filters;
 
 namespace Data.Interfaces;
 public interface IGameRepository : IRepository<Game>

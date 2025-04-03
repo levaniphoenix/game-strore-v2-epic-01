@@ -3,7 +3,7 @@ using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
 using Data.Entities;
-using Data.Filters;
+using Common.Filters;
 using Data.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;

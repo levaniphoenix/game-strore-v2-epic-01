@@ -2,7 +2,7 @@
 using Business.Interfaces;
 using Business.Models;
 using Data.Data;
-using Data.Filters;
+using Common.Filters;
 using FluentAssertions;
 using Gamestore.Controllers;
 using Microsoft.AspNetCore.Mvc;

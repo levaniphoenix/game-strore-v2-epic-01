@@ -4,6 +4,7 @@ using AutoMapper;
 using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
+using Common.Options;
 using Data.Entities;
 using Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -148,9 +149,9 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 		await unitOfWork.SaveAsync();
 	}
 
-	public Task<PaymentMethodsModel> GetPaymentMethodsAsync()
+	public Task<PaymentOptions> GetPaymentMethodsAsync()
 	{
-		return Task.FromResult(new PaymentMethodsModel());
+		return Task.FromResult(new PaymentOptions());
 	}
 
 	public async Task<IActionResult> ProcessPaymentAsync(string method, JsonElement model)

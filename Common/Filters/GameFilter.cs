@@ -1,4 +1,4 @@
-﻿namespace Data.Filters;
+﻿namespace Common.Filters;
 
 public class GameFilter
 {

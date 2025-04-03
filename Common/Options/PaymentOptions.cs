@@ -1,6 +1,6 @@
-﻿namespace Business.Models;
+﻿namespace Common.Options;
 
-public class PaymentMethodsModel
+public class PaymentOptions
 {
 #pragma warning disable CA1822 // Mark members as static
 	public PaymentMethod[] PaymentMethods => [

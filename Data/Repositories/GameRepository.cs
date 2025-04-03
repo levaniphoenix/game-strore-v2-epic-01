@@ -1,8 +1,9 @@
 ﻿using Data.Data;
 using Data.Entities;
-using Data.Filters;
+using Common.Filters;
 using Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Common.Options;
 
 namespace Data.Repositories
 {
@@ -43,11 +44,11 @@ namespace Data.Repositories
 
 				query = filter.DatePublishing switch
 				{
-					"last week" => query.Where(g => g.PublishDate >= now.AddDays(-7)),
-					"last month" => query.Where(g => g.PublishDate >= now.AddMonths(-1)),
-					"last year" => query.Where(g => g.PublishDate >= now.AddYears(-1)),
-					"2 years" => query.Where(g => g.PublishDate >= now.AddYears(-2)),
-					"3 years" => query.Where(g => g.PublishDate >= now.AddYears(-3)),
+					PublishingDateOptions.LastWeek => query.Where(g => g.PublishDate >= now.AddDays(-7)),
+					PublishingDateOptions.LastMonth => query.Where(g => g.PublishDate >= now.AddMonths(-1)),
+					PublishingDateOptions.LastYear => query.Where(g => g.PublishDate >= now.AddYears(-1)),
+					PublishingDateOptions.LastTwoYears => query.Where(g => g.PublishDate >= now.AddYears(-2)),
+					PublishingDateOptions.LastThreeYears => query.Where(g => g.PublishDate >= now.AddYears(-3)),
 					_ => query // No filtering if the value doesn't match
 				};
 			}
@@ -61,11 +62,11 @@ namespace Data.Repositories
 			{
 				query = filter.Sort switch
 				{
-					"Price ASC" => query.OrderBy(g => g.Price),
-					"Price DESC" => query.OrderByDescending(g => g.Price),
-					"Most commented" => query.OrderByDescending(g => g.Comments.Count),
-					"Most popular" => query.OrderByDescending(g => g.Views),
-					"New" => query.OrderByDescending(g => g.PublishDate),
+					SortingOptions.PriceAscending => query.OrderBy(g => g.Price),
+					SortingOptions.PriceDescending => query.OrderByDescending(g => g.Price),
+					SortingOptions.MostCommented => query.OrderByDescending(g => g.Comments.Count),
+					SortingOptions.MostPopular => query.OrderByDescending(g => g.Views),
+					SortingOptions.New => query.OrderByDescending(g => g.PublishDate),
 					_ => query
 				};
 			}
@@ -79,7 +80,7 @@ namespace Data.Repositories
 		{
 			int pageCount = 10;
 
-			if (!string.IsNullOrEmpty(filter.PageCount) && !filter.PageCount.Equals("all"))
+			if (!string.IsNullOrEmpty(filter.PageCount) && !filter.PageCount.Equals(PaginationPageCountOptions.All))
 			{
 				var parse = int.TryParse(filter.PageCount, out pageCount);
 

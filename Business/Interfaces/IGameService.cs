@@ -1,5 +1,5 @@
 ﻿using Business.Models;
-using Data.Filters;
+using Common.Filters;
 
 namespace Business.Interfaces
 {
