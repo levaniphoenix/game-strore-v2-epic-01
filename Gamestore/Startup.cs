@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Business;
 using Business.Interfaces;
+using Business.Interfaces.Northwind;
 using Business.Services;
+using Business.Services.Northwind;
 using Data.Data;
 using Data.Interfaces;
 using Gamestore.CustomDeserializer;
@@ -9,6 +11,8 @@ using Gamestore.ExeptionHandlers;
 using Gamestore.Filters;
 using Gamestore.Middleware;
 using Microsoft.EntityFrameworkCore;
+using Northwind.Data.Data;
+using Northwind.Data.Intefaces;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
@@ -58,6 +62,12 @@ public class Startup(IConfiguration configuration)
 		services.AddScoped<IOrderService, OrderService>();
 		services.AddScoped<ICommentService, CommentService>();
 		services.AddSingleton<IBannedUsersService, BannedUsersService>();
+
+		// northwind services
+		var mongoDBConnectionString = configuration.GetConnectionString("MongoDBConnection");
+		services.AddScoped<IUnitOfWorkMongoDB, UnitOfWorkMongoDB>(_ => new UnitOfWorkMongoDB(mongoDBConnectionString!, "Northwind"));
+		services.AddScoped<ICategoryService, CategoryService>();
+		services.AddScoped<IProductService, ProductService>();
 
 		services.AddControllers(options =>
 		{

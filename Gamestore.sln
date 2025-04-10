@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gamestore.Tests", "Gamestor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{48060DF5-5572-4125-93EC-88C6403A98A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Northwind.Data", "Northwind.Data\Northwind.Data.csproj", "{1303BC8A-B82F-4FEF-BCD6-35A6928D1622}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{48060DF5-5572-4125-93EC-88C6403A98A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48060DF5-5572-4125-93EC-88C6403A98A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48060DF5-5572-4125-93EC-88C6403A98A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1303BC8A-B82F-4FEF-BCD6-35A6928D1622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1303BC8A-B82F-4FEF-BCD6-35A6928D1622}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1303BC8A-B82F-4FEF-BCD6-35A6928D1622}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1303BC8A-B82F-4FEF-BCD6-35A6928D1622}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,7 +1,13 @@
 ﻿using AutoMapper;
 using Business.Models;
+using Business.Models.Northwind;
 using Data.Entities;
+using Northwind.Data.Entities;
 using static Business.Models.CommentModel;
+using static Business.Models.Northwind.ProductModel;
+using Order = Data.Entities.Order;
+using OrderDetailsModel = Business.Models.OrderDetailsModel;
+using OrderModel = Business.Models.OrderModel;
 
 namespace Business
 {
@@ -69,6 +75,23 @@ namespace Business
 				.ForPath(to => to.Comment.Body, from => from.MapFrom(x => x.DisplayContent))
 				.ForPath(to => to.Comment.ChildComments, from => from.MapFrom(x => x.Replies))
 				.ForMember(to => to.ParentId, from => from.MapFrom(x => x.ParentId));
+
+			//mapping for Northwind
+			CreateMap<Category,CategoryModel>().ReverseMap();
+			CreateMap<Customer, CustomerModel>().ReverseMap();
+			CreateMap<Employee, EmployeeModel>().ReverseMap();
+			CreateMap<EmployeeTerritory, EmployeeTerritoryModel>().ReverseMap();
+			CreateMap<OrderDetails, Models.Northwind.OrderDetailsModel>().ReverseMap();
+			CreateMap<Northwind.Data.Entities.Order,Models.Northwind.OrderModel>().ReverseMap();
+			CreateMap<Region, RegionModel>().ReverseMap();
+			CreateMap<Shipper, ShipperModel>().ReverseMap();
+			CreateMap<Supplier, SupplierModel>().ReverseMap();
+			CreateMap<Territory, TerritoryModel>().ReverseMap();
+
+			CreateMap<Product, ProductDetails>().ReverseMap();
+			CreateMap<Product, ProductModel>()
+				.ForMember(to => to.Product, from => from.MapFrom(x => x))
+				.ReverseMap();
 		}
 	}
 }
