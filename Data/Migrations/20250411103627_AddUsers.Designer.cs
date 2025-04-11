@@ -4,6 +4,7 @@ using Data.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(GamestoreDBContext))]
-    partial class GamestoreDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250411103627_AddUsers")]
+    partial class AddUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,7 +158,7 @@ namespace Data.Migrations
                             Key = "test_game",
                             Name = "Test Game",
                             Price = 10.0,
-                            PublishDate = new DateTime(2025, 4, 11, 23, 5, 42, 807, DateTimeKind.Local).AddTicks(36),
+                            PublishDate = new DateTime(2025, 4, 11, 14, 36, 25, 576, DateTimeKind.Local).AddTicks(8842),
                             PublisherId = new Guid("407fb582-9b59-4dc9-89e7-49a8a6004e20"),
                             UnitInStock = 10,
                             Views = 0
@@ -394,9 +397,9 @@ namespace Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("89866a29-ebf5-46b0-9e82-91ef26ec0447"),
+                            Id = new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"),
                             CustomerId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            Date = new DateTime(2025, 4, 11, 23, 5, 42, 808, DateTimeKind.Local).AddTicks(1455),
+                            Date = new DateTime(2025, 4, 11, 14, 36, 25, 578, DateTimeKind.Local).AddTicks(955),
                             Status = 0
                         });
                 });
@@ -427,7 +430,7 @@ namespace Data.Migrations
                     b.HasData(
                         new
                         {
-                            OrderId = new Guid("89866a29-ebf5-46b0-9e82-91ef26ec0447"),
+                            OrderId = new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"),
                             ProductId = new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"),
                             Discount = 0,
                             Price = 60.0,
@@ -536,38 +539,6 @@ namespace Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("64614001-fec4-4889-928e-61b4aab78665"),
-                            Description = "Can manage users and roles. Can see deleted games. Can manage comments for the deleted game. Can edit a deleted game.",
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = new Guid("8e316382-2646-4484-a79b-3a78a41131d2"),
-                            Description = "Can manage business entities: games, genres, publishers, platforms, etc. Can edit orders. Can view orders history. Can’t edit orders from history. Can change the status of an order from paid to shipped. Can't edit a deleted game.",
-                            Name = "Manager"
-                        },
-                        new
-                        {
-                            Id = new Guid("7a24a152-00a7-42fb-ad05-ebb5b71ef264"),
-                            Description = "Can manage game comments. Can ban users from commenting.",
-                            Name = "Moderator"
-                        },
-                        new
-                        {
-                            Id = new Guid("c54327ae-8a79-4dd0-9670-f70786ebd7f6"),
-                            Description = "Can’t see deleted games. Can’t buy a deleted game. Can see the games in stock. Can comment game.",
-                            Name = "User"
-                        },
-                        new
-                        {
-                            Id = new Guid("2d32286b-8ae7-4579-92e8-0a8afa70d6ec"),
-                            Description = "Has read-only access.",
-                            Name = "Guest"
-                        });
                 });
 
             modelBuilder.Entity("Data.Entities.User", b =>
@@ -597,10 +568,10 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("VARCHAR(100)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(2058)
-                        .HasColumnType("nvarchar(2058)");
+                        .HasColumnType("varbinary(2058)");
 
                     b.HasKey("Id");
 
@@ -608,19 +579,6 @@ namespace Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("fc329ddf-39cd-4478-abe5-85663ca2659d"),
-                            BannedUntil = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "admin",
-                            FirstName = "admin",
-                            IsBanned = false,
-                            IsExternalUser = false,
-                            LastName = "admin",
-                            PasswordHash = "plPkIXrCzVHytBtFEPhraFJrrik7Z5j1XfNlIB6532A=-JxvDJ4ckFVbKUHJKX5HR+g=="
-                        });
                 });
 
             modelBuilder.Entity("Data.Entities.UserRole", b =>
@@ -636,18 +594,6 @@ namespace Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRole");
-
-                    b.HasData(
-                        new
-                        {
-                            RoleId = new Guid("64614001-fec4-4889-928e-61b4aab78665"),
-                            UserId = new Guid("fc329ddf-39cd-4478-abe5-85663ca2659d")
-                        },
-                        new
-                        {
-                            RoleId = new Guid("8e316382-2646-4484-a79b-3a78a41131d2"),
-                            UserId = new Guid("fc329ddf-39cd-4478-abe5-85663ca2659d")
-                        });
                 });
 
             modelBuilder.Entity("Data.Entities.Comment", b =>

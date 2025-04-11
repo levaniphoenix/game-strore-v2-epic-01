@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Common.Helpers;
 using Business.Models;
+using Business.Models.Auth;
 using Business.Models.Northwind;
 using Data.Entities;
 using Northwind.Data.Entities;
@@ -75,6 +77,31 @@ namespace Business
 				.ForPath(to => to.Comment.Body, from => from.MapFrom(x => x.DisplayContent))
 				.ForPath(to => to.Comment.ChildComments, from => from.MapFrom(x => x.Replies))
 				.ForMember(to => to.ParentId, from => from.MapFrom(x => x.ParentId));
+
+			CreateMap<User, UserRegistrationModel>()
+				.ForMember(to => to.Email, from => from.MapFrom(x => x.Email))
+				.ForMember(to => to.LastName, from => from.MapFrom(x => x.LastName))
+				.ForMember(to => to.FirstName, from => from.MapFrom(x => x.FirstName));
+
+			CreateMap<UserRegistrationModel, User>()
+				.ForMember(to => to.Email, from => from.MapFrom(x => x.Email))
+				.ForMember(to => to.LastName, from => from.MapFrom(x => x.LastName))
+				.ForMember(to => to.FirstName, from => from.MapFrom(x => x.FirstName))
+				.ForMember(to => to.PasswordHash, from => from.MapFrom(x => PasswordHasher.HashPassword(x.Password)));
+
+			CreateMap<User, UserModel>()
+				.ForPath(to => to.User.Id, from => from.MapFrom(x => x.Id))
+				.ForPath(to => to.User.Email, from => from.MapFrom(x => x.Email))
+				.ForPath(to => to.User.FirstName, from => from.MapFrom(x => x.FirstName))
+				.ForPath(to => to.User.LastName, from => from.MapFrom(x => x.LastName))
+				.ForPath(to => to.User.BannedUntil, from => from.MapFrom(x => x.BannedUntil))
+				.ForPath(to => to.User.IsBanned, from => from.MapFrom(x => x.IsBanned))
+				.ForPath(to => to.User.PasswordHash, from => from.MapFrom(x => x.PasswordHash))
+				.ReverseMap();
+
+			CreateMap<Role, RoleModel>().ReverseMap();
+
+
 
 			//mapping for Northwind
 			CreateMap<Category,CategoryModel>().ReverseMap();

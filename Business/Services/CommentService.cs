@@ -7,13 +7,13 @@ using Data.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Business.Services;
-public class CommentService(IBannedUsersService bannedUsersService,IUnitOfWork unitOfWork, IMapper mapper, ILogger<CommentService> logger) : ICommentService
+public class CommentService(IUserService userService,IUnitOfWork unitOfWork, IMapper mapper, ILogger<CommentService> logger) : ICommentService
 {
 	public async Task AddAsync(CommentModel model)
 	{
 		logger.LogInformation("checking if user:{Username} is banned", model.Comment.Name);
 
-		if (bannedUsersService.IsUserBanned(model.Comment.Name))
+		if (await userService.IsUserBanned(model.Comment.Name))
 		{
 			logger.LogWarning("User {Username} is banned", model.Comment.Name);
 			throw new GameStoreValidationException("User is banned");
@@ -77,7 +77,7 @@ public class CommentService(IBannedUsersService bannedUsersService,IUnitOfWork u
 	{
 		logger.LogInformation("checking if user:{Username} is banned", name);
 
-		if (bannedUsersService.IsUserBanned(name))
+		if (await userService.IsUserBanned(name))
 		{
 			logger.LogWarning("User {Username} is banned", name);
 			throw new GameStoreValidationException("User is banned");
@@ -117,7 +117,7 @@ public class CommentService(IBannedUsersService bannedUsersService,IUnitOfWork u
 	{
 		logger.LogInformation("checking if user:{Username} is banned", name);
 
-		if (bannedUsersService.IsUserBanned(name))
+		if (await userService.IsUserBanned(name))
 		{
 			logger.LogWarning("User {Username} is banned", name);
 			throw new GameStoreValidationException("User is banned");
@@ -173,7 +173,7 @@ public class CommentService(IBannedUsersService bannedUsersService,IUnitOfWork u
 			throw new GameStoreValidationException("No comments found for user");
 		}
 
-		bannedUsersService.BanUser(banRequest);
+		await userService.BanUser(banRequest);
 
 		foreach (var comment in comments)
 		{

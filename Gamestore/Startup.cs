@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text;
+using AutoMapper;
 using Business;
 using Business.Interfaces;
 using Business.Interfaces.Northwind;
@@ -9,8 +10,10 @@ using Data.Interfaces;
 using Gamestore.CustomDeserializer;
 using Gamestore.ExeptionHandlers;
 using Gamestore.Filters;
+using Gamestore.Helper;
 using Gamestore.Middleware;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Northwind.Data.Data;
 using Northwind.Data.Intefaces;
 using Polly;
@@ -33,6 +36,13 @@ public class Startup(IConfiguration configuration)
 		})
 		.AddPolicyHandler(GetRetryPolicy());
 
+		services.AddHttpClient("AuthClient", client =>
+		{
+			var baseUrl = configuration["AuthApiBaseUrl"];
+			client.BaseAddress = new Uri(baseUrl!);
+			client.DefaultRequestHeaders.Add("Accept", "application/json");
+		}).AddPolicyHandler(GetRetryPolicy());
+
 		QuestPDF.Settings.License = LicenseType.Community;
 		services.AddSerilog();
 		services.AddControllers()
@@ -53,6 +63,7 @@ public class Startup(IConfiguration configuration)
 		});
 		IMapper mapper = mapperConfig.CreateMapper();
 		services.AddSingleton(mapper);
+		services.AddSingleton<TokenProvider>();
 
 		services.AddScoped<IUnitOfWork, UnitOfWork>();
 		services.AddScoped<IGameService, GameService>();
@@ -61,7 +72,9 @@ public class Startup(IConfiguration configuration)
 		services.AddScoped<IPublisherService, PublisherService>();
 		services.AddScoped<IOrderService, OrderService>();
 		services.AddScoped<ICommentService, CommentService>();
-		services.AddSingleton<IBannedUsersService, BannedUsersService>();
+		services.AddScoped<IUserService, UserService>();
+		services.AddScoped<IAuthService, AuthService>();
+		services.AddScoped<IRoleService, RoleService>();
 
 		// northwind services
 		var mongoDBConnectionString = configuration.GetConnectionString("MongoDBConnection");
@@ -88,6 +101,25 @@ public class Startup(IConfiguration configuration)
 						  .AllowAnyHeader();
 				});
 		});
+
+		services.AddAuthentication("Bearer")
+			.AddJwtBearer("Bearer", options =>
+			{
+				options.TokenValidationParameters = new TokenValidationParameters
+				{
+					ValidateIssuer = false,
+					ValidateAudience = false,
+					ValidateLifetime = true,
+					ValidateIssuerSigningKey = true,
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+				};
+			});
+		services.AddAuthorization();
+		services.AddAuthorizationBuilder()
+			.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"))
+			.AddPolicy("ManagerPolicy", policy => policy.RequireRole("Manager", "Admin"))
+			.AddPolicy("ModeratorPolicy", policy => policy.RequireRole("Moderator", "Manager", "Admin"))
+			.AddPolicy("UserPolicy", policy => policy.RequireRole("User", "Moderator", "Manager", "Admin"));
 	}
 
 	public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -99,9 +131,11 @@ public class Startup(IConfiguration configuration)
 		}
 
 		app.UseCors("AllowAny");
+		app.UseMiddleware<FixAuthorizationHeaderMiddleware>();
 		app.UseMiddleware<RequestLoggingMiddleware>();
 		app.UseExceptionHandler(_ => { });
 		app.UseRouting();
+		app.UseAuthentication();
 		app.UseAuthorization();
 		app.UseEndpoints(endpoints =>
 		{

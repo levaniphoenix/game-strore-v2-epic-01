@@ -18,6 +18,10 @@ namespace Data.Interfaces
 
 		IRepository<Comment>? CommentRepository { get; }
 
+		IRepository<User>? UserRepository { get; }
+
+		IRepository<Role>? RoleRepository { get; }
+
 		Task SaveAsync();
 	}
 }

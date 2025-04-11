@@ -14,7 +14,7 @@ public class CommentModel
 	{
 		public Guid? Id { get; set; } = default!;
 
-		public string Name { get; set; }
+		public string? Name { get; set; }
 
 		public string Body { get; set; }
 

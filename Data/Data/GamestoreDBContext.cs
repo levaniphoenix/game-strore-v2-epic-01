@@ -11,6 +11,8 @@ namespace Data.Data
 		public DbSet<Publisher> Publishers { get; set; } = default!;
 		public DbSet<Order> Orders { get; set; } = default!;
 		public DbSet<Comment> Comments { get; set; } = default!;
+		public DbSet<User> Users { get; set; } = default!;
+		public DbSet<Role> Roles { get; set; } = default!;
 
 		public DbSet<GamePlatform> GamePlatforms { get; set; } = default!;
 		public DbSet<GameGenre> GameGenres { get; set; } = default!;
@@ -92,6 +94,24 @@ namespace Data.Data
 				.HasMany(c => c.Replies)
 				.WithOne(c => c.Parent)
 				.HasForeignKey(c => c.ParentId);
+
+			modelBuilder.Entity<Role>().HasIndex(Role => Role.Name).IsUnique(true);
+
+			modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique(true);
+
+			modelBuilder.Entity<User>()
+				.HasMany(u => u.Roles)
+				.WithMany(r => r.Users)
+				.UsingEntity<UserRole>(
+					j => j
+						.HasOne(e => e.Role)
+						.WithMany()
+						.HasForeignKey(e => e.RoleId),
+					j => j
+						.HasOne(e => e.User)
+						.WithMany()
+						.HasForeignKey(e => e.UserId)
+				);
 
 			DBSeeder.Seed(modelBuilder);
 		}

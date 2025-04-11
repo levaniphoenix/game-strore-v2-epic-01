@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using Business.Interfaces;
 using Business.Models;
 using Common.Filters;
 using Common.Options;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Business.Models.CommentModel;
 using static Business.Models.GenreModel;
@@ -125,6 +127,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok();
 	}
 
+	[Authorize(Policy = "AdminPolicy")]
 	[HttpPost("{key}/buy")]
 	public async Task<ActionResult> AddGameToCart(string key)
 	{
@@ -132,6 +135,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok();
 	}
 
+	[Authorize(Policy = "UserPolicy")]
 	[HttpPost("{key}/comments")]
 	public async Task<ActionResult> AddComment(string key, [FromBody] CommentModel comment)
 	{
@@ -148,6 +152,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		}
 
 		comment.GameId = game.Game.Id;
+		comment.Comment.Name = User.FindFirst(ClaimTypes.Email).Value;
 
 		switch (comment.Action)
 		{

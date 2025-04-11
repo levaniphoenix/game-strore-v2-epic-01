@@ -1,4 +1,5 @@
-﻿using Data.Entities;
+﻿using Common.Helpers;
+using Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Data
@@ -28,6 +29,12 @@ namespace Data.Data
 
 		public static Comment[] Tier3Replies => tier3replies;
 
+		public static Role[] Roles => roles;
+
+		public static User[] Users => users;
+
+		public static UserRole[] UserRoles => userRoles;
+
 		public static void Seed(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Publisher>().HasData(publishers);
@@ -42,6 +49,9 @@ namespace Data.Data
 			modelBuilder.Entity<Comment>().HasData(comments);
 			modelBuilder.Entity<Comment>().HasData(replies);
 			modelBuilder.Entity<Comment>().HasData(tier3replies);
+			modelBuilder.Entity<Role>().HasData(roles);
+			modelBuilder.Entity<User>().HasData(users);
+			modelBuilder.Entity<UserRole>().HasData(userRoles);
 		}
 
 		private static readonly Publisher[] publishers = new Publisher[]
@@ -107,7 +117,7 @@ namespace Data.Data
 
 		private static readonly Order[] orders = new Order[]
 			{
-				new Order { CustomerId = Guid.Parse("00000000-0000-0000-0000-000000000000"), Id = new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"), Date = DateTime.Now, Status = OrderStatus.Open },
+				new Order { CustomerId = Guid.Parse("00000000-0000-0000-0000-000000000000"), Id = new Guid("89866a29-ebf5-46b0-9e82-91ef26ec0447"), Date = DateTime.Now, Status = OrderStatus.Open },
 			};
 
 		private static readonly OrderGame[] orderGames = new OrderGame[]
@@ -130,6 +140,26 @@ namespace Data.Data
 		private static readonly Comment[] tier3replies = new Comment[]
 		{
 			new Comment { GameId = games[0].Id, Id = new Guid("0db6fa93-f8a1-43f5-a57c-4405bce7aa63"), Body = "This is a tier 3 reply to test comment", Name = "Paul", ParentId = replies[0].Id },
+		};
+
+		private static readonly Role[] roles = new Role[]
+		{
+			new Role { Id = new Guid("64614001-fec4-4889-928e-61b4aab78665"), Name = "Admin", Description = "Can manage users and roles. Can see deleted games. Can manage comments for the deleted game. Can edit a deleted game." },
+			new Role { Id = new Guid("8e316382-2646-4484-a79b-3a78a41131d2"), Name = "Manager", Description = "Can manage business entities: games, genres, publishers, platforms, etc. Can edit orders. Can view orders history. Can’t edit orders from history. Can change the status of an order from paid to shipped. Can't edit a deleted game." },
+			new Role { Id = new Guid("7a24a152-00a7-42fb-ad05-ebb5b71ef264"), Name = "Moderator", Description = "Can manage game comments. Can ban users from commenting." },
+			new Role { Id = new Guid("c54327ae-8a79-4dd0-9670-f70786ebd7f6"), Name = "User", Description = "Can’t see deleted games. Can’t buy a deleted game. Can see the games in stock. Can comment game." },
+			new Role { Id = new Guid("2d32286b-8ae7-4579-92e8-0a8afa70d6ec"), Name = "Guest", Description = "Has read-only access." }
+		};
+
+		private static readonly User[] users = new User[]
+		{
+			new User { Id = new Guid("fc329ddf-39cd-4478-abe5-85663ca2659d"), Email = "admin", FirstName = "admin", LastName = "admin", PasswordHash = PasswordHasher.HashPassword("admin"), IsBanned = false },
+		};
+
+		private static readonly UserRole[] userRoles = new UserRole[]
+		{
+			new UserRole { UserId = users[0].Id, RoleId = roles[0].Id },
+			new UserRole { UserId = users[0].Id, RoleId = roles[1].Id },
 		};
 	}
 }
