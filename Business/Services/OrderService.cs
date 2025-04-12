@@ -4,6 +4,7 @@ using AutoMapper;
 using Business.Exceptions;
 using Business.Interfaces;
 using Business.Models;
+using Common.Filters;
 using Common.Options;
 using Data.Entities;
 using Data.Interfaces;
@@ -16,7 +17,7 @@ namespace Business.Services;
 
 public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientFactory, IMapper mapper, ILogger<OrderService> logger) : IOrderService
 {
-	public async Task AddToCartAsync(string key)
+	public async Task AddToCartAsync(string key, Guid Id)
 	{
 		logger.LogInformation("Adding to cart with key {Key}", key);
 		
@@ -28,14 +29,14 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 			return;
 		}
 
-		var cartOrder = (await unitOfWork.OrderRepository.GetAllAsync(o => o.Status == OrderStatus.Open, includeProperties: "OrderDetails")).SingleOrDefault();
+		var cartOrder = (await unitOfWork.OrderRepository.GetAllAsync(o => o.Status == OrderStatus.Open && o.CustomerId == Id, includeProperties: "OrderDetails")).SingleOrDefault();
 
 		if (cartOrder == null)
 		{
 			logger.LogInformation("Creating new order");
 			cartOrder = new Order
 			{
-				CustomerId = Guid.Parse("00000000-0000-0000-0000-000000000000"),
+				CustomerId = Id,
 				Date = DateTime.Now,
 				Status = OrderStatus.Open,
 				OrderDetails = [new OrderGame { ProductId = game.Id, Quantity = 1, Price = game.Price, Discount = game.Discount }]
@@ -94,17 +95,19 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 		return mapper.Map<IEnumerable<OrderDetailsModel>>(orderDetails);
 	}
 
-	public async Task<IEnumerable<OrderModel>> GetPaidAndCancelledOrdersAsync()
+	public async Task<IEnumerable<OrderModel>> GetPaidAndCancelledOrdersAsync(OrderHistoryFilter historyFilter)
 	{
 		logger.LogInformation("Getting paid and cancelled orders");
-		var orders = await unitOfWork.OrderRepository.GetAllAsync(o => o.Status == OrderStatus.Paid || o.Status == OrderStatus.Cancelled);
+		var startDate = OrderHistoryFilter.ParseDate(historyFilter.Start) ?? DateTime.MinValue;
+		var endDate = OrderHistoryFilter.ParseDate(historyFilter.End) ?? DateTime.MaxValue;
+		var orders = await unitOfWork.OrderRepository.GetAllAsync(o => (o.Status == OrderStatus.Paid || o.Status == OrderStatus.Cancelled) && o.Date <= endDate && o.Date >= startDate, includeProperties: "OrderDetails");
 		return mapper.Map<IEnumerable<OrderModel>>(orders);
 	}
 
-	public async Task<IEnumerable<OrderDetailsModel>> GetCartAsync()
+	public async Task<IEnumerable<OrderDetailsModel>> GetCartAsync(Guid Id)
 	{
 		logger.LogInformation("Getting open orders");
-		var order = (await unitOfWork.OrderRepository.GetAllAsync(o => o.Status == OrderStatus.Open,includeProperties: "OrderDetails")).SingleOrDefault();
+		var order = (await unitOfWork.OrderRepository.GetAllAsync(o => o.Status == OrderStatus.Open && o.CustomerId == Id, includeProperties: "OrderDetails")).SingleOrDefault();
 		if(order is null)
 		{
 			return [];
@@ -113,7 +116,18 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 		return mapper.Map<IEnumerable<OrderDetailsModel>>(order.OrderDetails);
 	}
 
-	public async Task RemoveFromCartAsync(string key)
+	public async Task<IEnumerable<OrderModel>> GetOpenOrdersAsync()
+	{
+		var orders = await unitOfWork.OrderRepository.GetAllAsync(o => o.Status == OrderStatus.Open, includeProperties: "OrderDetails");
+		if (orders is null)
+		{
+			return [];
+		}
+
+		return mapper.Map<IEnumerable<OrderModel>>(orders);
+	}
+
+	public async Task RemoveFromCartAsync(string key, Guid Id)
 	{
 		logger.LogInformation("Removing from cart with key {Key}", key);
 
@@ -125,7 +139,7 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 			return;
 		}
 
-		var cartOrder = (await unitOfWork.OrderRepository.GetAllAsync(o => o.Status == OrderStatus.Open, includeProperties: "OrderDetails")).SingleOrDefault();
+		var cartOrder = (await unitOfWork.OrderRepository.GetAllAsync(o => o.Status == OrderStatus.Open && o.CustomerId == Id, includeProperties: "OrderDetails")).SingleOrDefault();
 
 		if (cartOrder == null)
 		{

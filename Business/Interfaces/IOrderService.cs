@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Business.Models;
+using Common.Filters;
 using Common.Options;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,17 +14,19 @@ public interface IOrderService
 
 	Task DeleteAsync(object modelId);
 
-	Task AddToCartAsync(string key);
+	Task AddToCartAsync(string key, Guid Id);
 
-	Task RemoveFromCartAsync(string key);
+	Task RemoveFromCartAsync(string key, Guid Id);
 
-	Task<IEnumerable<OrderModel>> GetPaidAndCancelledOrdersAsync();
+	Task<IEnumerable<OrderModel>> GetPaidAndCancelledOrdersAsync(OrderHistoryFilter historyFilter);
 
-	Task<IEnumerable<OrderDetailsModel>> GetCartAsync();
+	Task<IEnumerable<OrderDetailsModel>> GetCartAsync(Guid Id);
 
 	Task<IEnumerable<OrderDetailsModel>>? GetOrderDetailsByIdAsync(object id);
 
 	Task<PaymentOptions> GetPaymentMethodsAsync();
 
 	Task<IActionResult> ProcessPaymentAsync(string method, JsonElement model);
+
+	Task<IEnumerable<OrderModel>> GetOpenOrdersAsync();
 }

@@ -346,9 +346,9 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 
 	}
 
-	public async Task AddToCartAsync(string key)
+	public async Task AddToCartAsync(string key,Guid Id)
 	{
-		await orderService.AddToCartAsync(key);
+		await orderService.AddToCartAsync(key, Id);
 	}
 
 	private async Task<PaginatedGamesModel> MakePaginatedModelAsync(IEnumerable<GameModel> games, GameFilter filter)

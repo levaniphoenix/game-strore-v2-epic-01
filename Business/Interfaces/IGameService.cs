@@ -27,6 +27,6 @@ namespace Business.Interfaces
 
 		Task DeleteByKeyAsync(string key);
 
-		Task AddToCartAsync(string key);
+		Task AddToCartAsync(string key, Guid Id);
 	}
 }

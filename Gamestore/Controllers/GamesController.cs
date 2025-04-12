@@ -4,6 +4,7 @@ using Business.Interfaces;
 using Business.Models;
 using Common.Filters;
 using Common.Options;
+using Gamestore.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Business.Models.CommentModel;
@@ -17,17 +18,37 @@ namespace Gamestore.Controllers;
 [ApiController]
 public class GamesController(IGameService gameService, ICommentService commentService) : ControllerBase
 {
-	[HttpGet]
-	public async Task<ActionResult<PaginatedGamesModel>> Get([FromQuery] GameFilter filter)
+	[AllowAnonymous]
+	[HttpGet("all")]
+	public async Task<ActionResult<IEnumerable<GameDetails>>> GetAll()
 	{
-		var games = await gameService.GetAllWithFilterAsync(filter, false);
+		var userRoles = JwtHelper.GetUserRoles(HttpContext);
+		IEnumerable<GameDetails> games = userRoles.Contains("Admin")
+			? (await gameService.GetAllAsync(true)).Select(x => x.Game)
+			: (await gameService.GetAllAsync(false)).Select(x => x.Game);
 		return Ok(games);
 	}
 
+	[AllowAnonymous]
+	[HttpGet]
+	public async Task<ActionResult<PaginatedGamesModel>> Get([FromQuery] GameFilter filter)
+	{
+		var userRoles = JwtHelper.GetUserRoles(HttpContext);
+		PaginatedGamesModel games = userRoles.Contains("Admin")
+			? await gameService.GetAllWithFilterAsync(filter, true)
+			: await gameService.GetAllWithFilterAsync(filter, false);
+
+		return Ok(games);
+	}
+
+	[AllowAnonymous]
 	[HttpGet("{key}")]
 	public async Task<ActionResult<GameDetails?>> Get(string key)
 	{
-		var game = await gameService.GetByKeyAsync(key, false);
+		var userRoles = JwtHelper.GetUserRoles(HttpContext);
+		var game = userRoles.Contains("Admin")
+			? await gameService.GetByKeyAsync(key, true)
+			: await gameService.GetByKeyAsync(key, false);
 		if (game is null)
 		{
 			return NotFound("could not find the game with the specified key");
@@ -36,6 +57,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok(game.Game);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{key}/genres")]
 	public async Task<ActionResult<IEnumerable<GenreDetails>>> GetGenresByGamekey(string key)
 	{
@@ -50,6 +72,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok(platforms);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{key}/publisher")]
 	public async Task<ActionResult<PublisherDetails>> GetPublisherByGamekey(string key)
 	{
@@ -57,6 +80,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok(publisher.Publisher);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{key}/comments")]
 	public async Task<ActionResult<IEnumerable<CommentDetails>>?> GetCommentsByGameKeyAsync(string key)
 	{
@@ -64,6 +88,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok(comments);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("find/{id}")]
 	public async Task<ActionResult<GameDetails?>> GetById(Guid id)
 	{
@@ -77,10 +102,14 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok(game.Game);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{key}/file")]
 	public async Task<ActionResult> GetFile(string key)
 	{
-		var game = await gameService.GetByKeyAsync(key, false);
+		var userRoles = JwtHelper.GetUserRoles(HttpContext);
+		var game = userRoles.Contains("Admin")
+			? await gameService.GetByKeyAsync(key, true)
+			: await gameService.GetByKeyAsync(key, false);
 		if (game is null)
 		{
 			return NotFound("game was not found");
@@ -94,6 +123,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 	}
 
 	// POST: games/
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpPost]
 	public async Task<ActionResult> Post([FromBody] GameModel game)
 	{
@@ -107,6 +137,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 	}
 
 	// PUT: games/
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpPut]
 	public async Task<ActionResult> Put([FromBody] GameModel game)
 	{
@@ -120,6 +151,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 	}
 
 	// DELETE: games/1
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpDelete("{key}")]
 	public async Task<ActionResult> Delete(string key)
 	{
@@ -127,11 +159,18 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok();
 	}
 
-	[Authorize(Policy = "AdminPolicy")]
+	[Authorize(Policy = "UserPolicy")]
 	[HttpPost("{key}/buy")]
 	public async Task<ActionResult> AddGameToCart(string key)
 	{
-		await gameService.AddToCartAsync(key);
+		var game = await gameService.GetByKeyAsync(key, true);
+		if (game.Game.IsDeleted)
+		{
+			return BadRequest("The game is deleted");
+		}
+
+		var userId = JwtHelper.GetUserId(HttpContext);
+		await gameService.AddToCartAsync(key, userId);
 		return Ok();
 	}
 
@@ -170,10 +209,11 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok();
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpDelete("{key}/comments/{id}")]
 	public async Task<ActionResult> DeleteComment(string key, Guid id)
 	{
-		var game = await gameService.GetByKeyAsync(key, false);
+		var game = await gameService.GetByKeyAsync(key, true);
 
 		if (game is null)
 		{
@@ -191,18 +231,21 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 		return Ok();
 	}
 
+	[AllowAnonymous]
 	[HttpGet("publish-date-options")]
 	public ActionResult<IEnumerable<string>> GetPublishDateOptions()
 	{
 		return Ok(PublishingDateOptions.Values);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("pagination-options")]
 	public ActionResult<IEnumerable<string>> GetPaginationOptions()
 	{
 		return Ok(PaginationPageCountOptions.Values);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("sorting-options")]
 	public ActionResult<IEnumerable<string>> GetSortingOptions()
 	{

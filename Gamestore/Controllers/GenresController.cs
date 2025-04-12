@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces;
 using Business.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Business.Models.GenreModel;
 
@@ -9,12 +10,14 @@ namespace Gamestore.Controllers;
 [ApiController]
 public class GenresController(IGenreService genreService) : ControllerBase
 {
+	[AllowAnonymous]
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<GenreDetails>>> Get()
 	{
 		return Ok((await genreService.GetAllAsync()).Select(g => g.Genre));
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{id}")]
 	public async Task<ActionResult<GenreDetails?>> Get(Guid id)
 	{
@@ -28,12 +31,14 @@ public class GenresController(IGenreService genreService) : ControllerBase
 		return Ok(genre.Genre);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{id}/games")]
 	public async Task<ActionResult<IEnumerable<GameDetails?>>> GetGamesByGenre(Guid id)
 	{
 		return Ok((await genreService.GetGamesByGenreIdAsync(id)).Select(g => g.Game));
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{id}/genres")]
 	public async Task<ActionResult<IEnumerable<GenreDetails?>>> GetGenresByParentId(Guid id)
 	{
@@ -46,6 +51,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 		return Ok(genres.Select(g => g.Genre));
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpPost]
 	public async Task<ActionResult> Post([FromBody] GenreModel genre)
 	{
@@ -58,6 +64,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 		return Created();
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpPut]
 	public async Task<ActionResult> Put([FromBody] GenreModel genre)
 	{
@@ -70,6 +77,7 @@ public class GenresController(IGenreService genreService) : ControllerBase
 		return Ok();
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpDelete("{id}")]
 	public async Task<ActionResult> Delete(Guid id)
 	{

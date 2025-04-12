@@ -1,11 +1,13 @@
 ﻿using Business.Interfaces;
 using Business.Models;
 using Common.Options;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Business.Models.RoleModel;
 
 namespace Gamestore.Controllers;
 
+[Authorize(Policy ="ManagerPolicy")]
 [Route("[controller]")]
 [ApiController]
 public class RolesController(IRoleService roleService) : ControllerBase

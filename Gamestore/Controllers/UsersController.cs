@@ -2,6 +2,7 @@
 using Business.Interfaces;
 using Business.Models.Auth;
 using Gamestore.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.Controllers;
@@ -10,6 +11,7 @@ namespace Gamestore.Controllers;
 [ApiController]
 public class UsersController(IAuthService authService, TokenProvider tokenProvider) : ControllerBase
 {
+	[AllowAnonymous]
 	[HttpPost("login")]
 	public async Task<ActionResult<string>> Login([FromBody] LoginRequestModel loginRequest)
 	{
@@ -25,6 +27,7 @@ public class UsersController(IAuthService authService, TokenProvider tokenProvid
 		}
 	}
 
+	[AllowAnonymous]
 	[HttpPost("access")]
 	public ActionResult Access()
 	{

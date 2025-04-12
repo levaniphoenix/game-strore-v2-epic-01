@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces;
 using Business.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Business.Models.PublisherModel;
 
@@ -9,12 +10,14 @@ namespace Gamestore.Controllers;
 [ApiController]
 public class PublishersController(IPublisherService publisherService) : ControllerBase
 {
+	[AllowAnonymous]
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<PublisherDetails>>> Get()
 	{
 		return Ok((await publisherService.GetAllAsync()).Select(p => p.Publisher));
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{companyName}")]
 	public async Task<ActionResult<PublisherDetails?>> Get(string companyName)
 	{
@@ -27,12 +30,14 @@ public class PublishersController(IPublisherService publisherService) : Controll
 		return Ok(publisher.Publisher);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("{companyName}/games")]
 	public async Task<ActionResult<IEnumerable<PublisherDetails>>> GetGamesByPublisher(string companyName)
 	{
 		return Ok((await publisherService.GetGamesByPublisherNameAsync(companyName)).Select(g => g.Game));
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpPost]
 	public async Task<ActionResult> Post([FromBody] PublisherModel publisher)
 	{
@@ -45,6 +50,7 @@ public class PublishersController(IPublisherService publisherService) : Controll
 		return Ok();
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpPut]
 	public async Task<ActionResult> Put([FromBody] PublisherModel publisher)
 	{
@@ -57,6 +63,7 @@ public class PublishersController(IPublisherService publisherService) : Controll
 		return Ok();
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpDelete("{id}")]
 	public async Task<ActionResult> Delete(Guid id)
 	{

@@ -26,5 +26,7 @@ namespace Business.Models
 
 		[Required]
 		public int Discount { get; set; }
+
+		public bool IsDeleted { get; set; }
 	}
 }

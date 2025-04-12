@@ -10,8 +10,6 @@ using static Business.Models.Northwind.ProductModel;
 using Order = Data.Entities.Order;
 using OrderDetailsModel = Business.Models.OrderDetailsModel;
 using OrderModel = Business.Models.OrderModel;
-using Humanizer;
-using static MongoDB.Driver.WriteConcern;
 
 namespace Business
 {
@@ -28,6 +26,7 @@ namespace Business
 				.ForMember(to => to.Discount, from => from.MapFrom(x => x.Game.Discount))
 				.ForMember(to => to.UnitInStock, from => from.MapFrom(x => x.Game.UnitInStock))
 				.ForMember(to => to.PublisherId, from => from.MapFrom(x => x.PublisherId))
+				.ForMember(to => to.IsDeleted, from => from.MapFrom(x => x.Game.IsDeleted))
 				.ReverseMap();
 
 			CreateMap<GenreModel, Genre>()

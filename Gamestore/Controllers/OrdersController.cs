@@ -1,6 +1,9 @@
 ﻿using Business.Interfaces;
 using Business.Models;
+using Common.Filters;
 using Common.Options;
+using Gamestore.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.Controllers;
@@ -9,27 +12,41 @@ namespace Gamestore.Controllers;
 [ApiController]
 public class OrdersController(IOrderService orderService) : ControllerBase
 {
-	[HttpGet]
-	public async Task<ActionResult<IEnumerable<OrderModel>>> Get()
+	[Authorize(Policy = "ManagerPolicy")]
+	[HttpGet("history")]
+	public async Task<ActionResult<IEnumerable<OrderModel>>> Get([FromQuery]OrderHistoryFilter historyFilter)
 	{
-		var orders = await orderService.GetPaidAndCancelledOrdersAsync();
+		var orders = await orderService.GetPaidAndCancelledOrdersAsync(historyFilter);
 		return Ok(orders);
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
+	[HttpGet]
+	public async Task<ActionResult<IEnumerable<OrderModel>>> Get()
+	{
+		IEnumerable<OrderModel> orders = await orderService.GetOpenOrdersAsync();
+		return Ok(orders);
+	}
+
+	[Authorize(Policy = "UserPolicy")]
 	[HttpGet("cart")]
 	public async Task<ActionResult<IEnumerable<OrderDetailsModel>>> GetCartAsync()
 	{
-		var cart = await orderService.GetCartAsync();
+		var userId = JwtHelper.GetUserId(HttpContext);
+		var cart = await orderService.GetCartAsync(userId);
 		return Ok(cart);
 	}
 
+	[Authorize(Policy = "UserPolicy")]
 	[HttpDelete("cart/{key}")]
 	public async Task<ActionResult> RemoveFromCart(string key)
 	{
-		await orderService.RemoveFromCartAsync(key);
+		var userId = JwtHelper.GetUserId(HttpContext);
+		await orderService.RemoveFromCartAsync(key, userId);
 		return Ok();
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpGet("{id}/details")]
 	public async Task<ActionResult<IEnumerable<OrderDetailsModel>>> GetOrderDetailsByIdAsync(Guid id)
 	{
@@ -42,6 +59,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 		return Ok(orderDetails);
 	}
 
+	[Authorize(Policy = "ManagerPolicy")]
 	[HttpGet("{id}")]
 	public async Task<ActionResult<OrderModel>> GetById(Guid id)
 	{
@@ -54,6 +72,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 		return Ok(order);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("payment-methods")]
 	public async Task<ActionResult<IEnumerable<PaymentOptions>>> GetPaymentMethods()
 	{
@@ -61,6 +80,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 		return Ok(paymentMethods);
 	}
 
+	[Authorize(Policy = "UserPolicy")]
 	[HttpPost("payment")]
 	public async Task<IActionResult> Pay([FromBody] PaymentRequestModel request)
 	{
