@@ -5,13 +5,17 @@ namespace Business.Interfaces
 {
 	public interface IGameService : ICrud<GameModel>
 	{
-		Task<PaginatedGamesModel> GetAllWithFilterAsync(GameFilter filter);
+		Task<GameModel?> GetByIdAsync(object id, bool includeDeleted);
+
+		Task<IEnumerable<GameModel>> GetAllAsync(bool includeDeleted);
+
+		Task<PaginatedGamesModel> GetAllWithFilterAsync(GameFilter filter, bool includeDeleted);
+
+		Task<GameModel?> GetByNameAsync(string gameName, bool includeDeleted);
+
+		Task<GameModel?> GetByKeyAsync(string key, bool includeDeleted);
 
 		string GenerateKey(string gameName);
-
-		Task<GameModel?> GetByNameAsync(string gameName);
-
-		Task<GameModel?> GetByKeyAsync(string key);
 
 		Task<IEnumerable<GenreModel>> GetGenresByGamekey(string key);
 

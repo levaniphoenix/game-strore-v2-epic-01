@@ -71,6 +71,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 		logger.LogInformation("Game with key {GameKey} deleted successfully", key);
 	}
 
+	// get all games irespective of soft delete, call with includeDeleted = false to not get soft deleted entries
 	public async Task<IEnumerable<GameModel>> GetAllAsync()
 	{
 		logger.LogInformation("Fetching all games");
@@ -78,22 +79,87 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 		return mapper.Map<IEnumerable<GameModel>>(games);
 	}
 
-	public async Task<PaginatedGamesModel> GetAllWithFilterAsync(GameFilter filter)
+	public async Task<IEnumerable<GameModel>> GetAllAsync(bool includeDeleted)
+	{
+		if (includeDeleted)
+		{
+			return await GetAllAsync();
+		}
+
+		logger.LogInformation("Fetching all games");
+		var games = await unitOfWork.GameRepository!.GetAllAsync(x => !x.IsDeleted);
+		return mapper.Map<IEnumerable<GameModel>>(games);
+	}
+
+	public async Task<PaginatedGamesModel> GetAllWithFilterAsync(GameFilter filter, bool includeDeleted)
 	{
 		logger.LogInformation("Fetching all games with filter: {Filter}", filter);
-		var games = mapper.Map<IEnumerable<GameModel>>(await unitOfWork.GameRepository!.GetAllWithFilterAsync(filter));
+		var games = mapper.Map<IEnumerable<GameModel>>(await unitOfWork.GameRepository!.GetAllWithFilterAsync(filter, includeDeleted));
 		return await MakePaginatedModelAsync(games, filter);
 	}
 
-	public Task<GameModel?> GetByKeyAsync(string key)
+	public async Task<GameModel?> GetByIdAsync(object id, bool includeDeleted)
+	{
+		if (includeDeleted)
+		{
+			return await GetByIdAsync(id);
+		}
+
+		var game = await unitOfWork.GameRepository!.GetByIDAsync(id, x => !x.IsDeleted);
+
+		if (game == null)
+		{
+			logger.LogWarning("Game with ID {GameId} not found", id);
+			return null;
+		}
+
+		logger.LogInformation("Incrementing the View Count of Game: {GameName}", game.Name);
+		game.Views++;
+		unitOfWork.GameRepository.Update(game);
+		await unitOfWork.SaveAsync();
+		logger.LogInformation("View Count incremented successfully for Game: {GameName}, Views: {Views}", game.Name, game.Views);
+
+		return mapper.Map<GameModel?>(game);
+	}
+
+	// gets a game irespective of soft delete, call with includeDeleted = false to not get soft deleted entries
+	public Task<GameModel?> GetByIdAsync(object id)
+	{
+		ArgumentNullException.ThrowIfNull(id);
+		logger.LogInformation("Fetching game by ID: {GameId}", id);
+
+		async Task<GameModel?> getById()
+		{
+			var game = await unitOfWork.GameRepository!.GetByIDAsync(id);
+
+			if (game == null)
+			{
+				logger.LogWarning("Game with ID {GameId} not found", id);
+				return null;
+			}
+
+			logger.LogInformation("Incrementing the View Count of Game: {GameName}", game.Name);
+			game.Views++;
+			unitOfWork.GameRepository.Update(game);
+			await unitOfWork.SaveAsync();
+			logger.LogInformation("View Count incremented successfully for Game: {GameName}, Views: {Views}", game.Name, game.Views);
+
+			return mapper.Map<GameModel?>(game);
+		}
+
+		return getById();
+	}
+
+	public Task<GameModel?> GetByKeyAsync(string key, bool includeDeleted)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(key);
 		logger.LogInformation("Fetching game by key: {GameKey}", key);
 
 		async Task<GameModel?> getGameByIdAsync()
 		{
-			var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
-
+			Game? game = !includeDeleted
+				? (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key && !g.IsDeleted)).SingleOrDefault()
+				: (await unitOfWork.GameRepository!.GetAllAsync(g => g.Key == key)).SingleOrDefault();
 			if (game == null)
 			{
 				logger.LogWarning("Game with Key {Key} not found", key);
@@ -149,41 +215,16 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GameSer
 		return getPlatforms();
 	}
 
-	public Task<GameModel?> GetByIdAsync(object id)
-	{
-		ArgumentNullException.ThrowIfNull(id);
-		logger.LogInformation("Fetching game by ID: {GameId}", id);
-
-		async Task<GameModel?> getById()
-		{
-			var game = await unitOfWork.GameRepository!.GetByIDAsync(id);
-
-			if (game == null)
-			{
-				logger.LogWarning("Game with ID {GameId} not found", id);
-				return null;
-			}
-
-			logger.LogInformation("Incrementing the View Count of Game: {GameName}", game.Name);
-			game.Views++;
-			unitOfWork.GameRepository.Update(game);
-			await unitOfWork.SaveAsync();
-			logger.LogInformation("View Count incremented successfully for Game: {GameName}, Views: {Views}", game.Name, game.Views);
-
-			return mapper.Map<GameModel?>(game);
-		}
-
-		return getById();
-	}
-
-	public Task<GameModel?> GetByNameAsync(string gameName)
+	public Task<GameModel?> GetByNameAsync(string gameName, bool includeDeleted)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(gameName);
 		logger.LogInformation("Fetching game by name: {GameName}", gameName);
 
 		async Task<GameModel?> GetByName()
 		{
-			var game = (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == gameName)).SingleOrDefault();
+			Game? game = !includeDeleted
+				? (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == gameName && !g.IsDeleted)).SingleOrDefault()
+				: (await unitOfWork.GameRepository!.GetAllAsync(g => g.Name == gameName)).SingleOrDefault();
 			return mapper.Map<GameModel>(game);
 		}
 

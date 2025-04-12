@@ -37,6 +37,8 @@ namespace Data.Entities
 
 		public int Views { get; set; }
 
+		public bool IsDeleted { get; set; }
+
 		public ICollection<Platform> Platforms { get; set; } = [];
 
 		public ICollection<Genre> Genres { get; set; } = [];

@@ -9,9 +9,14 @@ namespace Data.Repositories
 {
 	public class GameRepository(GamestoreDBContext context) : GenericRepository<Game>(context), IGameRepository
 	{
-		public async Task<IEnumerable<Game>> GetAllWithFilterAsync(GameFilter filter)
+		public async Task<IEnumerable<Game>> GetAllWithFilterAsync(GameFilter filter, bool includeDeleted)
 		{
 			var query = Context.Games.AsQueryable();
+
+			if (!includeDeleted)
+			{
+				query = query.Where(g => !g.IsDeleted);
+			}
 
 			if (filter.Genres != null && filter.Genres.Count != 0)
 			{
@@ -91,6 +96,13 @@ namespace Data.Repositories
 			}
 
 			return query.Skip((filter.Page - 1) * pageCount).Take(pageCount);
+		}
+
+		public override void Delete(Game entityToDelete)
+		{
+			entityToDelete.Name += " [Deleted]";
+			entityToDelete.IsDeleted = true;
+			Update(entityToDelete);
 		}
 	}
 }

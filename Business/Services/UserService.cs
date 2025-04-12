@@ -13,6 +13,24 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 {
 	public Dictionary<string, DateTime> BannedUsers { get; set; } = [];
 
+	public async Task AddAsync(UserModel model)
+	{
+		await ValidateUser(model);
+		var user = mapper.Map<User>(model);
+		var role = (await unitOfWork.RoleRepository.GetAllAsync(x => x.Name == "User")).Single();
+		user.Roles = [role];
+		await unitOfWork.UserRepository.AddAsync(user);
+		await unitOfWork.SaveAsync();
+	}
+
+	public async Task UpdateAsync(UserModel model)
+	{
+		await ValidateUser(model);
+		var user = mapper.Map<User>(model);
+		unitOfWork.UserRepository.Update(user);
+		await unitOfWork.SaveAsync();
+	}
+
 	public async Task AddAsync(UserRegistrationModel model)
 	{
 		await ValidateUser(model);
@@ -106,6 +124,16 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 		}
 
 		var existingUser = (await unitOfWork.UserRepository.GetAllAsync(x => x.Email == model.Email)).FirstOrDefault();
+
+		if (existingUser != null)
+		{
+			throw new GameStoreValidationException("User with this email already exists");
+		}
+	}
+
+	private async Task ValidateUser(UserModel model)
+	{
+		var existingUser = (await unitOfWork.UserRepository.GetAllAsync(x => x.Email == model.User.Email && x.Id != model.User.Id)).FirstOrDefault();
 
 		if (existingUser != null)
 		{

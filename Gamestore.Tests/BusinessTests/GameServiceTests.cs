@@ -138,7 +138,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			UnitTestHelper.SetUpMockGameRepository(mockUnitOfWork, DBSeeder.Games);
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger, orderService);
-			var actual = await gameService.GetByKeyAsync(DBSeeder.Games[0].Key);
+			var actual = await gameService.GetByKeyAsync(DBSeeder.Games[0].Key, true);
 			actual.Should().NotBeNull();
 		}
 
@@ -148,7 +148,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			UnitTestHelper.SetUpMockGameRepository(mockUnitOfWork, DBSeeder.Games);
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger, orderService);
-			var act = async () => await gameService.GetByKeyAsync("");
+			var act = async () => await gameService.GetByKeyAsync("",true);
 			await act.Should().ThrowAsync<ArgumentException>();
 		}
 
@@ -216,8 +216,8 @@ namespace Gamestore.Tests.BusinessTests
 		public async Task GameServiceGetByIdAsyncReturnsGame()
 		{
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
-			mockUnitOfWork.Setup(m => m.GameRepository!.GetByIDAsync(It.IsAny<Guid>()))
-				.ReturnsAsync((Guid id) => DBSeeder.Games.SingleOrDefault(g => g.Id == id));
+			mockUnitOfWork.Setup(m => m.GameRepository!.GetByIDAsync(It.IsAny<Guid>(), It.IsAny<Expression<Func<Game, bool>>?>()))
+				.ReturnsAsync((Guid id, Expression<Func<Game, bool>> ? filter) => DBSeeder.Games.SingleOrDefault(g => g.Id == id));
 
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger, orderService);
 			var actual = await gameService.GetByIdAsync(DBSeeder.Games[0].Id);
@@ -237,8 +237,8 @@ namespace Gamestore.Tests.BusinessTests
 		public async Task GameServiceGetByIdAsyncReturnsNullForBadId()
 		{
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
-			mockUnitOfWork.Setup(m => m.GameRepository!.GetByIDAsync(It.IsAny<Guid>()))
-				.ReturnsAsync((Guid id) => DBSeeder.Games.SingleOrDefault(g => g.Id == id));
+			mockUnitOfWork.Setup(m => m.GameRepository!.GetByIDAsync(It.IsAny<Guid>(), It.IsAny<Expression<Func<Game, bool>>?>()))
+				.ReturnsAsync((Guid id, Expression<Func<Game, bool>>? filter) => DBSeeder.Games.SingleOrDefault(g => g.Id == id));
 
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger, orderService);
 			var id = Guid.NewGuid();
@@ -254,7 +254,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mapper = UnitTestHelper.CreateMapperProfile();
 			var gameService = new GameService(mockUnitOfWork.Object, mapper, logger, orderService);
 
-			var actual = await gameService.GetByNameAsync(DBSeeder.Games[0].Name);
+			var actual = await gameService.GetByNameAsync(DBSeeder.Games[0].Name, true);
 			var expected = mapper.Map<GameModel>(DBSeeder.Games[0]);
 
 			actual.Should().BeEquivalentTo(expected);
@@ -266,7 +266,7 @@ namespace Gamestore.Tests.BusinessTests
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 			UnitTestHelper.SetUpMockGameRepository(mockUnitOfWork, DBSeeder.Games);
 			var gameService = new GameService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger, orderService);
-			var act = async () => await gameService.GetByNameAsync("");
+			var act = async () => await gameService.GetByNameAsync("", true);
 			await act.Should().ThrowAsync<ArgumentException>();
 		}
 

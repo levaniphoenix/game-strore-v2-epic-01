@@ -124,7 +124,7 @@ namespace Gamestore.Tests.DataTests
 			await unitOfWork.SaveAsync();
 			//assert
 			var result = await unitOfWork.GameRepository.GetByIDAsync(game.Id);
-			Assert.That(result, Is.Null, message: "DeleteAsync method is inccorect");
+			Assert.That(result.IsDeleted, Is.True, message: "DeleteAsync method is inccorect");
 		}
 
 		[Test]
@@ -138,7 +138,7 @@ namespace Gamestore.Tests.DataTests
 			await unitOfWork.SaveAsync();
 			//assert
 			var result = await unitOfWork.GameRepository.GetByIDAsync(game.Id);
-			Assert.That(result, Is.Null, message: "DeleteByIdAsync method is inccorect");
+			Assert.That(result.IsDeleted, Is.True, message: "DeleteByIdAsync method is inccorect");
 		}
 
 		[Test]

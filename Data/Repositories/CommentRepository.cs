@@ -1,4 +1,5 @@
-﻿using Data.Data;
+﻿using System.Linq.Expressions;
+using Data.Data;
 using Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,11 +7,21 @@ namespace Data.Repositories;
 
 public class CommentRepository(GamestoreDBContext context) : GenericRepository<Comment>(context)
 {
-	public override async Task<Comment?> GetByIDAsync(object id)
+	public override async Task<Comment?> GetByIDAsync(object id, Expression<Func<Comment, bool>>? filter = null)
 	{
-		return await Context.Comments
+		if (filter != null)
+		{
+			return await Context.Comments
+			.Where(filter)
 			.Include(c => c.Replies) // Include replies for hierarchy
 			.FirstOrDefaultAsync(c => c.Id == (Guid)id);
+		}
+		else
+		{
+			return await Context.Comments
+			.Include(c => c.Replies)
+			.FirstOrDefaultAsync(c => c.Id == (Guid)id);
+		}
 	}
 
 	public override void Update(Comment entityToUpdate)

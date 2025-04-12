@@ -23,7 +23,7 @@ public class GamesControllerTests
 	{
 		var mockGameService = new Mock<IGameService>();
 		mockGameService
-			.Setup(s => s.GetAllWithFilterAsync(It.IsAny<GameFilter>()))
+			.Setup(s => s.GetAllWithFilterAsync(It.IsAny<GameFilter>(), It.IsAny<bool>()))
 			.ReturnsAsync(new PaginatedGamesModel() { Games = mapper.Map<IEnumerable<GameModel>>(DBSeeder.Games).Select(x => x.Game)});
 		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
 
@@ -42,8 +42,8 @@ public class GamesControllerTests
 	{
 		var mockGameService = new Mock<IGameService>();
 		mockGameService
-			.Setup(s => s.GetByKeyAsync(It.IsAny<string>()))
-			.ReturnsAsync((string key) => {
+			.Setup(s => s.GetByKeyAsync(It.IsAny<string>(), It.IsAny<bool>()))
+			.ReturnsAsync((string key, bool includeDeleted) => {
 				return mapper.Map<GameModel?>(DBSeeder.Games.SingleOrDefault(g => g.Key == key));
 			});
 		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);
@@ -62,8 +62,8 @@ public class GamesControllerTests
 	{
 		var mockGameService = new Mock<IGameService>();
 		mockGameService
-			.Setup(s => s.GetByKeyAsync(It.IsAny<string>()))
-			.ReturnsAsync((string key) => {
+			.Setup(s => s.GetByKeyAsync(It.IsAny<string>(), It.IsAny<bool>()))
+			.ReturnsAsync((string key, bool includeDeleted) => {
 				return mapper.Map<GameModel?>(DBSeeder.Games.SingleOrDefault(g => g.Key == key));
 			});
 		var gamesController = new GamesController(mockGameService.Object, mockCommentService.Object);

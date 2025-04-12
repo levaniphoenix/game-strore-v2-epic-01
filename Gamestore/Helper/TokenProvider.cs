@@ -25,7 +25,7 @@ public class TokenProvider(IConfiguration configuration)
 
 		foreach (var role in roles)
 		{
-			tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role.Name));
+			tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role.Role.Name));
 		}
 
 		var token = tokenHandler.CreateToken(tokenDescriptor);

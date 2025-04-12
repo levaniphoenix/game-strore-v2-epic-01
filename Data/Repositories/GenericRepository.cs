@@ -45,9 +45,16 @@ namespace Data.Repositories
 			return orderBy != null ? await orderBy(query).ToListAsync() : (IEnumerable<TEntity>)await query.ToListAsync();
 		}
 
-		public virtual async Task<TEntity?> GetByIDAsync(object id)
+		public virtual async Task<TEntity?> GetByIDAsync(object id, Expression<Func<TEntity, bool>>? filter = null)
 		{
-			return await dbSet.FindAsync(id);
+			IQueryable<TEntity> query = dbSet;
+
+			if (filter != null)
+			{
+				query = query.Where(filter);
+			}
+
+			return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id") == id);
 		}
 
 		public virtual async Task AddAsync(TEntity entity)

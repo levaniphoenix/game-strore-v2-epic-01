@@ -20,14 +20,14 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 	[HttpGet]
 	public async Task<ActionResult<PaginatedGamesModel>> Get([FromQuery] GameFilter filter)
 	{
-		var games = await gameService.GetAllWithFilterAsync(filter);
+		var games = await gameService.GetAllWithFilterAsync(filter, false);
 		return Ok(games);
 	}
 
 	[HttpGet("{key}")]
 	public async Task<ActionResult<GameDetails?>> Get(string key)
 	{
-		var game = await gameService.GetByKeyAsync(key);
+		var game = await gameService.GetByKeyAsync(key, false);
 		if (game is null)
 		{
 			return NotFound("could not find the game with the specified key");
@@ -80,7 +80,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 	[HttpGet("{key}/file")]
 	public async Task<ActionResult> GetFile(string key)
 	{
-		var game = await gameService.GetByKeyAsync(key);
+		var game = await gameService.GetByKeyAsync(key, false);
 		if (game is null)
 		{
 			return NotFound("game was not found");
@@ -144,7 +144,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 			return BadRequest(ModelState);
 		}
 
-		var game = await gameService.GetByKeyAsync(key);
+		var game = await gameService.GetByKeyAsync(key, false);
 
 		if (game is null)
 		{
@@ -173,7 +173,7 @@ public class GamesController(IGameService gameService, ICommentService commentSe
 	[HttpDelete("{key}/comments/{id}")]
 	public async Task<ActionResult> DeleteComment(string key, Guid id)
 	{
-		var game = await gameService.GetByKeyAsync(key);
+		var game = await gameService.GetByKeyAsync(key, false);
 
 		if (game is null)
 		{

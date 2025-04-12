@@ -12,7 +12,8 @@ public class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleService
 	public async Task AddAsync(RoleModel model)
 	{
 		await ValidateRole(model);
-		await unitOfWork.RoleRepository.AddAsync(mapper.Map<Role>(model));
+		var role = mapper.Map<Role>(model);
+		await unitOfWork.RoleRepository.AddAsync(role);
 		await unitOfWork.SaveAsync();
 	}
 
@@ -42,7 +43,7 @@ public class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleService
 
 	public async Task ValidateRole(RoleModel model)
 	{
-		var role = (await unitOfWork.RoleRepository.GetAllAsync(x => x.Name == model.Name)).SingleOrDefault();
+		var role = (await unitOfWork.RoleRepository.GetAllAsync(x => x.Name == model.Role.Name && x.Id != model.Role.Id)).SingleOrDefault();
 
 		if (role != null)
 		{

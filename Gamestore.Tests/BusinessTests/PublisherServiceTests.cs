@@ -1,13 +1,12 @@
-﻿using Business.Exceptions;
+﻿using System.Linq.Expressions;
+using Business.Exceptions;
 using Business.Models;
 using Business.Services;
 using Data.Data;
 using Data.Entities;
 using Data.Interfaces;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Validations;
 using Moq;
 using static Business.Models.PublisherModel;
 
@@ -72,8 +71,8 @@ public class PublisherServiceTests
 	public async Task GetByIdAsyncReturnsPublisher()
 	{
 		var mockUnitOfWork = new Mock<IUnitOfWork>();
-		mockUnitOfWork.Setup(m => m.PublisherRepository!.GetByIDAsync(It.IsAny<object>()))
-			.ReturnsAsync((object id) => DBSeeder.Publishers.SingleOrDefault(p => p.Id == (Guid)id));
+		mockUnitOfWork.Setup(m => m.PublisherRepository!.GetByIDAsync(It.IsAny<object>(), It.IsAny<Expression<Func<Publisher, bool>>?>()))
+			.ReturnsAsync((object id, Expression<Func<Publisher, bool>>? filter) => DBSeeder.Publishers.SingleOrDefault(p => p.Id == (Guid)id));
 		var publisherService = new PublisherService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger);
 		var id = DBSeeder.Publishers[0].Id;
 		var publisher = await publisherService.GetByIdAsync(id);
@@ -85,7 +84,7 @@ public class PublisherServiceTests
 	public async Task GetByIdAsyncReturnsNull()
 	{
 		var mockUnitOfWork = new Mock<IUnitOfWork>();
-		mockUnitOfWork.Setup(m => m.PublisherRepository!.GetByIDAsync(It.IsAny<object>()));
+		mockUnitOfWork.Setup(m => m.PublisherRepository!.GetByIDAsync(It.IsAny<object>(), It.IsAny<Expression<Func<Publisher, bool>>?>()));
 		UnitTestHelper.SetUpMockPublisherRepository(mockUnitOfWork, DBSeeder.Publishers);
 		var publisherService = new PublisherService(mockUnitOfWork.Object, UnitTestHelper.CreateMapperProfile(), logger);
 		var id = Guid.Parse("00000000-0000-0000-0000-000000000002");

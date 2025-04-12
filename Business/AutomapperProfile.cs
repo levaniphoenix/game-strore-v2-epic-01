@@ -10,6 +10,8 @@ using static Business.Models.Northwind.ProductModel;
 using Order = Data.Entities.Order;
 using OrderDetailsModel = Business.Models.OrderDetailsModel;
 using OrderModel = Business.Models.OrderModel;
+using Humanizer;
+using static MongoDB.Driver.WriteConcern;
 
 namespace Business
 {
@@ -99,8 +101,15 @@ namespace Business
 				.ForPath(to => to.User.PasswordHash, from => from.MapFrom(x => x.PasswordHash))
 				.ReverseMap();
 
-			CreateMap<Role, RoleModel>().ReverseMap();
+			CreateMap<Role, RoleModel>()
+				.ForPath(to => to.Role.Id, from => from.MapFrom(x => x.Id))
+				.ForPath(to => to.Role.Name, from => from.MapFrom(x => x.Name))
+				.ForMember(to => to.Permissions, from => from.MapFrom(x => x.Description.Split(",", StringSplitOptions.None)));
 
+			CreateMap<RoleModel, Role>()
+				.ForMember(to => to.Id, from => from.MapFrom(x => x.Role.Id))
+				.ForMember(to => to.Name, from => from.MapFrom(x => x.Role.Name))
+				.ForMember(to => to.Description, from => from.MapFrom(x => string.Join(",", x.Permissions.Where(v => v != null))));
 
 
 			//mapping for Northwind

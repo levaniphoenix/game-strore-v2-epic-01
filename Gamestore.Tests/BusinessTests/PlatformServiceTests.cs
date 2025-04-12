@@ -1,4 +1,5 @@
-﻿using Business.Exceptions;
+﻿using System.Linq.Expressions;
+using Business.Exceptions;
 using Business.Models;
 using Business.Services;
 using Data.Data;
@@ -67,8 +68,8 @@ namespace Gamestore.Tests.BusinessTests
 		public async Task PlatformServiceGetByIdAsyncReturnsPlatform()
 		{
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
-			mockUnitOfWork.Setup(m => m.PlatformRepository!.GetByIDAsync(It.IsAny<object>()))
-				.ReturnsAsync((object id) => DBSeeder.Platforms.SingleOrDefault(p => p.Id == (Guid)id));
+			mockUnitOfWork.Setup(m => m.PlatformRepository!.GetByIDAsync(It.IsAny<object>(), It.IsAny<Expression<Func<Platform, bool>>?>()))
+				.ReturnsAsync((object id, Expression<Func<Platform, bool>>? filter) => DBSeeder.Platforms.SingleOrDefault(p => p.Id == (Guid)id));
 
 			var mapper = UnitTestHelper.CreateMapperProfile();
 			var platformService = new PlatformService(mockUnitOfWork.Object, mapper, logger);
@@ -81,8 +82,8 @@ namespace Gamestore.Tests.BusinessTests
 		public async Task PlatformServiceGetByIdAsyncReturnsNull()
 		{
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
-			mockUnitOfWork.Setup(m => m.PlatformRepository!.GetByIDAsync(It.IsAny<object>()))
-				.ReturnsAsync((object id) => DBSeeder.Platforms.SingleOrDefault(p => p.Id == (Guid)id));
+			mockUnitOfWork.Setup(m => m.PlatformRepository!.GetByIDAsync(It.IsAny<object>(), It.IsAny<Expression<Func<Platform, bool>>?>()))
+				.ReturnsAsync((object id, Expression<Func<Platform, bool>>? filter) => DBSeeder.Platforms.SingleOrDefault(p => p.Id == (Guid)id));
 			var mapper = UnitTestHelper.CreateMapperProfile();
 			var platformService = new PlatformService(mockUnitOfWork.Object, mapper, logger);
 			var id = Guid.Parse("00000000-0000-0000-0000-000000000002");

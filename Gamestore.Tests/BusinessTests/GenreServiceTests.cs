@@ -1,4 +1,5 @@
-﻿using Business.Exceptions;
+﻿using System.Linq.Expressions;
+using Business.Exceptions;
 using Business.Models;
 using Business.Services;
 using Data.Data;
@@ -99,8 +100,8 @@ namespace Gamestore.Tests.BusinessTests
 		{
 			var mockUnitOfWork = new Mock<IUnitOfWork>();
 
-			mockUnitOfWork.Setup(m => m.GenreRepository!.GetByIDAsync(It.IsAny<object>()))
-				.ReturnsAsync((object id) => DBSeeder.Genres.SingleOrDefault(g => g.Id == (Guid)id));
+			mockUnitOfWork.Setup(m => m.GenreRepository!.GetByIDAsync(It.IsAny<object>(), It.IsAny<Expression<Func<Genre, bool>>?>()))
+				.ReturnsAsync((object id, Expression<Func<Genre, bool>>? filter) => DBSeeder.Genres.SingleOrDefault(g => g.Id == (Guid)id));
 
 			var mapper = UnitTestHelper.CreateMapperProfile();
 			var genreService = new GenreService(mockUnitOfWork.Object, mapper, logger);

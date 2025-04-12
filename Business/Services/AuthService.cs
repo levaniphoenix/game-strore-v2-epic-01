@@ -5,11 +5,10 @@ using Common.Helpers;
 using Business.Interfaces;
 using Business.Models;
 using Business.Models.Auth;
-using Data.Interfaces;
 
 namespace Business.Services;
 
-public class AuthService(IHttpClientFactory httpClientFactory, IUserService userService, IMapper mapper, IUnitOfWork unitOfWork) : IAuthService
+public class AuthService(IHttpClientFactory httpClientFactory, IUserService userService, IMapper mapper) : IAuthService
 {
 	public async Task<LoginSuccessResponseModel> LoginAsync(LoginRequestModel loginRequest)
 	{
