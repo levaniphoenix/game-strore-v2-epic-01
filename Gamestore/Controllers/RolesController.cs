@@ -63,4 +63,11 @@ public class RolesController(IRoleService roleService) : ControllerBase
 		await roleService.UpdateAsync(role);
 		return NoContent();
 	}
+
+	[HttpDelete("{id}")]
+	public async Task<ActionResult> Delete(Guid id)
+	{
+		await roleService.DeleteAsync(id);
+		return NoContent();
+	}
 }

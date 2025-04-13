@@ -94,7 +94,7 @@ namespace Business
 			CreateMap<User, UserModel>()
 				.ForPath(to => to.User.Id, from => from.MapFrom(x => x.Id))
 				.ForPath(to => to.User.Email, from => from.MapFrom(x => x.Email))
-				.ForPath(to => to.User.FirstName, from => from.MapFrom(x => x.FirstName))
+				.ForPath(to => to.User.Name, from => from.MapFrom(x => x.FirstName))
 				.ForPath(to => to.User.LastName, from => from.MapFrom(x => x.LastName))
 				.ForPath(to => to.User.BannedUntil, from => from.MapFrom(x => x.BannedUntil))
 				.ForPath(to => to.User.IsBanned, from => from.MapFrom(x => x.IsBanned))

@@ -65,7 +65,7 @@ public class AuthService(IHttpClientFactory httpClientFactory, IUserService user
 				throw new GameStoreValidationException("Invalid Password");
 			}
 
-			return new LoginSuccessResponseModel() { Id = user.User.Id ,Email = user.User.Email, FirstName = user.User.FirstName, LastName = user.User.LastName, Roles = roles};
+			return new LoginSuccessResponseModel() { Id = user.User.Id ,Email = user.User.Email, FirstName = user.User.Name, LastName = user.User.LastName, Roles = roles};
 		}
 	}
 }

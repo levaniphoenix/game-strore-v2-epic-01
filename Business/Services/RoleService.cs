@@ -20,6 +20,7 @@ public class RoleService(IUnitOfWork unitOfWork, IMapper mapper) : IRoleService
 	public async Task DeleteAsync(object modelId)
 	{
 		await unitOfWork.RoleRepository.DeleteByIdAsync(modelId);
+		await unitOfWork.SaveAsync();
 	}
 
 	public async Task<IEnumerable<RoleModel>> GetAllAsync()

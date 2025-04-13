@@ -31,6 +31,25 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 		await unitOfWork.SaveAsync();
 	}
 
+	public async Task UpdateAsync(UserDirectAddOrUpdateModel model)
+	{
+		var user = (await unitOfWork.UserRepository.GetAllAsync(x => x.Email == model.User.Name, includeProperties: "Roles")).FirstOrDefault() ?? throw new GameStoreValidationException("User not found");
+		user.FirstName = model.User.Name;
+		user.PasswordHash = PasswordHasher.HashPassword(model.Password);
+
+		if (model.RoleIds != null)
+		{
+			var roles = await unitOfWork.RoleRepository.GetAllAsync(x => model.RoleIds.Contains(x.Id));
+			if (roles.Count() != model.RoleIds.Length)
+			{
+				throw new GameStoreValidationException("Invalid role ids");
+			}
+			user.Roles = roles.ToList();
+		}
+		unitOfWork.UserRepository.Update(user);
+		await unitOfWork.SaveAsync();
+	}
+
 	public async Task AddAsync(UserRegistrationModel model)
 	{
 		await ValidateUser(model);
@@ -43,6 +62,37 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 		user.Roles = [role];
 
 		await unitOfWork.UserRepository.AddAsync(user);
+		await unitOfWork.SaveAsync();
+	}
+
+	public async Task AddAsync(UserDirectAddOrUpdateModel model)
+	{
+		var userRegistrationModel = new UserRegistrationModel
+		{
+			Email = model.User.Name,
+			FirstName = model.User.Name,
+			LastName = model.User.Name,
+			Password = model.Password,
+			ConfirmPassword = model.Password,
+		};
+		await ValidateUser(userRegistrationModel);
+
+		//validate passed in role ids
+		if (model.RoleIds != null)
+		{
+			var roles = await unitOfWork.RoleRepository.GetAllAsync(x => model.RoleIds.Contains(x.Id));
+			if (roles.Count() != model.RoleIds.Length)
+			{
+				throw new GameStoreValidationException("Invalid role ids");
+			}
+		}
+
+		//add user
+		await AddAsync(userRegistrationModel);
+		var user = (await unitOfWork.UserRepository.GetAllAsync(x => x.Email == model.User.Name)).FirstOrDefault() ?? throw new GameStoreValidationException("User not found");
+		var dbRoles = await unitOfWork.RoleRepository.GetAllAsync(x => model.RoleIds!.Contains(x.Id));
+		user.Roles = dbRoles.ToList();
+		unitOfWork.UserRepository.Update(user);
 		await unitOfWork.SaveAsync();
 	}
 
@@ -69,6 +119,16 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 	public async Task<UserModel?> GetByEmailAsync(string email)
 	{
 		var user = (await unitOfWork.UserRepository.GetAllAsync(x => x.Email == email)).FirstOrDefault();
+		if (user == null)
+		{
+			return null;
+		}
+		return mapper.Map<UserModel>(user);
+	}
+
+	public async Task<UserModel?> GetByIdWithRolesAsync(Guid id)
+	{
+		var user = (await unitOfWork.UserRepository.GetAllAsync(x => x.Id == id, includeProperties: "Roles")).FirstOrDefault();
 		if (user == null)
 		{
 			return null;

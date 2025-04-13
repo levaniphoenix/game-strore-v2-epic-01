@@ -9,7 +9,6 @@ using Common.Options;
 using Data.Entities;
 using Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
