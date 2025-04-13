@@ -9,6 +9,7 @@ using Common.Options;
 using Data.Entities;
 using Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -66,7 +67,42 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 		await unitOfWork.OrderDetailsRepository.AddAsync(orderDetail);
 		await unitOfWork.SaveAsync();
 		logger.LogInformation("Product added to cart with id {ProductId}", game.Id);
+	}
 
+	public async Task AddGameToAnyCartAsync(Guid orderId, string key)
+	{
+		logger.LogInformation("Adding game to any cart with key {Key}", key);
+		var game = (await unitOfWork.GameRepository.GetAllAsync(g => g.Key == key)).SingleOrDefault();
+		if (game == null)
+		{
+			logger.LogWarning("Game with key {Key} not found", key);
+			return;
+		}
+		var order = (await unitOfWork.OrderRepository.GetAllAsync(o => o.Id == orderId, includeProperties: "OrderDetails")).SingleOrDefault();
+		if (order == null)
+		{
+			logger.LogWarning("Order with id {OrderId} not found", orderId);
+			return;
+		}
+
+		foreach (var item in order.OrderDetails)
+		{
+			if (item.ProductId == game.Id)
+			{
+				logger.LogInformation("Incrementing quantity of product with id {ProductId}", game.Id);
+				item.Quantity++;
+				unitOfWork.OrderRepository.Update(order);
+				await unitOfWork.SaveAsync();
+				return;
+			}
+		}
+
+		// Add new product to cart
+		logger.LogInformation("Adding new product to cart with id {ProductId}", game.Id);
+		var orderDetail = new OrderGame { OrderId = order.Id, ProductId = game.Id, Quantity = 1, Price = game.Price, Discount = game.Discount };
+		await unitOfWork.OrderDetailsRepository.AddAsync(orderDetail);
+		await unitOfWork.SaveAsync();
+		logger.LogInformation("Game added to cart with id {ProductId}", game.Id);
 	}
 
 	public async Task DeleteAsync(object modelId)
@@ -127,6 +163,19 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 		return mapper.Map<IEnumerable<OrderModel>>(orders);
 	}
 
+	public async Task RemoveOrderDetailAsync(Guid orderId, Guid productId)
+	{
+		logger.LogInformation("Removing order detail with order id {OrderId} and product id {ProductId}", orderId, productId);
+		var orderDetail = await unitOfWork.OrderDetailsRepository.GetByIDAsync(orderId, productId);
+		if (orderDetail == null)
+		{
+			logger.LogWarning("Order detail with order id {OrderId} and product id {ProductId} not found", orderId, productId);
+			return;
+		}
+		await unitOfWork.OrderDetailsRepository.DeleteByIdAsync(orderDetail.OrderId, orderDetail.ProductId);
+		await unitOfWork.SaveAsync();
+	}
+
 	public async Task RemoveFromCartAsync(string key, Guid Id)
 	{
 		logger.LogInformation("Removing from cart with key {Key}", key);
@@ -166,6 +215,19 @@ public class OrderService(IUnitOfWork unitOfWork, IHttpClientFactory httpClientF
 	public Task<PaymentOptions> GetPaymentMethodsAsync()
 	{
 		return Task.FromResult(new PaymentOptions());
+	}
+
+	public async Task UpdateOrderDetailQuantityAsync(Guid orderId, Guid productId, int quantity)
+	{
+		logger.LogInformation("Updating order detail quantity with order id {OrderId} and product id {ProductId}", orderId, productId);
+		var orderDetail = await unitOfWork.OrderDetailsRepository.GetByIDAsync(orderId, productId);
+		if (orderDetail == null)
+		{
+			logger.LogWarning("Order detail with order id {OrderId} and product id {ProductId} not found", orderId, productId);
+		}
+		orderDetail.Quantity = quantity;
+		unitOfWork.OrderDetailsRepository.Update(orderDetail);
+		await unitOfWork.SaveAsync();
 	}
 
 	public async Task<IActionResult> ProcessPaymentAsync(string method, JsonElement model)

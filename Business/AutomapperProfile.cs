@@ -49,7 +49,8 @@ namespace Business
 
 			CreateMap<OrderModel, Order>().ReverseMap();
 
-			CreateMap<OrderDetailsModel, OrderGame>().ReverseMap();
+			CreateMap<OrderDetailsModel, OrderGame>()
+				.ReverseMap();
 
 			CreateMap<CommentDetails, Comment>()
 				.ForMember(to => to.Id, from => from.MapFrom(x => x.Id))

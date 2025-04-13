@@ -18,6 +18,8 @@ public interface IOrderService
 
 	Task RemoveFromCartAsync(string key, Guid Id);
 
+	Task RemoveOrderDetailAsync(Guid orderId, Guid productId);
+
 	Task<IEnumerable<OrderModel>> GetPaidAndCancelledOrdersAsync(OrderHistoryFilter historyFilter);
 
 	Task<IEnumerable<OrderDetailsModel>> GetCartAsync(Guid Id);
@@ -29,4 +31,8 @@ public interface IOrderService
 	Task<IActionResult> ProcessPaymentAsync(string method, JsonElement model);
 
 	Task<IEnumerable<OrderModel>> GetOpenOrdersAsync();
+
+	Task UpdateOrderDetailQuantityAsync(Guid orderId, Guid productId, int quantity);
+	
+	Task AddGameToAnyCartAsync(Guid orderId, string key);
 }

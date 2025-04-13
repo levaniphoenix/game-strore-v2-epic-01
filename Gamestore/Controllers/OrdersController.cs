@@ -1,4 +1,5 @@
-﻿using Business.Interfaces;
+﻿using System.Text.Json;
+using Business.Interfaces;
 using Business.Models;
 using Common.Filters;
 using Common.Options;
@@ -46,6 +47,20 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 		return Ok();
 	}
 
+	[Authorize(Policy = "UserPolicy")]
+	[HttpDelete("details/{compositeKey}")]
+	public async Task<ActionResult> RemoveOrderDetail(string compositeKey)
+	{
+		var keys = compositeKey.Split('&');
+		if (keys.Length != 2 || !Guid.TryParse(keys[0], out var orderId) || !Guid.TryParse(keys[1], out var productId))
+		{
+			return BadRequest("Invalid composite key format.");
+		}
+
+		await orderService.RemoveOrderDetailAsync(orderId, productId);
+		return Ok();
+	}
+
 	[Authorize(Policy = "ManagerPolicy")]
 	[HttpGet("{id}/details")]
 	public async Task<ActionResult<IEnumerable<OrderDetailsModel>>> GetOrderDetailsByIdAsync(Guid id)
@@ -85,5 +100,32 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 	public async Task<IActionResult> Pay([FromBody] PaymentRequestModel request)
 	{
 		return await orderService.ProcessPaymentAsync(request.Method, request.Model);
+	}
+
+	[Authorize(Policy = "ManagerPolicy")]
+	[HttpPost("{OrderId}/details/{key}")]
+	public async Task<IActionResult> AddGameToCart(string key, Guid orderId)
+	{
+		await orderService.AddGameToAnyCartAsync(orderId, key);
+		return Ok();
+	}
+
+	[Authorize(Policy = "ManagerPolicy")]
+	[HttpPatch("details/{compositeKey}/quantity")]
+	public async Task<IActionResult> UpdateOrderDetailQuantity(string compositeKey, [FromBody] Dictionary<string, object> data)
+	{
+		var keys = compositeKey.Split('&');
+		if (keys.Length != 2 || !Guid.TryParse(keys[0], out var orderId) || !Guid.TryParse(keys[1], out var productId))
+		{
+			return BadRequest("Invalid composite key format.");
+		}
+
+		if (!data.TryGetValue("count", out var quantityObj) || quantityObj is not JsonElement quantityElement || !quantityElement.TryGetInt32(out var count))
+		{
+			return BadRequest("Invalid count format.");
+		}
+
+		await orderService.UpdateOrderDetailQuantityAsync(orderId, productId, count);
+		return Ok();
 	}
 }

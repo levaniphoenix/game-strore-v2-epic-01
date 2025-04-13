@@ -1,4 +1,5 @@
 ﻿using Data.Entities;
+using Data.Repositories;
 
 namespace Data.Interfaces
 {
@@ -14,7 +15,7 @@ namespace Data.Interfaces
 
 		IRepository<Order>? OrderRepository { get; }
 
-		IRepository<OrderGame>? OrderDetailsRepository { get; }
+		OrderGameRepository OrderDetailsRepository { get; }
 
 		IRepository<Comment>? CommentRepository { get; }
 

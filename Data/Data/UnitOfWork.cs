@@ -11,7 +11,7 @@ namespace Data.Data
 		private IRepository<Genre>? genreRepository;
 		private IRepository<Publisher>? publisherRepository;
 		private IRepository<Order>? orderRepository;
-		private IRepository<OrderGame>? orderGameRepository;
+		private OrderGameRepository? orderGameRepository;
 		private IRepository<Comment>? commentRepository;
 		private IRepository<User>? userRepository;
 		private IRepository<Role>? roleRepository;
@@ -85,7 +85,7 @@ namespace Data.Data
 			}
 		}
 
-		public IRepository<OrderGame>? OrderDetailsRepository
+		public OrderGameRepository OrderDetailsRepository
 		{
 			get
 			{
