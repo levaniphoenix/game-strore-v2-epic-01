@@ -44,8 +44,8 @@ public class UsersController(IUserService userService) : ControllerBase
 
 		var roleSummaries = user.Roles.Select(x => new
 		{
-			Id = x.Role.Id,
-			Name = x.Role.Name,
+			x.Role.Id,
+			x.Role.Name,
 		});
 		return Ok(roleSummaries);
 	}

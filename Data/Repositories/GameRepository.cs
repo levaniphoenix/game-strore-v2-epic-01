@@ -63,19 +63,8 @@ namespace Data.Repositories
 				query = query.Where(g => g.Name.Contains(filter.Name));
 			}
 
-			if (!string.IsNullOrEmpty(filter.Sort))
-			{
-				query = filter.Sort switch
-				{
-					SortingOptions.PriceAscending => query.OrderBy(g => g.Price),
-					SortingOptions.PriceDescending => query.OrderByDescending(g => g.Price),
-					SortingOptions.MostCommented => query.OrderByDescending(g => g.Comments.Count),
-					SortingOptions.MostPopular => query.OrderByDescending(g => g.Views),
-					SortingOptions.New => query.OrderByDescending(g => g.PublishDate),
-					_ => query
-				};
-			}
-			
+			query = ApplySorting(query, filter);
+
 			query = ApplyPagination(query, filter);
 
 			return await query.ToListAsync();
@@ -96,6 +85,24 @@ namespace Data.Repositories
 			}
 
 			return query.Skip((filter.Page - 1) * pageCount).Take(pageCount);
+		}
+
+		private static IQueryable<Game> ApplySorting(IQueryable<Game> query, GameFilter filter)
+		{
+			if (!string.IsNullOrEmpty(filter.Sort))
+			{
+				query = filter.Sort switch
+				{
+					SortingOptions.PriceAscending => query.OrderBy(g => g.Price),
+					SortingOptions.PriceDescending => query.OrderByDescending(g => g.Price),
+					SortingOptions.MostCommented => query.OrderByDescending(g => g.Comments.Count),
+					SortingOptions.MostPopular => query.OrderByDescending(g => g.Views),
+					SortingOptions.New => query.OrderByDescending(g => g.PublishDate),
+					_ => query
+				};
+			}
+
+			return query;
 		}
 
 		public override void Delete(Game entityToDelete)

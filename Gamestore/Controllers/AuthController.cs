@@ -19,7 +19,7 @@ public class AuthController(IAuthService authService, TokenProvider tokenProvide
 		{
 			var result = await authService.LoginAsync(loginRequest);
 			var token = tokenProvider.GenerateToken(result.Id.ToString(), result.Email, result.Roles);
-			return Ok(new { token = token });
+			return Ok(new { token });
 		}
 		catch (GameStoreValidationException ex)
 		{

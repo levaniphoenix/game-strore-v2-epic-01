@@ -33,7 +33,7 @@ namespace Data.Migrations
             migrationBuilder.InsertData(
                 table: "Orders",
                 columns: new[] { "Id", "CustomerId", "Date", "Status" },
-                values: new object[] { new Guid("89866a29-ebf5-46b0-9e82-91ef26ec0447"), new Guid("00000000-0000-0000-0000-000000000000"), new DateTime(2025, 4, 11, 23, 5, 42, 808, DateTimeKind.Local).AddTicks(1455), 0 });
+                values: new object[] { new Guid("89866a29-ebf5-46b0-9e82-91ef26ec0447"), Guid.Empty, new DateTime(2025, 4, 11, 23, 5, 42, 808, DateTimeKind.Local).AddTicks(1455), 0 });
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -130,7 +130,7 @@ namespace Data.Migrations
             migrationBuilder.InsertData(
                 table: "Orders",
                 columns: new[] { "Id", "CustomerId", "Date", "Status" },
-                values: new object[] { new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"), new Guid("00000000-0000-0000-0000-000000000000"), new DateTime(2025, 4, 11, 15, 38, 50, 362, DateTimeKind.Local).AddTicks(36), 0 });
+                values: new object[] { new Guid("2c779a02-8e67-49e1-919b-03dd6d5f2206"), Guid.Empty, new DateTime(2025, 4, 11, 15, 38, 50, 362, DateTimeKind.Local).AddTicks(36), 0 });
 
             migrationBuilder.InsertData(
                 table: "OrderDetails",
