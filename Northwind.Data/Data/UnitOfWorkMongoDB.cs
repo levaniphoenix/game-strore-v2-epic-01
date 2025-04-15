@@ -27,19 +27,22 @@ public class UnitOfWorkMongoDB : IUnitOfWorkMongoDB
 
 	public IRepository<Territory> Territories { get; }
 
+	public IRepository<EmployeeTerritories> EmployeeTerritories { get; }
+
 	public UnitOfWorkMongoDB(string connectionString, string databaseName)
 	{
 		var mongoClient = new MongoClient(connectionString);
 		var mongoDatabase = mongoClient.GetDatabase(databaseName);
 		Categories = new CategoryRepository(mongoDatabase);
-		Customers = new GenericRepository<Customer>(mongoDatabase,"customers");
-		Employees = new GenericRepository<Employee>(mongoDatabase, "employees");
-		Orders = new GenericRepository<Order>(mongoDatabase, "orders");
-		OrderDetails = new GenericRepository<OrderDetails>(mongoDatabase, "order-details");
-		Products = new GenericRepository<Product>(mongoDatabase, "products");
-		Regions = new GenericRepository<Region>(mongoDatabase, "regions");
-		Shippers = new GenericRepository<Shipper>(mongoDatabase, "shippers");
-		Suppliers = new GenericRepository<Supplier>(mongoDatabase, "suppliers");
-		Territories = new GenericRepository<Territory>(mongoDatabase, "territories");
+		Customers = new CustomerRepository(mongoDatabase);
+		Employees = new EmployeeRepository(mongoDatabase);
+		Orders = new OrderRepository(mongoDatabase);
+		OrderDetails = new OrderDetailsRepository(mongoDatabase);
+		Products = new ProductRepository(mongoDatabase);
+		Regions = new RegionRepository(mongoDatabase);
+		Shippers = new ShipperRepository(mongoDatabase);
+		Suppliers = new SupplierRepository(mongoDatabase);
+		Territories = new TerritoryRepository(mongoDatabase);
+		EmployeeTerritories = new EmployeeTerritoriesRepository(mongoDatabase);
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using Northwind.Data.Entities;
+using Northwind.Data.Repositories;
 
 namespace Northwind.Data.Intefaces;
 
@@ -23,4 +24,6 @@ public interface IUnitOfWorkMongoDB
 	IRepository<Supplier> Suppliers { get; }
 
 	IRepository<Territory> Territories { get; }
+
+	IRepository<EmployeeTerritories> EmployeeTerritories { get; }
 }
